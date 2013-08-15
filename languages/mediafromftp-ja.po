@@ -27,3 +27,11 @@ msgstr "メディアライブラリに登録されていないファイルはあ
 
 msgid "The above file is a file that is not registered in the media library."
 msgstr "上記のファイルは、メディアライブラリに登録されていないファイルです。"
+
+msgid ""
+"You can not register, because there are spaces in the file below. Please try "
+"again with the exception of the spaces. It is a specification for the "
+"standard of the media library."
+msgstr ""
+"下記ファイル内にスペースがあるので登録できません。スペースを除いて、もう一度"
+"やり直してください。これはメディアライブラリの標準の仕様です。"
