@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 1.0
+Version: 1.1
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -124,6 +124,7 @@ function mediafromftp_manage_page() {
 	$servername = 'http://'.$_SERVER['HTTP_HOST'];
 	$files = mediafromftp_scan_file($document_root,$suffix);
 	$count = 0;
+	$unregister_count = 0;
 	foreach ( $files as $file ){
 		$new_url = $servername.str_replace(str_replace($wp_path, '', ABSPATH), '', $file);
 		$new_title = str_replace($suffix, '', end(explode('/', $new_url)));
@@ -137,50 +138,55 @@ function mediafromftp_manage_page() {
 			}
 		}
 		if ($new_file) {
-			++$count;
-			if ( $count == 1 ) {
-				?>
-				<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
-				<tbody>
-				<?
-			}
-			$newfile_post = array(
-				'post_title' => $new_title,
-				'post_content' => '',
-				'guid' => $new_url,
-				'post_status' => 'inherit', 
-				'post_type' => 'attachment',
-				'post_mime_type' => mediafromftp_mime_type($suffix)
-				);
-			if ( $adddb === 'TRUE' ) {
-				$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url);
-				$attach_id = wp_insert_attachment( $newfile_post, $filename );
-				$metadata = NULL;
-				if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
-					if ( preg_match( "/jpg|jpeg|jpe|gif|png/i", $suffix) ){
-						$thumbfile = str_replace($suffix, '-'.get_option('thumbnail_size_w').'x'.get_option('thumbnail_size_h').$suffix, $file);
-						$thumbcraetes[$thumbcount] = array(
-							'file' => $file,
-							'thumbfile' => $thumbfile,
-							'suffix' => $suffix
-							);
-					}
-					$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file( $attach_id ) );
-					wp_update_attachment_metadata( $attach_id, $metadata );
-				} else {
-					wp_update_attachment_metadata( $attach_id, $metadata );
-				}
-				?>
-				<tr><td>
-				<?php echo $new_title.$suffix; ?>
-				</td></tr>
-				<?
+			if ( strpos($file, ' ' ) ) {
+				$unregisters[$unregister_count] = $new_url;
+				++$unregister_count;
 			} else {
-				?>
-				<tr><td>
-				<?php echo $new_url; ?>
-				</td></tr>
-				<?
+				++$count;
+				if ( $count == 1 ) {
+					?>
+					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<tbody>
+					<?
+				}
+				$newfile_post = array(
+					'post_title' => $new_title,
+					'post_content' => '',
+					'guid' => $new_url,
+					'post_status' => 'inherit', 
+					'post_type' => 'attachment',
+					'post_mime_type' => mediafromftp_mime_type($suffix)
+					);
+				if ( $adddb === 'TRUE' ) {
+					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url);
+					$attach_id = wp_insert_attachment( $newfile_post, $filename );
+					$metadata = NULL;
+					if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
+						if ( preg_match( "/jpg|jpeg|jpe|gif|png/i", $suffix) ){
+							$thumbfile = str_replace($suffix, '-'.get_option('thumbnail_size_w').'x'.get_option('thumbnail_size_h').$suffix, $file);
+							$thumbcraetes[$thumbcount] = array(
+								'file' => $file,
+								'thumbfile' => $thumbfile,
+								'suffix' => $suffix
+								);
+						}
+						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file( $attach_id ) );
+						wp_update_attachment_metadata( $attach_id, $metadata );
+					} else {
+						wp_update_attachment_metadata( $attach_id, $metadata );
+					}
+					?>
+					<tr><td>
+					<?php echo $new_title.$suffix; ?>
+					</td></tr>
+					<?
+				} else {
+					?>
+						<tr><td>
+						<?php echo $new_url; ?>
+						</td></tr>
+					<?
+				}
 			}
 		}
 	}
@@ -188,16 +194,6 @@ function mediafromftp_manage_page() {
 	</tbody>
 	</table>
 	<?
-
-	unset($exts, $exts2 ,$args, $files);
-
-	if( !empty($thumbcraetes) ){
-		foreach ( $thumbcraetes as $values ){
-			mediafromftp_thumbcreate_gd( $values['file'], $values['thumbfile'], $values['suffix'] );
-		}
-	}
-
-	unset($thumbcraetes);
 
 	if ( $adddb === 'TRUE' ) {
 		?>
@@ -207,11 +203,13 @@ function mediafromftp_manage_page() {
 		<?
 	} else {
 		if ( $count == 0 ) {
-			?>
-			<p>
-			<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
-			</p>
-			<?
+			if ( $unregister_count == 0 ) {
+				?>
+				<p>
+				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
+				</p>
+				<?
+			}
 		} else {
 			?>
 			<p>
@@ -281,6 +279,37 @@ function mediafromftp_manage_page() {
 		</table>
 		<?
 	}
+
+	if ( !empty($unregisters) ) {
+		?>
+		<p>
+		<?php _e('You can not register, because there are spaces in the file below. Please try again with the exception of the spaces. It is a specification for the standard of the media library.', 'mediafromftp'); ?>
+		</p>
+		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+		<tbody>
+		<?
+		foreach ( $unregisters as $unregister_url ) {
+			?>
+			<tr><td>
+			<?php echo $unregister_url; ?>
+			</td></tr>
+			<?
+		}
+		?>
+		</tbody>
+		</table>
+		<?
+	}
+
+	unset($exts, $exts2 ,$args, $files, $unregisters);
+
+	if( !empty($thumbcraetes) ){
+		foreach ( $thumbcraetes as $values ){
+			mediafromftp_thumbcreate_gd( $values['file'], $values['thumbfile'], $values['suffix'] );
+		}
+	}
+
+	unset($thumbcraetes);
 
 }
 
