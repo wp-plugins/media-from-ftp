@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 1.1
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -14,7 +14,7 @@ Register to media library from files that have been uploaded by FTP.
 
 * Register to media library from files that have been uploaded by FTP.
 * Find the file for each type.
-* This create a thumbnail of the image file. Support ( jpg jpeg jpe gif png )
+* This create a thumbnail of the image file.
 
 Why I made this?
 In the media uploader, you may not be able to upload by the environment of server.
@@ -36,6 +36,9 @@ none
 
 == Changelog ==
 
+= 1.2 =
+Fixed the problem of thumbnail creation.
+
 = 1.1 =
 Specifications to exclude files that contain spaces.
 
@@ -43,6 +46,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 1.2 =
 = 1.1 =
 = 1.0 =
 
