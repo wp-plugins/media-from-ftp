@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 1.1
+Version: 1.2
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -162,14 +162,6 @@ function mediafromftp_manage_page() {
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
 					$metadata = NULL;
 					if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
-						if ( preg_match( "/jpg|jpeg|jpe|gif|png/i", $suffix) ){
-							$thumbfile = str_replace($suffix, '-'.get_option('thumbnail_size_w').'x'.get_option('thumbnail_size_h').$suffix, $file);
-							$thumbcraetes[$thumbcount] = array(
-								'file' => $file,
-								'thumbfile' => $thumbfile,
-								'suffix' => $suffix
-								);
-						}
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file( $attach_id ) );
 						wp_update_attachment_metadata( $attach_id, $metadata );
 					} else {
@@ -301,16 +293,6 @@ function mediafromftp_manage_page() {
 		<?
 	}
 
-	unset($exts, $exts2 ,$args, $files, $unregisters);
-
-	if( !empty($thumbcraetes) ){
-		foreach ( $thumbcraetes as $values ){
-			mediafromftp_thumbcreate_gd( $values['file'], $values['thumbfile'], $values['suffix'] );
-		}
-	}
-
-	unset($thumbcraetes);
-
 }
 
 /* ==================================================
@@ -370,53 +352,6 @@ function mediafromftp_mime_type($suffix){
 	}
 
 	return $mimetype;
-
-}
-
-/* ==================================================
- * @param	string	$file
- * @param	string	$thumbfile
- * @param	string	$suffix
- * @return	none
- * @since	1.0
- */
-function mediafromftp_thumbcreate_gd($file, $thumbfile, $suffix){
-
-	if ( $suffix === '.jpg' || $suffix === '.jpeg' || $suffix === '.jpe') {
-		$image = imagecreatefromjpeg( $file );
-	} else if ( $suffix === '.gif' ) {
-		$image = imagecreatefromgif( $file );
-	} else if ( $suffix === '.png' ) {
-		$image = imagecreatefrompng( $file );
-	}
-
-	$width  = imagesx( $image );
-	$height = imagesy( $image );
-	if ( $width >= $height ) {
-	    $side = $height;
-    	$x = floor( ( $width - $height ) / 2 );
-	    $y = 0;
-    	$width = $side;
-	} else {
-	    $side = $width;
-    	$y = floor( ( $height - $width ) / 2 );
-	    $x = 0;
-    	$height = $side;
-	}
-	$thumbnail_width  = get_option('thumbnail_size_w');
-	$thumbnail_height = get_option('thumbnail_size_h');
-	$thumbnail = imagecreatetruecolor( $thumbnail_width, $thumbnail_height );
-	imagecopyresized( $thumbnail, $image, 0, 0, $x, $y, $thumbnail_width, $thumbnail_height, $width, $height );
-
-	if ( $suffix === '.jpg' || $suffix === '.jpeg' || $suffix === '.jpe') {
-		imagejpeg( $thumbnail, $thumbfile );
-	} else if ( $suffix === '.gif' ) {
-		imagegif( $thumbnail, $thumbfile );
-	} else if ( $suffix === '.png' ) {
-		imagepng( $thumbnail, $thumbfile );
-	}
-
-	imagedestroy ( $image );
 
 }
 
