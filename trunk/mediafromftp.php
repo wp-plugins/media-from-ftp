@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 1.2
+Version: 1.3
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -27,7 +27,6 @@ Domain Path: /languages
 	load_plugin_textdomain('mediafromftp', false, basename( dirname( __FILE__ ) ) . '/languages' );
 	add_filter( 'plugin_action_links', 'mediafromftp_settings_link', 10, 2 );
 	add_action('admin_menu', 'mediafromftp_add_pages');
-	add_shortcode( 'mediafromftp', 'mediafromftp_func' );
 
 function mediafromftp_add_pages() {
 	add_management_page('Media from FTP', 'Media from FTP', 8, 'mediafromftp', 'mediafromftp_manage_page');
@@ -37,6 +36,8 @@ function mediafromftp_add_pages() {
  * Main
  */
 function mediafromftp_manage_page() {
+
+	session_start();
 
 	$adddb = FALSE;
 	$suffix = '.mp4';
@@ -121,9 +122,23 @@ function mediafromftp_manage_page() {
 		);
 	$attachments = get_posts($args);
 
+	foreach ( $attachments as $attachment ){
+		if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
+			$remake_target = wp_get_attachment_metadata( $attachment->ID );
+			if ( empty($remake_target) ) {
+				$remake_file = str_replace($wp_path, '', ABSPATH).$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
+				$remake_tmp_file = str_replace($suffix, '', $remake_file).'tmp'.$suffix;
+				copy($remake_file, $remake_tmp_file);
+				wp_delete_attachment( $attachment->ID );
+				rename($remake_tmp_file, $remake_file );
+			}
+		}
+	}
+
 	$servername = 'http://'.$_SERVER['HTTP_HOST'];
 	$files = mediafromftp_scan_file($document_root,$suffix);
 	$count = 0;
+	$post_attachs = array();
 	$unregister_count = 0;
 	foreach ( $files as $file ){
 		$new_url = $servername.str_replace(str_replace($wp_path, '', ABSPATH), '', $file);
@@ -145,9 +160,44 @@ function mediafromftp_manage_page() {
 				++$count;
 				if ( $count == 1 ) {
 					?>
-					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<table>
 					<tbody>
 					<?
+					if ( $adddb <> 'TRUE' ) {
+						?>
+						<tr>
+						<td>
+						<form method="get" action="<?php echo $scriptname; ?>">
+							<div class="submit">
+								<input type="hidden" name="page" value="mediafromftp">
+								<input type="hidden" name="adddb" value="TRUE">
+								<input type="hidden" name="suffix" value="<?php echo $suffix; ?>">
+								<input type="submit" value="<?php _e('Update Media') ?>" />
+							</div>
+						</form>
+						</td>
+						<?
+					}
+					?>
+					<td>
+					<form method="get" action="<?php echo $scriptname; ?>">
+						<div class="submit">
+							<input type="hidden" name="page" value="mediafromftp">
+							<input type="hidden" name="suffix" value="<?php echo $suffix; ?>">
+							<input type="submit" value="<?php _e('Search') ?>" />
+						</div>
+					</form>
+					</td>
+					</tr>
+					</tbody>
+					</table>
+					<?
+					if ( $adddb <> 'TRUE' ) {
+						?>
+						<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+						<tbody>
+						<?
+					}
 				}
 				$newfile_post = array(
 					'post_title' => $new_title,
@@ -160,18 +210,7 @@ function mediafromftp_manage_page() {
 				if ( $adddb === 'TRUE' ) {
 					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url);
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
-					$metadata = NULL;
-					if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
-						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file( $attach_id ) );
-						wp_update_attachment_metadata( $attach_id, $metadata );
-					} else {
-						wp_update_attachment_metadata( $attach_id, $metadata );
-					}
-					?>
-					<tr><td>
-					<?php echo $new_title.$suffix; ?>
-					</td></tr>
-					<?
+					$post_attachs[$attach_id] = $new_title;
 				} else {
 					?>
 						<tr><td>
@@ -190,29 +229,40 @@ function mediafromftp_manage_page() {
 	if ( $adddb === 'TRUE' ) {
 		?>
 		<p>
+		<?php _e('If the output is interrupted, please press the search button.', 'mediafromftp'); ?>
+		</p>
+		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+		<tbody>
+		<tr>
+		<?
+		foreach ($post_attachs as $post_attach_id => $new_title) {
+			?>
+			<td>File:
+			<?php echo $new_title.$suffix; ?>
+			</td>
+			<td>ID:
+			<?php echo $post_attach_id; ?>
+			</td>
+			<?
+			echo str_pad(" ",4096);
+			ob_end_flush();
+			ob_start('mb_output_handler');
+			if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
+				$metadata = wp_generate_attachment_metadata( $post_attach_id, get_attached_file($post_attach_id) );
+			}
+			wp_update_attachment_metadata( $post_attach_id, $metadata );
+			ob_flush();
+			flush();
+			?>
+			</tr>
+		</tbody>
+		</table>
+		<?
+		}
+		?>
+		<p>
 		<?php _e('The above file was registered to the media library.', 'mediafromftp'); ?>
 		</p>
-		<?
-	} else {
-		if ( $count == 0 ) {
-			if ( $unregister_count == 0 ) {
-				?>
-				<p>
-				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
-				</p>
-				<?
-			}
-		} else {
-			?>
-			<p>
-			<?php _e('The above file is a file that is not registered in the media library.', 'mediafromftp'); ?>
-			</p>
-			<?
-		}
-	}
-
-	if ( $adddb === 'TRUE' ) {
-		?>
 		<table>
 		<tbody>
 		<tr>
@@ -237,35 +287,50 @@ function mediafromftp_manage_page() {
 		</table>
 		<?
 	} else {
-		?>
-		<table>
-		<tbody>
-		<tr>
-		<?
-		if ( $count > 0 ) {
+		if ( $count == 0 ) {
+			if ( $unregister_count == 0 ) {
+				?>
+				<p>
+				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
+				</p>
+				<p>
+				<?php _e('In the case of updating the media, again, please press the search button.', 'mediafromftp'); ?>
+				</p>
+				<table>
+				<tbody>
+				<tr>
+				<?
+			}
+		} else {
 			?>
+			<p>
+			<?php _e('The above file is a file that is not registered in the media library.', 'mediafromftp'); ?>
+			</p>
+			<table>
+			<tbody>
+			<tr>
+			<td>
 			<form method="get" action="<?php echo $scriptname; ?>">
-				<td>
 				<div class="submit">
 					<input type="hidden" name="page" value="mediafromftp">
 					<input type="hidden" name="adddb" value="TRUE">
 					<input type="hidden" name="suffix" value="<?php echo $suffix; ?>">
 					<input type="submit" value="<?php _e('Update Media') ?>" />
 				</div>
-				</td>
 			</form>
+			</td>
 			<?
 		}
 		?>
+		<td>
 		<form method="get" action="<?php echo $scriptname; ?>">
-			<td>
 			<div class="submit">
 				<input type="hidden" name="page" value="mediafromftp">
 				<input type="hidden" name="suffix" value="<?php echo $suffix; ?>">
 				<input type="submit" value="<?php _e('Search') ?>" />
 			</div>
-			</td>
 		</form>
+		</td>
 		</tr>
 		</tbody>
 		</table>
