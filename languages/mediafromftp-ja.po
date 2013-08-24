@@ -35,3 +35,10 @@ msgid ""
 msgstr ""
 "下記ファイル内にスペースがあるので登録できません。スペースを除いて、もう一度"
 "やり直してください。これはメディアライブラリの標準の仕様です。"
+
+msgid "If the output is interrupted, please press the search button."
+msgstr "出力が中断された場合は、検索ボタンを押してください。"
+
+msgid ""
+"In the case of updating the media, again, please press the search button."
+msgstr "メディアを更新中の場合には、再度、検索ボタンを押してください。"
