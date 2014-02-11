@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 1.4
+Version: 1.5
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -53,21 +53,21 @@ function mediafromftp_manage_page() {
 
 	?>
 	<div id="icon-tools" class="icon32"><br /></div><h2>Media from FTP</h2>
-	<h3><? _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
-	<?
+	<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
+	<?php
 	if ( $adddb <> 'TRUE' ) {
 		?>
-		<p><? _e('In the following directory, please upload the file :', 'mediafromftp'); ?> <b><span style="color:red"><?php echo $wp_uploads[url]; ?></span></b></p>
-		<p><? _e('Find the file for each type.', 'mediafromftp'); ?></p>
+		<p><?php _e('In the following directory, please upload the file :', 'mediafromftp'); ?> <b><span style="color:red"><?php echo $wp_uploads[url]; ?></span></b></p>
+		<p><?php _e('Find the file for each type.', 'mediafromftp'); ?></p>
 		<table>
 		<tbody>
 		<tr>
-		<td><? _e('File type:'); ?></td>
+		<td><?php _e('File type:'); ?></td>
 		<td>
 		<form method="get" action="<?php echo $scriptname; ?>">
 		<input type="hidden" name="page" value="mediafromftp">
 		<select name="suffix" onchange="submit(this.form)">
-		<?
+		<?php
 		$exts = array_keys(wp_get_mime_types());
 		foreach ($exts as $ext) {
 			$pos = strpos($ext, '|');
@@ -75,11 +75,11 @@ function mediafromftp_manage_page() {
 				if( $suffix === '.'.$ext ) {
 					?>
 					<option value=".<?php echo $ext; ?>" selected><?php echo $ext; ?></option>
-					<?
+					<?php
 				} else {
 					?>
 					<option value=".<?php echo $ext; ?>"><?php echo $ext; ?></option>
-					<?
+					<?php
 				}
 			} else {
 				$exts2 = explode('|',$ext);
@@ -87,11 +87,11 @@ function mediafromftp_manage_page() {
 					if( $suffix === '.'.$ext2 ) {
 						?>
 						<option value=".<?php echo $ext2; ?>" selected><?php echo $ext2; ?></option>
-						<?
+						<?php
 					} else {
 						?>
 						<option value=".<?php echo $ext2; ?>"><?php echo $ext2; ?></option>
-						<?
+						<?php
 					}
 				}
 			}
@@ -102,14 +102,19 @@ function mediafromftp_manage_page() {
 		</td>
 		</tbody>
 		</table>
-		<?
+		<?php
 	}
 
 	$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
 	$topurl = $wp_uploads_path;
 
 	$wp_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', get_bloginfo('wpurl')).'/';
-	$document_root = str_replace($wp_path, '', ABSPATH).$topurl;
+	$document_root = str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)).$topurl;
+	if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+		$document_root = mb_convert_encoding($document_root, "sjis-win", "auto");
+	} else {
+		$document_root = mb_convert_encoding($document_root, "UTF-8", "auto");
+	}
 
 	$args = array(
 		'post_type' => 'attachment',
@@ -124,7 +129,7 @@ function mediafromftp_manage_page() {
 		if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix) ){
 			$remake_target = wp_get_attachment_metadata( $attachment->ID );
 			if ( empty($remake_target) ) {
-				$remake_file = str_replace($wp_path, '', ABSPATH).$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
+				$remake_file = str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)).$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
 				$remake_tmp_file = str_replace($suffix, '', $remake_file).'tmp'.$suffix;
 				copy($remake_file, $remake_tmp_file);
 				wp_delete_attachment( $attachment->ID );
@@ -139,7 +144,7 @@ function mediafromftp_manage_page() {
 	$post_attachs = array();
 	$unregister_count = 0;
 	foreach ( $files as $file ){
-		$new_url = $servername.str_replace(str_replace($wp_path, '', ABSPATH), '', $file);
+		$new_url = $servername.str_replace(str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)), '', $file);
 		$new_title = str_replace($suffix, '', end(explode('/', $new_url)));
 		$new_file = TRUE;
 		foreach ( $attachments as $attachment ){
@@ -160,7 +165,7 @@ function mediafromftp_manage_page() {
 					?>
 					<table>
 					<tbody>
-					<?
+					<?php
 					if ( $adddb <> 'TRUE' ) {
 						?>
 						<tr>
@@ -174,7 +179,7 @@ function mediafromftp_manage_page() {
 							</div>
 						</form>
 						</td>
-						<?
+						<?php
 					}
 					?>
 					<td>
@@ -189,12 +194,12 @@ function mediafromftp_manage_page() {
 					</tr>
 					</tbody>
 					</table>
-					<?
+					<?php
 					if ( $adddb <> 'TRUE' ) {
 						?>
 						<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 						<tbody>
-						<?
+						<?php
 					}
 				}
 				$newfile_post = array(
@@ -214,7 +219,7 @@ function mediafromftp_manage_page() {
 						<tr><td>
 						<?php echo $new_url; ?>
 						</td></tr>
-					<?
+					<?php
 				}
 			}
 		}
@@ -222,7 +227,7 @@ function mediafromftp_manage_page() {
 	?>
 	</tbody>
 	</table>
-	<?
+	<?php
 
 	if ( $adddb === 'TRUE' ) {
 		?>
@@ -232,7 +237,7 @@ function mediafromftp_manage_page() {
 		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 		<tbody>
 		<tr>
-		<?
+		<?php
 		foreach ($post_attachs as $post_attach_id => $new_title) {
 			?>
 			<td>File:
@@ -241,7 +246,7 @@ function mediafromftp_manage_page() {
 			<td>ID:
 			<?php echo $post_attach_id; ?>
 			</td>
-			<?
+			<?php
 			echo str_pad(" ",4096);
 			ob_end_flush();
 			ob_start('mb_output_handler');
@@ -255,7 +260,7 @@ function mediafromftp_manage_page() {
 			</tr>
 		</tbody>
 		</table>
-		<?
+		<?php
 		}
 		?>
 		<p>
@@ -283,7 +288,7 @@ function mediafromftp_manage_page() {
 		</tr>
 		</tbody>
 		</table>
-		<?
+		<?php
 	} else {
 		if ( $count == 0 ) {
 			if ( $unregister_count == 0 ) {
@@ -297,7 +302,7 @@ function mediafromftp_manage_page() {
 				<table>
 				<tbody>
 				<tr>
-				<?
+				<?php
 			}
 		} else {
 			?>
@@ -317,7 +322,7 @@ function mediafromftp_manage_page() {
 				</div>
 			</form>
 			</td>
-			<?
+			<?php
 		}
 		?>
 		<td>
@@ -332,7 +337,7 @@ function mediafromftp_manage_page() {
 		</tr>
 		</tbody>
 		</table>
-		<?
+		<?php
 	}
 
 	if ( !empty($unregisters) ) {
@@ -342,18 +347,18 @@ function mediafromftp_manage_page() {
 		</p>
 		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 		<tbody>
-		<?
+		<?php
 		foreach ( $unregisters as $unregister_url ) {
 			?>
 			<tr><td>
 			<?php echo $unregister_url; ?>
 			</td></tr>
-			<?
+			<?php
 		}
 		?>
 		</tbody>
 		</table>
-		<?
+		<?php
 	}
 
 }
@@ -388,7 +393,8 @@ function mediafromftp_scan_file($dir,$suffix) {
        	}
    	}
 
-   	foreach(glob($dir.'/*'.$suffix, GLOB_BRACE) as $file) {
+	$pattern = $dir.'/*'.'{'.strtoupper($suffix).','.strtolower($suffix).'}';
+   	foreach(glob($pattern, GLOB_BRACE) as $file) {
 		if (!preg_match("/-[0-9]*x[0-9]*/", $file)) { // thumbnail
 			$list[] = $file;
 		}
