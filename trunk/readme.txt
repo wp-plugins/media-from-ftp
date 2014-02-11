@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 1.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -36,6 +36,11 @@ none
 
 == Changelog ==
 
+= 1.5 =
+Supported Xampp(Microsoft Windows).
+Supported the file extension of the upper case.
+Change /languages.
+
 = 1.4 =
 Delete unnecessary code.
 
@@ -52,6 +57,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 1.5 =
 = 1.4 =
 = 1.3 =
 = 1.2 =
