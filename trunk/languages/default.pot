@@ -9,15 +9,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.6.4\n"
-"Language: ja\n"
 
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr ""
 
 msgid "In the following directory, please upload the file :"
-msgstr ""
-
-msgid "Find the file for each type."
 msgstr ""
 
 msgid "The above file was registered to the media library."
