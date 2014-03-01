@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 1.5
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,6 @@ Register to media library from files that have been uploaded by FTP.
 == Description ==
 
 * Register to media library from files that have been uploaded by FTP.
-* Find the file for each type.
 * This create a thumbnail of the image file.
 
 Why I made this?
@@ -36,6 +35,11 @@ none
 
 == Changelog ==
 
+= 2.0 =
+Can select a file in the check box.
+Change /languages.
+Change readme.txt.
+
 = 1.5 =
 Supported Xampp(Microsoft Windows).
 Supported the file extension of the upper case.
@@ -57,6 +61,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.0 =
 = 1.5 =
 = 1.4 =
 = 1.3 =

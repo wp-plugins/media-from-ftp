@@ -17,9 +17,6 @@ msgstr "FTPでアップロードされたファイルからメディアライブ
 msgid "In the following directory, please upload the file :"
 msgstr "次のディレクトリに、ファイルをアップロードしてください :"
 
-msgid "Find the file for each type."
-msgstr "各タイプのファイルを検索します。"
-
 msgid "The above file was registered to the media library."
 msgstr "上記のファイルは、メディアライブラリに登録されました。"
 
