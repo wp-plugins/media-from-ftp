@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,6 +35,10 @@ none
 
 == Changelog ==
 
+= 2.1 =
+Can the selection of directories to search.
+Change /languages.
+
 = 2.0 =
 Can select a file in the check box.
 Change /languages.
@@ -61,6 +65,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.1 =
 = 2.0 =
 = 1.5 =
 = 1.4 =
