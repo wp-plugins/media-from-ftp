@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 2.0
+Version: 2.1
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -51,17 +51,19 @@ function mediafromftp_manage_page() {
 	<div id="icon-tools" class="icon32"><br /></div><h2>Media from FTP</h2>
 	<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
 	<?php
-	if ( $adddb <> 'TRUE' ) {
-		?>
-		<p><?php _e('In the following directory, please upload the file :', 'mediafromftp'); ?> <b><span style="color:red"><?php echo $wp_uploads[url]; ?></span></b></p>
-		<?php
-	}
 
 	$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
-	$topurl = $wp_uploads_path;
+
+	if (empty($_POST['topurl'])){
+		$topurl = $wp_uploads_path;
+	} else {
+		$topurl = str_replace('http://'.$_SERVER["SERVER_NAME"], '', urldecode($_POST['topurl']));
+	}
 
 	$wp_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', get_bloginfo('wpurl')).'/';
-	$document_root = str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)).$topurl;
+	$server_root = $_SERVER['DOCUMENT_ROOT'];
+	$document_root = $server_root.$topurl;
+	$dir_root = $server_root.$wp_uploads_path;
 
 	$languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 	if( substr($languages[0],0,2) === 'ja' ) {
@@ -78,6 +80,36 @@ function mediafromftp_manage_page() {
 		$document_root = mb_convert_encoding($document_root, "UTF-8", "auto");
 	}
 
+	if ( $adddb <> 'TRUE' ) {
+		?>
+		<p><?php _e('Find the following directories.', 'mediafromftp'); ?></p>
+		<?php
+		$dirs = mediafromftp_scan_dir($dir_root);
+		$linkselectbox = NULL;
+		foreach ($dirs as $linkdir) {
+			$linkdirenc = mb_convert_encoding(str_replace($server_root, "", $linkdir), "UTF-8", "auto");
+			if( $topurl === $linkdirenc ){
+				$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
+			}else{
+				$linkdirs = '<option value="'.urlencode($linkdirenc).'">'.$linkdirenc.'</option>';
+			}
+			$linkselectbox = $linkselectbox.$linkdirs;
+		}
+		if(empty($_POST['topurl'])){
+			$linkdirs = '<option value="" selected>'.$wp_uploads_path.'</option>';
+		}else{
+			$linkdirs = '<option value="">'.$wp_uploads_path.'</option>';
+		}
+		$linkselectbox = $linkselectbox.$linkdirs;
+		?>
+		<form method="post" action="<?php echo $scriptname; ?>">
+		<select name="topurl" onchange="submit(this.form)">
+		<?php echo $linkselectbox; ?>
+		</select>
+		</form>
+		<?php
+	}
+
 	$args = array(
 		'post_type' => 'attachment',
 		'numberposts' => -1,
@@ -91,7 +123,7 @@ function mediafromftp_manage_page() {
 		if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_attach) ){
 			$remake_target = wp_get_attachment_metadata( $attachment->ID );
 			if ( empty($remake_target) ) {
-				$remake_file = str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)).$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
+				$remake_file = $server_root.$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
 				$remake_tmp_file = str_replace($suffix_attach, '', $remake_file).'tmp'.$suffix_attach;
 				copy($remake_file, $remake_tmp_file);
 				wp_delete_attachment( $attachment->ID );
@@ -110,7 +142,7 @@ function mediafromftp_manage_page() {
 			$new_file = FALSE;
 		} else {
 			$suffix_file = '.'.end(explode('.', end(explode('/', $file)))); 
-			$new_url = $servername.str_replace(str_replace($wp_path, '', str_replace("\\", "/", ABSPATH)), '', $file);
+			$new_url = $servername.str_replace($server_root, '', $file);
 			$new_title = str_replace($suffix_file, '', end(explode('/', $new_url)));
 			$new_file = TRUE;
 			foreach ( $attachments as $attachment ){
@@ -133,13 +165,6 @@ function mediafromftp_manage_page() {
 					<table>
 					<tbody>
 					<tr>
-					<td>
-					<form method="post" action="<?php echo $scriptname; ?>">
-						<div class="submit">
-							<input type="submit" value="<?php _e('Search') ?>" />
-						</div>
-					</form>
-					</td>
 					<?php
 					if ( $adddb <> 'TRUE' ) {
 						?>
@@ -183,9 +208,6 @@ function mediafromftp_manage_page() {
 		$new_url_attaches = $_POST["new_url_attaches"];
 		if (!empty($new_url_attaches)) {
 			?>
-			<p>
-			<?php _e('If the output is interrupted, please press the search button.', 'mediafromftp'); ?>
-			</p>
 			<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 			<tbody>
 			<?php
@@ -263,9 +285,6 @@ function mediafromftp_manage_page() {
 				<p>
 				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
 				</p>
-				<p>
-				<?php _e('In the case of updating the media, again, please press the search button.', 'mediafromftp'); ?>
-				</p>
 				<table>
 				<tbody>
 				<tr>
@@ -289,13 +308,6 @@ function mediafromftp_manage_page() {
 			<?php
 		}
 		?>
-		<td>
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<div class="submit">
-				<input type="submit" value="<?php _e('Search') ?>" />
-			</div>
-		</form>
-		</td>
 		</tr>
 		</tbody>
 		</table>
@@ -362,6 +374,29 @@ function mediafromftp_scan_file($dir) {
 	}
 
    	return $list;
+}
+
+/* ==================================================
+ * @param	string	$dir
+ * @return	array	$dirlist
+ * @since	2.1
+ */
+function mediafromftp_scan_dir($dir) {
+
+	$dirlist = $tmp = array();
+    foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
+	    if ($tmp = mediafromftp_scan_dir($child_dir)) {
+   		    $dirlist = array_merge($dirlist, $tmp);
+       	}
+	}
+
+    foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
+		$dirlist[] = $child_dir;
+	}
+
+	arsort($dirlist);
+	return $dirlist;
+
 }
 
 /* ==================================================

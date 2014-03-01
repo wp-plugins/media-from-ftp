@@ -13,7 +13,7 @@ msgstr ""
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr ""
 
-msgid "In the following directory, please upload the file :"
+msgid "Find the following directories."
 msgstr ""
 
 msgid "The above file was registered to the media library."
@@ -29,11 +29,4 @@ msgid ""
 "You can not register, because there are spaces in the file below. Please try "
 "again with the exception of the spaces. It is a specification for the "
 "standard of the media library."
-msgstr ""
-
-msgid "If the output is interrupted, please press the search button."
-msgstr ""
-
-msgid ""
-"In the case of updating the media, again, please press the search button."
 msgstr ""
