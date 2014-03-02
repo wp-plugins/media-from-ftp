@@ -10,7 +10,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 1.6.4\n"
 
+msgid "Search & Register"
+msgstr ""
+
+msgid "Exclude file"
+msgstr ""
+
 msgid "Register to media library from files that have been uploaded by FTP."
+msgstr ""
+
+msgid ""
+"* Attribute of the directory that contains the files you want to "
+"registration should be 777 or 757."
 msgstr ""
 
 msgid "Find the following directories."
@@ -29,4 +40,7 @@ msgid ""
 "You can not register, because there are spaces in the file below. Please try "
 "again with the exception of the spaces. It is a specification for the "
 "standard of the media library."
+msgstr ""
+
+msgid "| Specify separated by. Regular expression is possible."
 msgstr ""

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 2.2
+Version: 2.3
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -25,6 +25,12 @@ Domain Path: /languages
 */
 
 	load_plugin_textdomain('mediafromftp', false, basename( dirname( __FILE__ ) ) . '/languages' );
+
+	require_once( dirname( __FILE__ ) . '/req/MediaFromFtpRegist.php' );
+	$mediafromftpregist = new MediaFromFtpRegist();
+	add_action('admin_init', array($mediafromftpregist, 'register_settings'));
+	unset($mediafromftpregist);
+
 	add_filter( 'plugin_action_links', 'mediafromftp_settings_link', 10, 2 );
 	add_action('admin_menu', 'mediafromftp_add_pages');
 
@@ -37,6 +43,16 @@ function mediafromftp_add_pages() {
  */
 function mediafromftp_manage_page() {
 
+	if ( !current_user_can( 'manage_options' ) )  {
+		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+	}
+
+	$pluginurl = plugins_url($path='',$scheme=null);
+
+	wp_enqueue_style( 'jquery-ui-tabs', $pluginurl.'/media-from-ftp/css/jquery-ui.css' );
+	wp_enqueue_script( 'jquery-ui-tabs' );
+	wp_enqueue_script( 'jquery-ui-tabs-in', $pluginurl.'/media-from-ftp/js/jquery-ui-tabs-in.js' );
+
 	$adddb = FALSE;
 	if (!empty($_POST['adddb'])){
 		$adddb = $_POST['adddb'];
@@ -48,8 +64,22 @@ function mediafromftp_manage_page() {
 	$wp_uploads = wp_upload_dir();
 
 	?>
-	<div id="icon-tools" class="icon32"><br /></div><h2>Media from FTP</h2>
+	<div class="wrap">
+
+	<h2>Media from FTP</h2>
+		<div id="tabs">
+			<ul>
+			<li><a href="#tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
+			<li><a href="#tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
+			<!--
+			<li><a href="#tabs-3">FAQ</a></li>
+			 -->
+			</ul>
+			<div id="tabs-1">
+
 	<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
+	<h3><font color="red"><?php _e('* Attribute of the directory that contains the files you want to registration should be 777 or 757.', 'mediafromftp'); ?></font></h3>
+
 	<?php
 
 	$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
@@ -211,6 +241,12 @@ function mediafromftp_manage_page() {
 			?>
 			<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 			<tbody>
+			<tr>
+			<td>Title</td>
+			<td>attachment_id</td>
+			<td>URL</td>
+			<td>FileName</td>
+			</tr>
 			<?php
 			foreach ( $new_url_attaches as $new_url_attach ){
 				$suffix_attach_file = '.'.end(explode('.', end(explode('/', $new_url_attach)))); 
@@ -228,18 +264,10 @@ function mediafromftp_manage_page() {
 
 				?>
 				<tr>
-				<td>Title:
-				<?php echo $new_attach_title; ?>
-				</td>
-				<td>attachment_id:
-				<?php echo $attach_id; ?>
-				</td>
-				<td>URL:
-				<?php echo $new_url_attach; ?>
-				</td>
-				<td>FileName:
-				<?php echo end(explode('/', $new_url_attach)); ?>
-				</td>
+				<td><?php echo $new_attach_title; ?></td>
+				<td><?php echo $attach_id; ?></td>
+				<td><?php echo $new_url_attach; ?></td>
+				<td><?php echo end(explode('/', $new_url_attach)); ?></td>
 				</tr>
 				<?php
 				echo str_pad(" ",4096);
@@ -341,6 +369,34 @@ function mediafromftp_manage_page() {
 		</table>
 		<?php
 	}
+	?>
+	</div>
+
+	<div id="tabs-2">
+	<div class="wrap">
+		<form method="post" action="options.php">
+			<?php settings_fields('mediafromftp-settings-group'); ?>
+			<h2><?php _e('Exclude file', 'mediafromftp') ?></h2>	
+			<table border="1" bgcolor="#dddddd">
+			<tbody>
+				<tr>
+					<td align="center" valign="middle">
+						<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" cols="120"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
+					</td>
+					<td align="left" valign="middle"><?php _e('| Specify separated by. Regular expression is possible.', 'mediafromftp'); ?></td>
+				</tr>
+			</tbody>
+			</table>
+			<p class="submit">
+				<input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" />
+			</p>
+		</form>
+	</div>
+	</div>
+
+	</div>
+	</div>
+	<?php
 
 }
 
@@ -373,10 +429,11 @@ function mediafromftp_scan_file($dir, $extpattern) {
        	}
    	}
 
+	$excludefile = get_option('mediafromftp_exclude_file');
 	$pattern = $dir.'/*';
    	foreach(glob($pattern, GLOB_BRACE) as $file) {
 		if (!is_dir($file)){
-			if (!preg_match("/-[0-9]*x[0-9]*/", $file)) { // thumbnail
+			if (!preg_match("/".$excludefile."/", $file)) { // thumbnail
 				if (preg_match("/".$extpattern."/", end(explode('.', $file)))) {
 					$list[] = $file;
 				}

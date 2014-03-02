@@ -11,8 +11,21 @@ msgstr ""
 "X-Generator: Poedit 1.6.4\n"
 "Language: ja\n"
 
+msgid "Search & Register"
+msgstr "検索＆登録"
+
+msgid "Exclude file"
+msgstr "除外ファイル"
+
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr "FTPでアップロードされたファイルからメディアライブラリに登録します。"
+
+msgid ""
+"* Attribute of the directory that contains the files you want to "
+"registration should be 777 or 757."
+msgstr ""
+"※　登録するファイルを含むディレクトリの属性は、777または757にする必要がありま"
+"す。"
 
 msgid "Find the following directories."
 msgstr "次のディレクトリを検索します。"
@@ -33,3 +46,6 @@ msgid ""
 msgstr ""
 "下記ファイル内にスペースがあるので登録できません。スペースを除いて、もう一度"
 "やり直してください。これはメディアライブラリの標準の仕様です。"
+
+msgid "| Specify separated by. Regular expression is possible."
+msgstr "| で区切って指定します。正規表現が可能です。"
