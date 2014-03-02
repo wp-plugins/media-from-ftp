@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 2.1
+Version: 2.2
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -133,7 +133,8 @@ function mediafromftp_manage_page() {
 	}
 
 	$servername = 'http://'.$_SERVER['HTTP_HOST'];
-	$files = mediafromftp_scan_file($document_root);
+	$extpattern = mediafromftp_extpattern();
+	$files = mediafromftp_scan_file($document_root, $extpattern);
 	$count = 0;
 	$post_attachs = array();
 	$unregister_count = 0;
@@ -227,11 +228,17 @@ function mediafromftp_manage_page() {
 
 				?>
 				<tr>
-				<td>File:
-				<?php echo $new_attach_title.$suffix_attach_file; ?>
+				<td>Title:
+				<?php echo $new_attach_title; ?>
 				</td>
-				<td>ID:
+				<td>attachment_id:
 				<?php echo $attach_id; ?>
+				</td>
+				<td>URL:
+				<?php echo $new_url_attach; ?>
+				</td>
+				<td>FileName:
+				<?php echo end(explode('/', $new_url_attach)); ?>
 				</td>
 				</tr>
 				<?php
@@ -357,19 +364,23 @@ function mediafromftp_settings_link( $links, $file ) {
  * @return	array	$list
  * @since	1.0
  */
-function mediafromftp_scan_file($dir) {
+function mediafromftp_scan_file($dir, $extpattern) {
 
    	$list = $tmp = array();
    	foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
-       	if ($tmp = mediafromftp_scan_file($child_dir)) {
+       	if ($tmp = mediafromftp_scan_file($child_dir, $extpattern)) {
            	$list = array_merge($list, $tmp);
        	}
    	}
 
 	$pattern = $dir.'/*';
    	foreach(glob($pattern, GLOB_BRACE) as $file) {
-		if (!preg_match("/-[0-9]*x[0-9]*/", $file)) { // thumbnail
-			$list[] = $file;
+		if (!is_dir($file)){
+			if (!preg_match("/-[0-9]*x[0-9]*/", $file)) { // thumbnail
+				if (preg_match("/".$extpattern."/", end(explode('.', $file)))) {
+					$list[] = $file;
+				}
+			}
 		}
 	}
 
@@ -396,6 +407,24 @@ function mediafromftp_scan_dir($dir) {
 
 	arsort($dirlist);
 	return $dirlist;
+
+}
+
+/* ==================================================
+ * @param	none
+ * @return	string	$extpattern
+ * @since	2.2
+ */
+function mediafromftp_extpattern(){
+
+	$mimes = wp_get_mime_types();
+
+	foreach ($mimes as $ext => $mime) {
+		$extpattern .= $ext.'|'.strtoupper($ext).'|';
+	}
+	$extpattern = substr($extpattern, 0, -1);
+
+	return $extpattern;
 
 }
 
