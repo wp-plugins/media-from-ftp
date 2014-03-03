@@ -19,11 +19,6 @@ msgstr ""
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr ""
 
-msgid ""
-"* Attribute of the directory that contains the files you want to "
-"registration should be 777 or 757."
-msgstr ""
-
 msgid "Find the following directories."
 msgstr ""
 
@@ -33,13 +28,21 @@ msgstr ""
 msgid "There is no file that is not registered in the media library."
 msgstr ""
 
-msgid "The above file is a file that is not registered in the media library."
+msgid ""
+"The above file is a file that is not registered in the media library. And "
+"can be registered."
 msgstr ""
 
 msgid ""
-"You can not register, because there are spaces in the file below. Please try "
+"You can not register, because there are spaces in the filename. Please try "
 "again with the exception of the spaces. It is a specification for the "
 "standard of the media library."
+msgstr ""
+
+msgid ""
+"You can not register directory is unwritable, because generates a thumbnail "
+"In the case of image files. Must be writable(757 or 777) of attributes of "
+"the directory that contains the files required for registration."
 msgstr ""
 
 msgid "| Specify separated by. Regular expression is possible."
