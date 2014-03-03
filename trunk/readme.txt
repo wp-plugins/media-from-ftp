@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 2.3
+Stable tag: 2.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -34,6 +34,11 @@ none
 none
 
 == Changelog ==
+
+= 2.4 =
+Adding a message to a file that can not be registered.
+Delete unnecessary code.
+Change /languages.
 
 = 2.3 =
 Add a setting of exclude file.
@@ -72,6 +77,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.4 =
 = 2.3 =
 = 2.2 =
 = 2.1 =

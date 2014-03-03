@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 2.3
+Version: 2.4
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -78,7 +78,6 @@ function mediafromftp_manage_page() {
 			<div id="tabs-1">
 
 	<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
-	<h3><font color="red"><?php _e('* Attribute of the directory that contains the files you want to registration should be 777 or 757.', 'mediafromftp'); ?></font></h3>
 
 	<?php
 
@@ -148,26 +147,13 @@ function mediafromftp_manage_page() {
 		);
 	$attachments = get_posts($args);
 
-	foreach ( $attachments as $attachment ){
-		$suffix_attach = '.'.end(explode('.', end(explode('/', $attachment->guid)))); 
-		if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_attach) ){
-			$remake_target = wp_get_attachment_metadata( $attachment->ID );
-			if ( empty($remake_target) ) {
-				$remake_file = $server_root.$wp_uploads_path.str_replace($wp_uploads['baseurl'], '', $attachment->guid);
-				$remake_tmp_file = str_replace($suffix_attach, '', $remake_file).'tmp'.$suffix_attach;
-				copy($remake_file, $remake_tmp_file);
-				wp_delete_attachment( $attachment->ID );
-				rename($remake_tmp_file, $remake_file );
-			}
-		}
-	}
-
 	$servername = 'http://'.$_SERVER['HTTP_HOST'];
 	$extpattern = mediafromftp_extpattern();
 	$files = mediafromftp_scan_file($document_root, $extpattern);
 	$count = 0;
 	$post_attachs = array();
-	$unregister_count = 0;
+	$unregister_space_count = 0;
+	$unregister_unwritable_count = 0;
 	foreach ( $files as $file ){
 		if ( is_dir($file) ) { // dirctory
 			$new_file = FALSE;
@@ -187,8 +173,11 @@ function mediafromftp_manage_page() {
 		}
 		if ($new_file) {
 			if ( strpos($file, ' ' ) ) {
-				$unregisters[$unregister_count] = $new_url;
-				++$unregister_count;
+				$unregisters_space[$unregister_space_count] = $new_url;
+				++$unregister_space_count;
+			} else if ( !is_writable(dirname($file)) && preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_file) ) {
+				$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
+				++$unregister_unwritable_count;
 			} else {
 				++$count;
 				if ( $count == 1 ) {
@@ -199,8 +188,8 @@ function mediafromftp_manage_page() {
 					<?php
 					if ( $adddb <> 'TRUE' ) {
 						?>
-						<td>
 						<form method="post" action="<?php echo $scriptname; ?>">
+						<td>
 							<div class="submit">
 								<input type="hidden" name="adddb" value="TRUE">
 								<input type="submit" value="<?php _e('Update Media') ?>" />
@@ -315,7 +304,7 @@ function mediafromftp_manage_page() {
 		<?php
 	} else {
 		if ( $count == 0 ) {
-			if ( $unregister_count == 0 ) {
+			if ( $unregister_space_count == 0 && $unregister_unwritable_count == 0 ) {
 				?>
 				<p>
 				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
@@ -328,7 +317,7 @@ function mediafromftp_manage_page() {
 		} else {
 			?>
 			<p>
-			<?php _e('The above file is a file that is not registered in the media library.', 'mediafromftp'); ?>
+			<?php _e('The above file is a file that is not registered in the media library. And can be registered.', 'mediafromftp'); ?>
 			</p>
 			<table>
 			<tbody>
@@ -338,8 +327,8 @@ function mediafromftp_manage_page() {
 					<input type="hidden" name="adddb" value="TRUE">
 					<input type="submit" value="<?php _e('Update Media') ?>" />
 				</div>
-			</form>
 			</td>
+			</form>
 			<?php
 		}
 		?>
@@ -349,26 +338,57 @@ function mediafromftp_manage_page() {
 		<?php
 	}
 
-	if ( !empty($unregisters) ) {
+	if ( !empty($unregisters_space) ) {
 		?>
 		<p>
-		<?php _e('You can not register, because there are spaces in the file below. Please try again with the exception of the spaces. It is a specification for the standard of the media library.', 'mediafromftp'); ?>
-		</p>
 		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 		<tbody>
 		<?php
-		foreach ( $unregisters as $unregister_url ) {
+		foreach ( $unregisters_space as $unregister_space_url ) {
 			?>
-			<tr><td>
-			<?php echo $unregister_url; ?>
-			</td></tr>
+			<tr>
+			<td>
+			<?php echo $unregister_space_url; ?>
+			</td>
+			<td>
+			<?php _e('You can not register, because there are spaces in the filename. Please try again with the exception of the spaces. It is a specification for the standard of the media library.', 'mediafromftp'); ?>
+			</td>
+			</tr>
 			<?php
 		}
 		?>
 		</tbody>
 		</table>
+		</p>
 		<?php
 	}
+
+	if ( !empty($unregisters_unwritable) ) {
+		?>
+		<p>
+		<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+		<tbody>
+		<?php
+		foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
+			?>
+			<tr>
+			<td>
+			<?php echo $unregister_unwritable_url; ?>
+			</td>
+			<td>
+			<?php _e('You can not register directory is unwritable, because generates a thumbnail In the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
+			</td>
+			</tr>
+			<?php
+		}
+		?>
+		</tbody>
+		</table>
+		</p>
+		<?php
+	}
+
+
 	?>
 	</div>
 
