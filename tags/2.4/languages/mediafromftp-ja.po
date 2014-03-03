@@ -1,0 +1,57 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Media from FTP\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: Katsushi Kawamori <dodesyoswift312@gmail.com>\n"
+"Language-Team:  <dodesyoswift312@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.4\n"
+"Language: ja\n"
+
+msgid "Search & Register"
+msgstr "検索＆登録"
+
+msgid "Exclude file"
+msgstr "除外ファイル"
+
+msgid "Register to media library from files that have been uploaded by FTP."
+msgstr "FTPでアップロードされたファイルからメディアライブラリに登録します。"
+
+msgid "Find the following directories."
+msgstr "次のディレクトリを検索します。"
+
+msgid "The above file was registered to the media library."
+msgstr "上記のファイルは、メディアライブラリに登録されました。"
+
+msgid "There is no file that is not registered in the media library."
+msgstr "メディアライブラリに登録されていないファイルはありません。"
+
+msgid ""
+"The above file is a file that is not registered in the media library. And "
+"can be registered."
+msgstr ""
+"上記のファイルは、メディアライブラリに登録されていないファイルです。そして登"
+"録が可能です。"
+
+msgid ""
+"You can not register, because there are spaces in the filename. Please try "
+"again with the exception of the spaces. It is a specification for the "
+"standard of the media library."
+msgstr ""
+"ファイル内にスペースがあるので登録できません。スペースを除いて、もう一度やり"
+"直してください。これはメディアライブラリの標準の仕様です。"
+
+msgid ""
+"You can not register directory is unwritable, because generates a thumbnail "
+"In the case of image files. Must be writable(757 or 777) of attributes of "
+"the directory that contains the files required for registration."
+msgstr ""
+"画像ファイルの場合はサムネイルを生成するため、ディレクトリが書き込み不可では"
+"登録することはできません。登録に必要なファイルを含むディレクトリの属性は、書"
+"き込み可能（757または777）である必要があります。"
+
+msgid "| Specify separated by. Regular expression is possible."
+msgstr "| で区切って指定します。正規表現が可能です。"
