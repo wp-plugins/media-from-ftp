@@ -47,11 +47,14 @@ class MediaFromFtpAdmin {
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
 		}
+		$wp_uploads = wp_upload_dir();
+		$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
+		$topurl = $wp_uploads_path;
+		if (!empty($_POST['topurl'])){
+			$topurl = str_replace('http://'.$_SERVER["SERVER_NAME"], '', urldecode($_POST['topurl']));
+		}
 
 		$scriptname = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH).'?page=mediafromftp';
-
-		$pluginurl = plugins_url($path='',$scheme=null);
-		$wp_uploads = wp_upload_dir();
 
 		?>
 		<div class="wrap">
@@ -70,14 +73,6 @@ class MediaFromFtpAdmin {
 		<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
 
 		<?php
-
-		$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
-
-		if (empty($_POST['topurl'])){
-			$topurl = $wp_uploads_path;
-		} else {
-			$topurl = str_replace('http://'.$_SERVER["SERVER_NAME"], '', urldecode($_POST['topurl']));
-		}
 
 		$wp_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', get_bloginfo('wpurl')).'/';
 		$server_root = $_SERVER['DOCUMENT_ROOT'];
@@ -100,9 +95,6 @@ class MediaFromFtpAdmin {
 		}
 
 		if ( $adddb <> 'TRUE' ) {
-			?>
-			<p><?php _e('Find the following directories.', 'mediafromftp'); ?></p>
-			<?php
 			$dirs = $mediafromftp->scan_dir($dir_root);
 			$linkselectbox = NULL;
 			foreach ($dirs as $linkdir) {
@@ -114,7 +106,7 @@ class MediaFromFtpAdmin {
 				}
 				$linkselectbox = $linkselectbox.$linkdirs;
 			}
-			if(empty($_POST['topurl'])){
+			if( empty($_POST['topurl']) || $topurl ===  $wp_uploads_path ){
 				$linkdirs = '<option value="" selected>'.$wp_uploads_path.'</option>';
 			}else{
 				$linkdirs = '<option value="">'.$wp_uploads_path.'</option>';
@@ -122,9 +114,25 @@ class MediaFromFtpAdmin {
 			$linkselectbox = $linkselectbox.$linkdirs;
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
-			<select name="topurl" onchange="submit(this.form)">
-			<?php echo $linkselectbox; ?>
-			</select>
+				<table>
+				<tbody>
+					<tr>
+					<td>
+					<?php _e('Find the following directories.', 'mediafromftp'); ?>
+					</td>
+					<td>
+						<select name="topurl">
+						<?php echo $linkselectbox; ?>
+						</select>
+					</td>
+					<td>
+						<div class="submit">
+							<input type="submit" value="<?php _e('Search'); ?>" />
+						</div>
+					</td>
+					</tr>
+				</tbody>
+				</table>
 			</form>
 			<?php
 		}
@@ -179,12 +187,13 @@ class MediaFromFtpAdmin {
 						if ( $adddb <> 'TRUE' ) {
 							?>
 							<form method="post" action="<?php echo $scriptname; ?>">
-							<td>
-								<div class="submit">
-									<input type="hidden" name="adddb" value="TRUE">
-									<input type="submit" value="<?php _e('Update Media') ?>" />
-								</div>
-							</td>
+								<td>
+									<div class="submit">
+										<input type="hidden" name="adddb" value="TRUE">
+										<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+										<input type="submit" value="<?php _e('Update Media'); ?>" />
+									</div>
+								</td>
 							<?php
 						}
 						?>
@@ -273,22 +282,23 @@ class MediaFromFtpAdmin {
 			?>
 			<table>
 			<tbody>
-			<tr>
-			<td>
-			<form method="post" action="<?php echo $scriptname; ?>">
-				<div class="submit">
-					<input type="submit" value="<?php _e('Back') ?>" />
-				</div>
-			</form>
-			</td>
-			<td>
-			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-				<div class="submit">
-					<input type="submit" value="<?php _e('Media Library') ?>" />
-				</div>
-			</form>
-			</td>
-			</tr>
+				<tr>
+				<td>
+					<form method="post" action="<?php echo $scriptname; ?>">
+						<div class="submit">
+							<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+							<input type="submit" value="<?php _e('Back'); ?>" />
+						</div>
+					</form>
+				</td>
+				<td>
+					<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
+						<div class="submit">
+							<input type="submit" value="<?php _e('Media Library'); ?>" />
+						</div>
+					</form>
+				</td>
+				</tr>
 			</tbody>
 			</table>
 			<?php
@@ -302,23 +312,25 @@ class MediaFromFtpAdmin {
 			} else {
 				if ( $count > 0 ) {
 					?>
-					<p>
+					<br>
+					<div>
 					<?php _e('The above file is a file that is not registered in the media library. And can be registered.', 'mediafromftp'); ?>
-					</p>
+					</div>
 					<?php
 				}
 				?>
 				<table>
 				<tbody>
-				<tr>
-				<td>
-					<div class="submit">
-						<input type="hidden" name="adddb" value="TRUE">
-						<input type="submit" value="<?php _e('Update Media') ?>" />
-					</div>
-				</td>
-				</form>
-				</tr>
+					<tr>
+						<td>
+							<div class="submit">
+								<input type="hidden" name="adddb" value="TRUE">
+								<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+								<input type="submit" value="<?php _e('Update Media'); ?>" />
+							</div>
+						</td>
+					</form>
+					</tr>
 				</tbody>
 				</table>
 				<?php
@@ -380,7 +392,7 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 			<form method="post" action="options.php">
 				<?php settings_fields('mediafromftp-settings-group'); ?>
-				<h2><?php _e('Exclude file', 'mediafromftp') ?></h2>	
+				<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>	
 				<table border="1" bgcolor="#dddddd">
 				<tbody>
 					<tr>
@@ -392,7 +404,7 @@ class MediaFromFtpAdmin {
 				</tbody>
 				</table>
 				<p class="submit">
-					<input type="submit" name="Submit" value="<?php _e('Save Changes') ?>" />
+					<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 				</p>
 			</form>
 		</div>
