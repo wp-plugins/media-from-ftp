@@ -152,10 +152,12 @@ class MediaFromFtpAdmin {
 		$post_attachs = array();
 		$unregister_space_count = 0;
 		$unregister_unwritable_count = 0;
+		$unregister_multibyte_file_count = 0;
 		foreach ( $files as $file ){
 			if ( is_dir($file) ) { // dirctory
 				$new_file = FALSE;
 			} else {
+				$file = mb_convert_encoding($file, "UTF-8", "auto");
 				$suffix_file = '.'.end(explode('.', end(explode('/', $file)))); 
 				$new_url = $servername.str_replace($server_root, '', $file);
 				$new_title = str_replace($suffix_file, '', end(explode('/', $new_url)));
@@ -176,6 +178,9 @@ class MediaFromFtpAdmin {
 				} else if ( !is_writable(dirname($file)) && preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_file) ) {
 					$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
 					++$unregister_unwritable_count;
+				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
+					$unregisters_multibyte_file[$unregister_multibyte_file_count] = $new_url;
+					++$unregister_multibyte_file_count;
 				} else {
 					++$count;
 					if ( $count == 1 ) {
@@ -239,6 +244,31 @@ class MediaFromFtpAdmin {
 				foreach ( $new_url_attaches as $new_url_attach ){
 					$suffix_attach_file = '.'.end(explode('.', end(explode('/', $new_url_attach)))); 
 					$new_attach_title = str_replace($suffix_attach_file, '', end(explode('/', $new_url_attach)));
+					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
+					if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
+						if ( strpos( $filename ,'/' ) === FALSE ) {
+							$currentdir = '';
+							$currentfile = str_replace($suffix_attach_file, '', $filename);
+						} else {
+							$currentfile = end(explode('/', $filename));
+							$currentdir = str_replace($currentfile, '', $filename);
+							$currentfile = str_replace($suffix_attach_file, '', $currentfile);
+						}
+						if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+							$currentdir = mb_convert_encoding($currentdir, "sjis-win", "auto");
+							$currentfile = mb_convert_encoding($currentfile, "sjis-win", "auto");
+						} else {
+							$currentdir = mb_convert_encoding($currentdir, "UTF-8", "auto");
+							$currentfile = mb_convert_encoding($currentfile, "UTF-8", "auto");
+						}
+						$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
+						$filename = $currentdir.md5($currentfile).$suffix_attach_file;
+						$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
+						copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
+						unlink( $dir_root.'/'.$oldfilename );
+						$filename = mb_convert_encoding($filename, "UTF-8", "auto");
+						$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
+					}
 					$newfile_post = array(
 						'post_title' => $new_attach_title,
 						'post_content' => '',
@@ -247,7 +277,6 @@ class MediaFromFtpAdmin {
 						'post_type' => 'attachment',
 						'post_mime_type' => $mediafromftp->mime_type($suffix_attach_file)
 						);
-					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
 
 					?>
@@ -303,7 +332,7 @@ class MediaFromFtpAdmin {
 			</table>
 			<?php
 		} else {
-			if ( $count == 0 && $unregister_space_count == 0 && $unregister_unwritable_count == 0 ) {
+			if ( $count == 0 && $unregister_space_count == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
 				?>
 				<p>
 				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
@@ -371,7 +400,31 @@ class MediaFromFtpAdmin {
 						<?php echo $unregister_unwritable_url; ?>
 						</td>
 						<td>
-						<?php _e('You can not register directory is unwritable, because generates a thumbnail In the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
+						<?php _e('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
+						</td>
+						</tr>
+						<?php
+					}
+					?>
+					</tbody>
+					</table>
+					</p>
+					<?php
+				}
+				if ( !empty($unregisters_multibyte_file) ) {
+					?>
+					<p>
+					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<tbody>
+					<?php
+					foreach ( $unregisters_multibyte_file as $unregister_multibyte_file_url ) {
+						?>
+						<tr>
+						<td>
+						<?php echo $unregister_multibyte_file_url; ?>
+						</td>
+						<td>
+						<?php _e('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
 						</td>
 						</tr>
 						<?php
