@@ -40,9 +40,16 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You can not register directory is unwritable, because generates a thumbnail "
-"In the case of image files. Must be writable(757 or 777) of attributes of "
+"Can not register to directory for unwritable, because generating a thumbnail "
+"in the case of image files. Must be writable(757 or 777) of attributes of "
 "the directory that contains the files required for registration."
+msgstr ""
+
+msgid ""
+"Can not register to directory for unwritable, because to delete the previous "
+"file by converting in MD5 format from multi-byte file names. Must be "
+"writable(757 or 777) of attributes of the directory that contains the files "
+"required for registration."
 msgstr ""
 
 msgid "| Specify separated by. Regular expression is possible."
