@@ -31,12 +31,12 @@ none
 
 == Screenshots ==
 
-`screenshot-1.png`
-`screenshot-2.png`
-`screenshot-3.png`
-`screenshot-4.png`
-`screenshot-5.png`
-`screenshot-6.png`
+`/assets/screenshot-1.png`
+`/assets/screenshot-2.png`
+`/assets/screenshot-3.png`
+`/assets/screenshot-4.png`
+`/assets/screenshot-5.png`
+`/assets/screenshot-6.png`
 
 
 == Changelog ==
