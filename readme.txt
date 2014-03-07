@@ -1,10 +1,10 @@
 === Media from FTP ===
 Contributors: Katsushi Kawamori
 Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
-Tags: media,upload
+Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 2.9
+Stable tag: 2.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,13 +38,18 @@ none
 5. `/assets/screenshot-5.png`
 6. `/assets/screenshot-6.png`
 
+
 == Changelog ==
+
+= 2.10 =
+Change readme.txt.
 
 = 2.9 =
 Add screenshot.
+Change readme.txt.
 
 = 2.7 =
-Supported multi-byte-directories and multi-byte-files.
+Supported multi-byte-directoryname and multi-byte-filename.
 Change /languages.
 
 = 2.6 =
@@ -95,6 +100,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.10 =
 = 2.9 =
 = 2.7 =
 = 2.6 =
