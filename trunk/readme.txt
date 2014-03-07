@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: media,upload
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 2.7
+Stable tag: 2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,9 +31,18 @@ none
 
 == Screenshots ==
 
-none
+`/assets/screenshot-1.png`
+`/assets/screenshot-2.png`
+`/assets/screenshot-3.png`
+`/assets/screenshot-4.png`
+`/assets/screenshot-5.png`
+`/assets/screenshot-6.png`
+
 
 == Changelog ==
+
+= 2.8 =
+Add screenshot.
 
 = 2.7 =
 Supported multi-byte-directories and multi-byte-files.
@@ -87,6 +96,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.8 =
 = 2.7 =
 = 2.6 =
 = 2.5 =
