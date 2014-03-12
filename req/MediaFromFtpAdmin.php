@@ -42,6 +42,7 @@ class MediaFromFtpAdmin {
 		wp_enqueue_style( 'jquery-ui-tabs', $pluginurl.'/media-from-ftp/css/jquery-ui.css' );
 		wp_enqueue_script( 'jquery-ui-tabs' );
 		wp_enqueue_script( 'jquery-ui-tabs-in', $pluginurl.'/media-from-ftp/js/jquery-ui-tabs-in.js' );
+		wp_enqueue_script( 'jquery-check-selectall-in', $pluginurl.'/media-from-ftp/js/jquery-check-selectall-in.js' );
 
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
@@ -175,7 +176,7 @@ class MediaFromFtpAdmin {
 				if ( strpos($file, ' ' ) ) {
 					$unregisters_space[$unregister_space_count] = $new_url;
 					++$unregister_space_count;
-				} else if ( !is_writable(dirname($file)) && preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_file) ) {
+				} else if ( !is_writable(dirname($file)) && wp_ext2type(end(explode('.', $suffix_file))) === 'image' ) {
 					$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
 					++$unregister_unwritable_count;
 				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
@@ -208,6 +209,13 @@ class MediaFromFtpAdmin {
 						<?php
 						if ( $adddb <> 'TRUE' ) {
 							?>
+							<table cellspacing="0" cellpadding="6">
+							<tbody>
+							<tr><td>
+							<input type="checkbox" id="group_media-from-ftp" class="checkAll"><?php _e('Select all'); ?>
+							</td></tr>
+							</tbody>
+							</table>
 							<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
 							<tbody>
 							<?php
@@ -216,7 +224,7 @@ class MediaFromFtpAdmin {
 					if ( $adddb <> 'TRUE' ) {
 						?>
 							<tr><td>
-							 <input name="new_url_attaches[]" type="checkbox" value="<?php echo $new_url; ?>"><?php echo $new_url; ?>
+							 <input name="new_url_attaches[]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp"><?php echo $new_url; ?>
 							</td></tr>
 						<?php
 					}
@@ -291,7 +299,7 @@ class MediaFromFtpAdmin {
 					ob_end_flush();
 					ob_start('mb_output_handler');
 
-					if ( preg_match( "/jpg|jpeg|jpe|gif|png|bmp|tif|tiff|ico/i", $suffix_attach_file) ){
+					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
 					}
 					wp_update_attachment_metadata( $attach_id, $metadata );
