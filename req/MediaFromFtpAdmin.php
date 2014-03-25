@@ -301,6 +301,10 @@ class MediaFromFtpAdmin {
 
 					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
+					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'video' ){
+						$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
+					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'audio' ){
+						$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
 					}
 					wp_update_attachment_metadata( $attach_id, $metadata );
 
