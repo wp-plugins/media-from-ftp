@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 3.4
-Stable tag: 2.12
+Stable tag: 2.13
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,6 +40,10 @@ none
 
 
 == Changelog ==
+
+= 2.13 =
+Add setting for directory of uploading files.
+Change /languages.
 
 = 2.12 =
 Add generate metadata for video / audio.

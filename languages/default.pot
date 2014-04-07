@@ -54,3 +54,12 @@ msgstr ""
 
 msgid "| Specify separated by. Regular expression is possible."
 msgstr ""
+
+msgid ""
+"If you change the settings, you must be re-register the file to the media "
+"library."
+msgstr ""
+
+msgid ""
+"When you want to restore the original settings of the above, please be blank."
+msgstr ""
