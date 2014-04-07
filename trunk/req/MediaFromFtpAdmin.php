@@ -1,4 +1,23 @@
 <?php
+/**
+ * Media from FTP
+ * 
+ * @package    Media from FTP
+ * @subpackage MediafromFTPAdmin Main & Management screen
+/*  Copyright (c) 2013- Katsushi Kawamori (email : dodesyoswift312@gmail.com)
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; version 2 of the License.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 class MediaFromFtpAdmin {
 
@@ -44,6 +63,9 @@ class MediaFromFtpAdmin {
 		wp_enqueue_script( 'jquery-ui-tabs-in', $pluginurl.'/media-from-ftp/js/jquery-ui-tabs-in.js' );
 		wp_enqueue_script( 'jquery-check-selectall-in', $pluginurl.'/media-from-ftp/js/jquery-check-selectall-in.js' );
 
+		update_option( 'upload_path', $_POST['upload_path'] );
+		update_option( 'upload_url_path', $_POST['upload_url_path'] );
+
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
@@ -65,8 +87,9 @@ class MediaFromFtpAdmin {
 				<ul>
 				<li><a href="#tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
 				<li><a href="#tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
+				<li><a href="#tabs-3"><?php _e('Uploading Files'); ?></a></li>
 				<!--
-				<li><a href="#tabs-3">FAQ</a></li>
+				<li><a href="#tabs-4">FAQ</a></li>
 				 -->
 				</ul>
 				<div id="tabs-1">
@@ -455,23 +478,42 @@ class MediaFromFtpAdmin {
 
 		<div id="tabs-2">
 		<div class="wrap">
-			<form method="post" action="options.php">
-				<?php settings_fields('mediafromftp-settings-group'); ?>
-				<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>	
-				<table border="1" bgcolor="#dddddd">
-				<tbody>
-					<tr>
-						<td align="center" valign="middle">
-							<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" cols="120"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
-						</td>
-						<td align="left" valign="middle"><?php _e('| Specify separated by. Regular expression is possible.', 'mediafromftp'); ?></td>
-					</tr>
-				</tbody>
-				</table>
-				<p class="submit">
-					<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
-				</p>
-			</form>
+		<form method="post" action="options.php">
+		<?php settings_fields('mediafromftp-settings-group'); ?>
+			<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>
+			<p><?php _e('| Specify separated by. Regular expression is possible.', 'mediafromftp'); ?></p>
+				<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" cols="40"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
+			<p class="submit">
+				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+			</p>
+		</form>
+		</div>
+		</div>
+
+		<div id="tabs-3">
+		<div class="wrap">
+		<form method="post" action="<?php echo $scriptname; ?>">
+			<h2><?php _e('Uploading Files'); ?></h2>
+			<table>
+			<tbody>
+				<tr>
+					<td align="right" valign="middle"><?php _e('Store uploads in this folder'); ?></td>
+					<td valign="middle"><input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr(get_option('upload_path')); ?>" /></td>
+					<td align="left" valign="middle"><?php _e('Default is <code>wp-content/uploads</code>'); ?></td>
+				</tr>
+				<tr>
+					<td align="right" valign="middle"><?php _e('Full URL path to files'); ?></td>
+					<td valign="middle"><input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option('upload_url_path')); ?>" /></td>
+					<td align="left" valign="middle"><?php _e('Configuring this is optional. By default, it should be blank.'); ?></td>
+				</tr>
+			</tbody>
+			</table>
+			<p><font color="red"><?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?></font></p>
+			<p><font color="red"><?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?></font></p>
+			<p class="submit">
+				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+			</p>
+		</form>
 		</div>
 		</div>
 

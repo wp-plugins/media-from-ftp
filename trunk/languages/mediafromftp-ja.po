@@ -66,3 +66,14 @@ msgstr ""
 
 msgid "| Specify separated by. Regular expression is possible."
 msgstr "| で区切って指定します。正規表現が可能です。"
+
+msgid ""
+"If you change the settings, you must be re-register the file to the media "
+"library."
+msgstr ""
+"設定を変更する場合は、メディアライブラリにファイルを再登録する必要がありま"
+"す。"
+
+msgid ""
+"When you want to restore the original settings of the above, please be blank."
+msgstr "上記の設定を元に戻したいときには、空白にしてください。"
