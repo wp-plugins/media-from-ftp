@@ -181,19 +181,19 @@ class MediaFromFtpAdmin {
 			if ( is_dir($file) ) { // dirctory
 				$new_file = FALSE;
 			} else {
-				$file = mb_convert_encoding($file, "UTF-8", "auto");
 				$suffix_file = '.'.end(explode('.', end(explode('/', $file)))); 
 				$new_url = $servername.str_replace($server_root, '', $file);
 				$new_title = str_replace($suffix_file, '', end(explode('/', $new_url)));
+				$new_title_md5 = md5($new_title);
+				$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
 				$new_file = TRUE;
 				foreach ( $attachments as $attachment ){
-					$attach_file = end(explode('/', $attachment->guid));
-					$attach_title = str_replace('.'.end(explode('.', $attach_file)), '', $attach_file);
-					$attach_file_md5 = md5($attach_title).'.'.end(explode('.', $attach_file));
-					if ( $attach_file === $new_title.$suffix_file || $attach_file_md5 === $new_title.$suffix_file) {
+					$attach_url = $attachment->guid;
+					if ( $attach_url === $new_url || $attach_url === $new_url_md5 ) {
 						$new_file = FALSE;
 					}
 				}
+				$new_url = mb_convert_encoding($new_url, "UTF-8", "auto");
 			}
 			if ($new_file) {
 				if ( strpos($file, ' ' ) ) {
