@@ -232,14 +232,14 @@ class MediaFromFtpAdmin {
 						<?php
 						if ( $adddb <> 'TRUE' ) {
 							?>
-							<table cellspacing="0" cellpadding="6">
+							<table class="wp-list-table widefat">
 							<tbody>
 							<tr><td>
 							<input type="checkbox" id="group_media-from-ftp" class="checkAll"><?php _e('Select all'); ?>
 							</td></tr>
 							</tbody>
 							</table>
-							<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+							<table class="wp-list-table widefat" border="1">
 							<tbody>
 							<?php
 						}
@@ -263,15 +263,34 @@ class MediaFromFtpAdmin {
 			$new_url_attaches = $_POST["new_url_attaches"];
 			if (!empty($new_url_attaches)) {
 				?>
-				<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+				<table>
 				<tbody>
 				<tr>
-				<td>Title</td>
-				<td>attachment_id</td>
-				<td>URL</td>
-				<td>FileName</td>
+				<td>
+					<form method="post" action="<?php echo $scriptname; ?>">
+						<div class="submit">
+							<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+							<input type="submit" value="<?php _e('Back'); ?>" />
+							<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
+						</div>
+					</form>
+				</td>
+				</tr>
+				</tbody>
+				</table>
+				<table class="wp-list-table widefat" border="1">
+				<tbody>
+				<tr>
+				<td><?php _e('Thumbnail'); ?></td>
+				<td><?php _e('Media File'); ?></td>
+				<td><?php _e('Metadata'); ?></td>
 				</tr>
 				<?php
+
+				echo str_pad(' ',4096)."\n";
+				ob_end_flush();
+				ob_start('mb_output_handler');
+
 				foreach ( $new_url_attaches as $new_url_attach ){
 					$suffix_attach_file = '.'.end(explode('.', end(explode('/', $new_url_attach)))); 
 					$new_attach_title = str_replace($suffix_attach_file, '', end(explode('/', $new_url_attach)));
@@ -310,30 +329,77 @@ class MediaFromFtpAdmin {
 						);
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
 
-					?>
-					<tr>
-					<td><?php echo $new_attach_title; ?></td>
-					<td><?php echo $attach_id; ?></td>
-					<td><?php echo $new_url_attach; ?></td>
-					<td><?php echo end(explode('/', $new_url_attach)); ?></td>
-					</tr>
-					<?php
-					echo str_pad(" ",4096);
-					ob_end_flush();
-					ob_start('mb_output_handler');
-
 					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
+						wp_update_attachment_metadata( $attach_id, $metadata );
 					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'video' ){
 						$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
+						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
+						$length = $metadata['length_formatted'];
+						wp_update_attachment_metadata( $attach_id, $metadata );
 					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'audio' ){
 						$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
+						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
+						$length = $metadata['length_formatted'];
+						wp_update_attachment_metadata( $attach_id, $metadata );
+					} else {
+						$metadata = NULL;
 					}
-					wp_update_attachment_metadata( $attach_id, $metadata );
 
+					$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
+					$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
+					$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
+					$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
+
+					$stamptime = get_the_time( 'Y/n/j ', $attach_id ).get_the_time( 'G:i', $attach_id );
+					if ( isset( $metadata['filesize'] ) ) {
+						$file_size = $metadata['filesize'];
+					} else {
+						$file_size = filesize( get_attached_file($attach_id) );
+						$filetype = strtoupper(end(explode('.', $suffix_attach_file)));
+					}
+
+					$output_html = NULL;
+					$output_html .= '<tr>';
+					$output_html .= '<td><img width="50" height="50" src="'.$image_attr_thumbnail[0].'"></td>';
+					$output_html .= '<td>';
+					$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
+					$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
+					$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
+					$output_html .= '<div>'.__('File name:').' '.end(explode('/', $new_url_attach)).'</div>';
+					$output_html .= '</td>';
+
+					$output_html .= '<td>';
+					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ) {
+						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+						$output_html .= '<div>'.__('Thumbnail size').': <a href="'.$image_attr_thumbnail[0].'" target="_blank">'.$image_attr_thumbnail[1].'x'.$image_attr_thumbnail[2].'</a></div>';
+						$output_html .= '<div>'.__('Medium size').': <a href="'.$image_attr_medium[0].'" target="_blank">'.$image_attr_medium[1].'x'.$image_attr_medium[2].'</a></div>';
+						$output_html .= '<div>'.__('Large size').': <a href="'.$image_attr_large[0].'" target="_blank">'.$image_attr_large[1].'x'.$image_attr_large[2].'</a></div>';
+					} else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'video' ) {
+						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+						$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+					} else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'audio' ) {
+						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+						$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+					} else {
+						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+						$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+					}
+
+					$output_html .= '</td>';
+					$output_html .= '</tr>';
+
+					echo $output_html;
 					ob_flush();
 					flush();
+
 				}
+				ob_end_clean();
 				?>
 				</tbody>
 				</table>
@@ -401,7 +467,7 @@ class MediaFromFtpAdmin {
 				if ( !empty($unregisters_space) ) {
 					?>
 					<p>
-					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<table class="wp-list-table widefat" border="1">
 					<tbody>
 					<?php
 					foreach ( $unregisters_space as $unregister_space_url ) {
@@ -425,7 +491,7 @@ class MediaFromFtpAdmin {
 				if ( !empty($unregisters_unwritable) ) {
 					?>
 					<p>
-					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<table class="wp-list-table widefat" border="1">
 					<tbody>
 					<?php
 					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
@@ -449,7 +515,7 @@ class MediaFromFtpAdmin {
 				if ( !empty($unregisters_multibyte_file) ) {
 					?>
 					<p>
-					<table border="1" bordercolor="red" cellspacing="0" cellpadding="5">
+					<table class="wp-list-table widefat" border="1">
 					<tbody>
 					<?php
 					foreach ( $unregisters_multibyte_file as $unregister_multibyte_file_url ) {
@@ -521,6 +587,10 @@ class MediaFromFtpAdmin {
 		</div>
 		<?php
 
+	}
+
+	function modify_attachment_link($markup) {
+	    return preg_replace('/^<a([^>]+)>(.*)$/', '<a\\1 target="_blank">\\2', $markup);
 	}
 
 }

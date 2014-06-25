@@ -63,3 +63,8 @@ msgstr ""
 msgid ""
 "When you want to restore the original settings of the above, please be blank."
 msgstr ""
+
+msgid ""
+"Please try again pressing Back button, if the processing is stopped on the "
+"way."
+msgstr ""
