@@ -44,7 +44,9 @@ class MediaFromFtp {
 	   	foreach(glob($pattern, GLOB_BRACE) as $file) {
 			if (!is_dir($file)){
 				if (!preg_match("/".$excludefile."/", $file)) {
-					if (preg_match("/".$extpattern."/", end(explode('.', $file)))) {
+					$exts = explode('.', $file);
+					$ext = end($exts);
+					if (preg_match("/".$extpattern."/", $ext)) {
 						$list[] = $file;
 					}
 				}
@@ -86,6 +88,7 @@ class MediaFromFtp {
 
 		$mimes = wp_get_mime_types();
 
+		$extpattern = NULL;
 		foreach ($mimes as $ext => $mime) {
 			$extpattern .= $ext.'|'.strtoupper($ext).'|';
 		}

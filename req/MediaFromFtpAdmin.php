@@ -41,7 +41,7 @@ class MediaFromFtpAdmin {
 	 * @since	1.0
 	 */
 	function add_pages() {
-		add_management_page('Media from FTP', 'Media from FTP', 8, 'mediafromftp', array($this, 'manage_page'));
+		add_management_page('Media from FTP', 'Media from FTP', 'manage_options', 'mediafromftp', array($this, 'manage_page'));
 	}
 
 	/* ==================================================
@@ -53,18 +53,23 @@ class MediaFromFtpAdmin {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
-		$mediafromftp = new MediaFromFtp();
-
 		$pluginurl = plugins_url($path='',$scheme=null);
 
 		wp_enqueue_style( 'jquery-ui-tabs', $pluginurl.'/media-from-ftp/css/jquery-ui.css' );
+		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-tabs' );
 		wp_enqueue_script( 'jquery-ui-tabs-in', $pluginurl.'/media-from-ftp/js/jquery-ui-tabs-in.js' );
 		wp_enqueue_script( 'jquery-check-selectall-in', $pluginurl.'/media-from-ftp/js/jquery-check-selectall-in.js' );
 
-		update_option( 'upload_path', $_POST['upload_path'] );
-		update_option( 'upload_url_path', $_POST['upload_url_path'] );
+		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
+		$mediafromftp = new MediaFromFtp();
+
+		if ( !empty($_POST['upload_path']) ) {
+			update_option( 'upload_path', $_POST['upload_path'] );
+		}
+		if ( !empty($_POST['upload_url_path']) ) {
+			update_option( 'upload_url_path', $_POST['upload_url_path'] );
+		}
 
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
@@ -163,9 +168,7 @@ class MediaFromFtpAdmin {
 
 		$args = array(
 			'post_type' => 'attachment',
-			'numberposts' => -1,
-			'post_status' => null,
-			'post_parent' => $post->ID
+			'numberposts' => -1
 			);
 		$attachments = get_posts($args);
 
@@ -181,9 +184,14 @@ class MediaFromFtpAdmin {
 			if ( is_dir($file) ) { // dirctory
 				$new_file = FALSE;
 			} else {
-				$suffix_file = '.'.end(explode('.', end(explode('/', $file)))); 
+				$suffix_filenames = explode('/', $file);
+				$suffix_filename = end($suffix_filenames);
+				$exts = explode('.', $suffix_filename);
+				$ext = end($exts);
+				$suffix_file = '.'.$ext;
 				$new_url = $servername.str_replace($server_root, '', $file);
-				$new_title = str_replace($suffix_file, '', end(explode('/', $new_url)));
+				$new_titles = explode('/', $new_url);
+				$new_title = str_replace($suffix_file, '', end($new_titles));
 				$new_title_md5 = md5($new_title);
 				$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
 				$new_file = TRUE;
@@ -199,7 +207,7 @@ class MediaFromFtpAdmin {
 				if ( strpos($file, ' ' ) ) {
 					$unregisters_space[$unregister_space_count] = $new_url;
 					++$unregister_space_count;
-				} else if ( !is_writable(dirname($file)) && wp_ext2type(end(explode('.', $suffix_file))) === 'image' ) {
+				} else if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
 					$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
 					++$unregister_unwritable_count;
 				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
@@ -292,15 +300,21 @@ class MediaFromFtpAdmin {
 				ob_start('mb_output_handler');
 
 				foreach ( $new_url_attaches as $new_url_attach ){
-					$suffix_attach_file = '.'.end(explode('.', end(explode('/', $new_url_attach)))); 
-					$new_attach_title = str_replace($suffix_attach_file, '', end(explode('/', $new_url_attach)));
+					$suffix_attach_filenames = explode('/', $new_url_attach);
+					$suffix_attach_filename = end($suffix_attach_filenames);
+					$suffix_attach_files = explode('.', $suffix_attach_filename);
+					$ext = end($suffix_attach_files);
+					$suffix_attach_file = '.'.$ext;
+					$new_attach_titlenames = explode('/', $new_url_attach);
+					$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
 					if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
 						if ( strpos( $filename ,'/' ) === FALSE ) {
 							$currentdir = '';
 							$currentfile = str_replace($suffix_attach_file, '', $filename);
 						} else {
-							$currentfile = end(explode('/', $filename));
+							$currentfiles = explode('/', $filename);
+							$currentfile = end($currentfiles);
 							$currentdir = str_replace($currentfile, '', $filename);
 							$currentfile = str_replace($suffix_attach_file, '', $currentfile);
 						}
@@ -329,15 +343,15 @@ class MediaFromFtpAdmin {
 						);
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
 
-					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ){
+					if ( wp_ext2type($ext) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
 						wp_update_attachment_metadata( $attach_id, $metadata );
-					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'video' ){
+					}else if ( wp_ext2type($ext) === 'video' ){
 						$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
 						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
 						$length = $metadata['length_formatted'];
 						wp_update_attachment_metadata( $attach_id, $metadata );
-					}else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'audio' ){
+					}else if ( wp_ext2type($ext) === 'audio' ){
 						$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
 						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
 						$length = $metadata['length_formatted'];
@@ -356,7 +370,7 @@ class MediaFromFtpAdmin {
 						$file_size = $metadata['filesize'];
 					} else {
 						$file_size = filesize( get_attached_file($attach_id) );
-						$filetype = strtoupper(end(explode('.', $suffix_attach_file)));
+						$filetype = strtoupper($ext);
 					}
 
 					$output_html = NULL;
@@ -366,21 +380,22 @@ class MediaFromFtpAdmin {
 					$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
 					$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
 					$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
-					$output_html .= '<div>'.__('File name:').' '.end(explode('/', $new_url_attach)).'</div>';
+					$new_url_attachs = explode('/', $new_url_attach);
+					$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
 					$output_html .= '</td>';
 
 					$output_html .= '<td>';
-					if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'image' ) {
+					if ( wp_ext2type($ext) === 'image' ) {
 						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 						$output_html .= '<div>'.__('Thumbnail size').': <a href="'.$image_attr_thumbnail[0].'" target="_blank">'.$image_attr_thumbnail[1].'x'.$image_attr_thumbnail[2].'</a></div>';
 						$output_html .= '<div>'.__('Medium size').': <a href="'.$image_attr_medium[0].'" target="_blank">'.$image_attr_medium[1].'x'.$image_attr_medium[2].'</a></div>';
 						$output_html .= '<div>'.__('Large size').': <a href="'.$image_attr_large[0].'" target="_blank">'.$image_attr_large[1].'x'.$image_attr_large[2].'</a></div>';
-					} else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'video' ) {
+					} else if ( wp_ext2type($ext) === 'video' ) {
 						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
 						$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
-					} else if ( wp_ext2type(end(explode('.', $suffix_attach_file))) === 'audio' ) {
+					} else if ( wp_ext2type($ext) === 'audio' ) {
 						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
