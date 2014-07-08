@@ -34,12 +34,6 @@ msgid ""
 msgstr ""
 
 msgid ""
-"You can not register, because there are spaces in the filename. Please try "
-"again with the exception of the spaces. It is a specification for the "
-"standard of the media library."
-msgstr ""
-
-msgid ""
 "Can not register to directory for unwritable, because generating a thumbnail "
 "in the case of image files. Must be writable(757 or 777) of attributes of "
 "the directory that contains the files required for registration."

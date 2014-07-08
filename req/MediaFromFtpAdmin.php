@@ -177,7 +177,6 @@ class MediaFromFtpAdmin {
 		$files = $mediafromftp->scan_file($document_root, $extpattern);
 		$count = 0;
 		$post_attachs = array();
-		$unregister_space_count = 0;
 		$unregister_unwritable_count = 0;
 		$unregister_multibyte_file_count = 0;
 		foreach ( $files as $file ){
@@ -204,10 +203,7 @@ class MediaFromFtpAdmin {
 				$new_url = mb_convert_encoding($new_url, "UTF-8", "auto");
 			}
 			if ($new_file) {
-				if ( strpos($file, ' ' ) ) {
-					$unregisters_space[$unregister_space_count] = $new_url;
-					++$unregister_space_count;
-				} else if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
+				if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
 					$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
 					++$unregister_unwritable_count;
 				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
@@ -308,6 +304,13 @@ class MediaFromFtpAdmin {
 					$new_attach_titlenames = explode('/', $new_url_attach);
 					$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
+					if ( strpos($filename, ' ' ) ) {
+						$oldfilename = $filename;
+						$filename = str_replace(' ', '-', $oldfilename);
+						$new_url_attach = str_replace(' ', '-', $new_url_attach);
+						copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
+						unlink( $dir_root.'/'.$oldfilename );
+					}
 					if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
 						if ( strpos( $filename ,'/' ) === FALSE ) {
 							$currentdir = '';
@@ -346,6 +349,9 @@ class MediaFromFtpAdmin {
 					if ( wp_ext2type($ext) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
 						wp_update_attachment_metadata( $attach_id, $metadata );
+						$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
+						$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
+						$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
 					}else if ( wp_ext2type($ext) === 'video' ){
 						$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
 						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
@@ -361,9 +367,6 @@ class MediaFromFtpAdmin {
 					}
 
 					$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
-					$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
-					$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
-					$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
 
 					$stamptime = get_the_time( 'Y/n/j ', $attach_id ).get_the_time( 'G:i', $attach_id );
 					if ( isset( $metadata['filesize'] ) ) {
@@ -448,7 +451,7 @@ class MediaFromFtpAdmin {
 			</table>
 			<?php
 		} else {
-			if ( $count == 0 && $unregister_space_count == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
+			if ( $count == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
 				?>
 				<p>
 				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
@@ -479,30 +482,6 @@ class MediaFromFtpAdmin {
 				</tbody>
 				</table>
 				<?php
-				if ( !empty($unregisters_space) ) {
-					?>
-					<p>
-					<table class="wp-list-table widefat" border="1">
-					<tbody>
-					<?php
-					foreach ( $unregisters_space as $unregister_space_url ) {
-						?>
-						<tr>
-						<td>
-						<?php echo $unregister_space_url; ?>
-						</td>
-						<td>
-						<?php _e('You can not register, because there are spaces in the filename. Please try again with the exception of the spaces. It is a specification for the standard of the media library.', 'mediafromftp'); ?>
-						</td>
-						</tr>
-						<?php
-					}
-					?>
-					</tbody>
-					</table>
-					</p>
-					<?php
-				}
 				if ( !empty($unregisters_unwritable) ) {
 					?>
 					<p>
