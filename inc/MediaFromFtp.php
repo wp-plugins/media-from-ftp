@@ -29,31 +29,37 @@ class MediaFromFtp {
 	function scan_file($dir, $extpattern) {
 
 	   	$list = $tmp = array();
-	   	foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
-	       	if ($tmp = $this->scan_file($child_dir, $extpattern)) {
-	           	$list = array_merge($list, $tmp);
-	       	}
-	   	}
+		$searchdir = glob($dir . '/*', GLOB_ONLYDIR);
+		if ( is_array($searchdir) ) {
+		   	foreach($searchdir as $child_dir) {
+		       	if ($tmp = $this->scan_file($child_dir, $extpattern)) {
+		           	$list = array_merge($list, $tmp);
+		       	}
+		   	}
+		}
 
 		$excludefile = '-[0-9]*x[0-9]*';	// thumbnail
 		if( get_option('mediafromftp_exclude_file') ){
 			$excludefile .= '|'.get_option('mediafromftp_exclude_file');
 		}
 
-		$pattern = $dir.'/*';
-	   	foreach(glob($pattern, GLOB_BRACE) as $file) {
-			if (!is_dir($file)){
-				if (!preg_match("/".$excludefile."/", $file)) {
-					$exts = explode('.', $file);
-					$ext = end($exts);
-					if (preg_match("/".$extpattern."/", $ext)) {
-						$list[] = $file;
+		$searchfile = glob($dir . '/*', GLOB_BRACE);
+		if ( is_array($searchfile) ) {
+		   	foreach($searchfile as $file) {
+				if (!is_dir($file)){
+					if (!preg_match("/".$excludefile."/", $file)) {
+						$exts = explode('.', $file);
+						$ext = end($exts);
+						if (preg_match("/".$extpattern."/", $ext)) {
+							$list[] = $file;
+						}
 					}
 				}
 			}
 		}
 
 	   	return $list;
+
 	}
 
 	/* ==================================================
@@ -64,14 +70,17 @@ class MediaFromFtp {
 	function scan_dir($dir) {
 
 		$dirlist = $tmp = array();
-	    foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
-		    if ($tmp = $this->scan_dir($child_dir)) {
-	   		    $dirlist = array_merge($dirlist, $tmp);
-	       	}
-		}
+		$searchdir = glob($dir . '/*', GLOB_ONLYDIR);
+		if ( is_array($searchdir) ) {
+		    foreach($searchdir as $child_dir) {
+			    if ($tmp = $this->scan_dir($child_dir)) {
+		   		    $dirlist = array_merge($dirlist, $tmp);
+		       	}
+			}
 
-	    foreach(glob($dir . '/*', GLOB_ONLYDIR) as $child_dir) {
-			$dirlist[] = $child_dir;
+		    foreach($searchdir as $child_dir) {
+				$dirlist[] = $child_dir;
+			}
 		}
 
 		arsort($dirlist);
