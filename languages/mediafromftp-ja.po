@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.4\n"
+"X-Generator: Poedit 1.6.7\n"
 "Language: ja\n"
 
 msgid "Search & Register"
@@ -75,3 +75,9 @@ msgid ""
 "way."
 msgstr ""
 "処理が途中で停止している場合は、[戻る]ボタンを押して再度お試しください。"
+
+msgid "Update to use of the current time."
+msgstr "現在の時刻で更新"
+
+msgid "Update to use of time stamp of the file."
+msgstr "ファイルのタイムスタンプで更新"

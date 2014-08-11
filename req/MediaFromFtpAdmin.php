@@ -221,6 +221,12 @@ class MediaFromFtpAdmin {
 							?>
 							<form method="post" action="<?php echo $scriptname; ?>">
 								<td>
+									<div><input type="radio" name="dateset" value="new" checked>
+									<?php _e('Update to use of the current time.', 'mediafromftp'); ?>
+									</div>
+									<div><input type="radio" name="dateset" value="server">
+									<?php _e('Update to use of time stamp of the file.', 'mediafromftp'); ?>
+									</div>
 									<div class="submit">
 										<input type="hidden" name="adddb" value="TRUE">
 										<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
@@ -304,6 +310,9 @@ class MediaFromFtpAdmin {
 					$new_attach_titlenames = explode('/', $new_url_attach);
 					$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
+					if ( $_POST["dateset"] === 'server' ) {
+						$postdategmt = date("Y-m-d H:i:s", @filemtime($dir_root.'/'.$filename));
+					}
 					if ( strpos($filename, ' ' ) ) {
 						$oldfilename = $filename;
 						$filename = str_replace(' ', '-', $oldfilename);
@@ -330,6 +339,9 @@ class MediaFromFtpAdmin {
 						}
 						$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
 						$filename = $currentdir.md5($currentfile).$suffix_attach_file;
+						if ( $_POST["dateset"] === 'server' ) {
+							$postdategmt = date("Y-m-d H:i:s", filemtime($dir_root.'/'.$oldfilename));
+						}
 						$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
 						copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
 						unlink( $dir_root.'/'.$oldfilename );
@@ -345,6 +357,18 @@ class MediaFromFtpAdmin {
 						'post_mime_type' => $mediafromftp->mime_type($suffix_attach_file)
 						);
 					$attach_id = wp_insert_attachment( $newfile_post, $filename );
+
+					if ( $_POST["dateset"] === 'server' ) {
+						$postdate = get_date_from_gmt($postdategmt);
+						$up_post = array(
+										'ID' => $attach_id,
+										'post_date' => $postdate,
+										'post_date_gmt' => $postdategmt,
+										'post_modified' => $postdate,
+										'post_modified_gmt' => $postdategmt
+									);
+						wp_update_post( $up_post );
+					}
 
 					if ( wp_ext2type($ext) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
@@ -368,7 +392,7 @@ class MediaFromFtpAdmin {
 
 					$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
 
-					$stamptime = get_the_time( 'Y/n/j ', $attach_id ).get_the_time( 'G:i', $attach_id );
+					$stamptime = get_the_time( 'Y-n-j ', $attach_id ).get_the_time( 'G:i', $attach_id );
 					if ( isset( $metadata['filesize'] ) ) {
 						$file_size = $metadata['filesize'];
 					} else {

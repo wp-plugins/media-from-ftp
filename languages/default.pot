@@ -62,3 +62,9 @@ msgid ""
 "Please try again pressing Back button, if the processing is stopped on the "
 "way."
 msgstr ""
+
+msgid "Update to use of the current time."
+msgstr ""
+
+msgid "Update to use of time stamp of the file."
+msgstr ""
