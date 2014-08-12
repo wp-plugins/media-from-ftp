@@ -75,14 +75,15 @@ class MediaFromFtpAdmin {
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
 		}
+
 		$wp_uploads = wp_upload_dir();
-		$wp_uploads_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', $wp_uploads['baseurl']);
-		$topurl = $wp_uploads_path;
-		if (!empty($_POST['topurl'])){
-			$topurl = str_replace('http://'.$_SERVER["SERVER_NAME"], '', urldecode($_POST['topurl']));
+		$wp_uploads_path = str_replace(home_url('/'), '', $wp_uploads['baseurl']);
+		$searchdir = $wp_uploads_path;
+		if (!empty($_POST['searchdir'])){
+			$searchdir = str_replace(home_url('/'), '', urldecode($_POST['searchdir']));
 		}
 
-		$scriptname = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH).'?page=mediafromftp';
+		$scriptname = admin_url('tools.php?page=mediafromftp');
 
 		?>
 		<div class="wrap">
@@ -103,15 +104,13 @@ class MediaFromFtpAdmin {
 
 		<?php
 
-		$wp_path = str_replace('http://'.$_SERVER["SERVER_NAME"], '', get_bloginfo('wpurl')).'/';
-		$server_root = $_SERVER['DOCUMENT_ROOT'];
-		$document_root = $server_root.$topurl;
-		$dir_root = $server_root.$wp_uploads_path;
+		$wordpress_root = ABSPATH;
+		$document_root = $wordpress_root.$searchdir;
+		$dir_root = $wp_uploads['basedir'];
 
-		$languages = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
-		if( substr($languages[0],0,2) === 'ja' ) {
+		if( WPLANG === 'ja' ) {
 			mb_language('Japanese');
-		} else if( substr($languages[0],0,2) === 'en' ) {
+		} else if( WPLANG === 'en' ) {
 			mb_language('English');
 		} else {
 			mb_language('uni');
@@ -127,15 +126,15 @@ class MediaFromFtpAdmin {
 			$dirs = $mediafromftp->scan_dir($dir_root);
 			$linkselectbox = NULL;
 			foreach ($dirs as $linkdir) {
-				$linkdirenc = mb_convert_encoding(str_replace($server_root, "", $linkdir), "UTF-8", "auto");
-				if( $topurl === $linkdirenc ){
+				$linkdirenc = mb_convert_encoding(str_replace($wordpress_root, "", $linkdir), "UTF-8", "auto");
+				if( $searchdir === $linkdirenc ){
 					$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
 				}else{
 					$linkdirs = '<option value="'.urlencode($linkdirenc).'">'.$linkdirenc.'</option>';
 				}
 				$linkselectbox = $linkselectbox.$linkdirs;
 			}
-			if( empty($_POST['topurl']) || $topurl ===  $wp_uploads_path ){
+			if( empty($_POST['searchdir']) || $searchdir ===  $wp_uploads_path ){
 				$linkdirs = '<option value="" selected>'.$wp_uploads_path.'</option>';
 			}else{
 				$linkdirs = '<option value="">'.$wp_uploads_path.'</option>';
@@ -150,7 +149,7 @@ class MediaFromFtpAdmin {
 					<?php _e('Find the following directories.', 'mediafromftp'); ?>
 					</td>
 					<td>
-						<select name="topurl">
+						<select name="searchdir">
 						<?php echo $linkselectbox; ?>
 						</select>
 					</td>
@@ -172,7 +171,6 @@ class MediaFromFtpAdmin {
 			);
 		$attachments = get_posts($args);
 
-		$servername = 'http://'.$_SERVER['HTTP_HOST'];
 		$extpattern = $mediafromftp->extpattern();
 		$files = $mediafromftp->scan_file($document_root, $extpattern);
 		$count = 0;
@@ -188,7 +186,7 @@ class MediaFromFtpAdmin {
 				$exts = explode('.', $suffix_filename);
 				$ext = end($exts);
 				$suffix_file = '.'.$ext;
-				$new_url = $servername.str_replace($server_root, '', $file);
+				$new_url = home_url('/').str_replace($wordpress_root, '', $file);
 				$new_titles = explode('/', $new_url);
 				$new_title = str_replace($suffix_file, '', end($new_titles));
 				$new_title_md5 = md5($new_title);
@@ -229,7 +227,7 @@ class MediaFromFtpAdmin {
 									</div>
 									<div class="submit">
 										<input type="hidden" name="adddb" value="TRUE">
-										<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+										<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 										<input type="submit" value="<?php _e('Update Media'); ?>" />
 									</div>
 								</td>
@@ -279,7 +277,7 @@ class MediaFromFtpAdmin {
 				<td>
 					<form method="post" action="<?php echo $scriptname; ?>">
 						<div class="submit">
-							<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+							<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 							<input type="submit" value="<?php _e('Back'); ?>" />
 							<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
 						</div>
@@ -458,7 +456,7 @@ class MediaFromFtpAdmin {
 				<td>
 					<form method="post" action="<?php echo $scriptname; ?>">
 						<div class="submit">
-							<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+							<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 							<input type="submit" value="<?php _e('Back'); ?>" />
 						</div>
 					</form>
@@ -497,7 +495,7 @@ class MediaFromFtpAdmin {
 						<td>
 							<div class="submit">
 								<input type="hidden" name="adddb" value="TRUE">
-								<input type="hidden" name="topurl" value="<?php echo $topurl; ?>">
+								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 								<input type="submit" value="<?php _e('Update Media'); ?>" />
 							</div>
 						</td>
