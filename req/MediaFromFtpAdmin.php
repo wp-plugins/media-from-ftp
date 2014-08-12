@@ -77,10 +77,10 @@ class MediaFromFtpAdmin {
 		}
 
 		$wp_uploads = wp_upload_dir();
-		$wp_uploads_path = str_replace(home_url('/'), '', $wp_uploads['baseurl']);
+		$wp_uploads_path = str_replace(site_url('/'), '', $wp_uploads['baseurl']);
 		$searchdir = $wp_uploads_path;
 		if (!empty($_POST['searchdir'])){
-			$searchdir = str_replace(home_url('/'), '', urldecode($_POST['searchdir']));
+			$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
 		}
 
 		$scriptname = admin_url('tools.php?page=mediafromftp');
@@ -186,7 +186,7 @@ class MediaFromFtpAdmin {
 				$exts = explode('.', $suffix_filename);
 				$ext = end($exts);
 				$suffix_file = '.'.$ext;
-				$new_url = home_url('/').str_replace($wordpress_root, '', $file);
+				$new_url = site_url('/').str_replace($wordpress_root, '', $file);
 				$new_titles = explode('/', $new_url);
 				$new_title = str_replace($suffix_file, '', end($new_titles));
 				$new_title_md5 = md5($new_title);
