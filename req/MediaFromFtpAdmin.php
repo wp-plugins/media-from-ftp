@@ -371,6 +371,15 @@ class MediaFromFtpAdmin {
 					if ( wp_ext2type($ext) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
 						wp_update_attachment_metadata( $attach_id, $metadata );
+						$imagethumburl_bases = explode('/', $new_url_attach);
+						$imagethumburl_base = rtrim($new_url_attach, end($imagethumburl_bases));
+						foreach ( $metadata as $key1 => $key2 ){
+							if ( $key1 === 'sizes' ) {
+								foreach ( $metadata[$key1] as $key2 => $key3 ){
+									$imagethumburls[$key2] = $imagethumburl_base.'/'.$metadata['sizes'][$key2]['file'];
+								}
+							}
+						}
 						$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
 						$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
 						$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
@@ -412,9 +421,11 @@ class MediaFromFtpAdmin {
 					$output_html .= '<td>';
 					if ( wp_ext2type($ext) === 'image' ) {
 						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-						$output_html .= '<div>'.__('Thumbnail size').': <a href="'.$image_attr_thumbnail[0].'" target="_blank">'.$image_attr_thumbnail[1].'x'.$image_attr_thumbnail[2].'</a></div>';
-						$output_html .= '<div>'.__('Medium size').': <a href="'.$image_attr_medium[0].'" target="_blank">'.$image_attr_medium[1].'x'.$image_attr_medium[2].'</a></div>';
-						$output_html .= '<div>'.__('Large size').': <a href="'.$image_attr_large[0].'" target="_blank">'.$image_attr_large[1].'x'.$image_attr_large[2].'</a></div>';
+						$output_html .= '<div>'.__('Images').': ';
+						foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
+							$output_html .= '[<a href="'.$imagethumburl.'" target="_blank">'.$thumbsize.'</a>]';
+						}
+						$output_html .= '</div>';
 					} else if ( wp_ext2type($ext) === 'video' ) {
 						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
