@@ -45,6 +45,18 @@ class MediaFromFtpAdmin {
 	}
 
 	/* ==================================================
+	 * Add Css and Script
+	 * @since	2.23
+	 */
+	function load_custom_wp_admin_style() {
+		wp_enqueue_style( 'jquery-ui-tabs', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery-ui.css' );
+		wp_enqueue_script( 'jquery' );
+		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_enqueue_script( 'jquery-ui-tabs-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-ui-tabs-in.js' );
+		wp_enqueue_script( 'jquery-check-selectall-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-check-selectall-in.js' );
+	}
+
+	/* ==================================================
 	 * Main
 	 */
 	function manage_page() {
@@ -52,14 +64,6 @@ class MediaFromFtpAdmin {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
-
-		$pluginurl = plugins_url($path='',$scheme=null);
-
-		wp_enqueue_style( 'jquery-ui-tabs', $pluginurl.'/media-from-ftp/css/jquery-ui.css' );
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-ui-tabs' );
-		wp_enqueue_script( 'jquery-ui-tabs-in', $pluginurl.'/media-from-ftp/js/jquery-ui-tabs-in.js' );
-		wp_enqueue_script( 'jquery-check-selectall-in', $pluginurl.'/media-from-ftp/js/jquery-check-selectall-in.js' );
 
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
@@ -181,9 +185,7 @@ class MediaFromFtpAdmin {
 			if ( is_dir($file) ) { // dirctory
 				$new_file = FALSE;
 			} else {
-				$suffix_filenames = explode('/', $file);
-				$suffix_filename = end($suffix_filenames);
-				$exts = explode('.', $suffix_filename);
+				$exts = explode('.', wp_basename($file));
 				$ext = end($exts);
 				$suffix_file = '.'.$ext;
 				$new_url = site_url('/').str_replace($wordpress_root, '', $file);
@@ -225,6 +227,16 @@ class MediaFromFtpAdmin {
 									<div><input type="radio" name="dateset" value="server">
 									<?php _e('Update to use of time stamp of the file.', 'mediafromftp'); ?>
 									</div>
+									<?php
+									if (get_option( 'uploads_use_yearmonth_folders' )) {
+									?>
+										<div>
+										<input name="move_yearmonth_folders" type="checkbox" value="1"<?php checked('1', get_option( 'uploads_use_yearmonth_folders' )); ?> />
+										<?php _e('Organize my uploads into month- and year-based folders'); ?>
+										</div>
+									<?php
+									}
+									?>
 									<div class="submit">
 										<input type="hidden" name="adddb" value="TRUE">
 										<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
@@ -300,14 +312,13 @@ class MediaFromFtpAdmin {
 				ob_start('mb_output_handler');
 
 				foreach ( $new_url_attaches as $new_url_attach ){
-					$suffix_attach_filenames = explode('/', $new_url_attach);
-					$suffix_attach_filename = end($suffix_attach_filenames);
-					$suffix_attach_files = explode('.', $suffix_attach_filename);
-					$ext = end($suffix_attach_files);
+					$exts = explode('.', wp_basename($new_url_attach));
+					$ext = end($exts);
 					$suffix_attach_file = '.'.$ext;
 					$new_attach_titlenames = explode('/', $new_url_attach);
 					$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
+					$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
 					if ( $_POST["dateset"] === 'server' ) {
 						$postdategmt = date("Y-m-d H:i:s", @filemtime($dir_root.'/'.$filename));
 					}
@@ -346,6 +357,24 @@ class MediaFromFtpAdmin {
 						$filename = mb_convert_encoding($filename, "UTF-8", "auto");
 						$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
 					}
+
+					if ( get_option( 'uploads_use_yearmonth_folders' ) ) {
+						if ( $_POST["move_yearmonth_folders"] == 1 ) {
+							$y = substr( $postdategmt, 0, 4 );
+							$m = substr( $postdategmt, 5, 2 );
+							$subdir = "/$y/$m";
+							if ( $dir_root.'/'.$filename <> $dir_root.$subdir.'/'.wp_basename($filename) ) {
+								if ( !file_exists($dir_root.$subdir) ) {
+									mkdir($dir_root.$subdir, 0757, true);
+								}
+								copy( $dir_root.'/'.$filename, $dir_root.$subdir.'/'.wp_basename($filename) );
+								unlink( $dir_root.'/'.$filename );
+								$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
+								$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
+							}
+						}
+					}
+
 					$newfile_post = array(
 						'post_title' => $new_attach_title,
 						'post_content' => '',
@@ -371,12 +400,11 @@ class MediaFromFtpAdmin {
 					if ( wp_ext2type($ext) === 'image' ){
 						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
 						wp_update_attachment_metadata( $attach_id, $metadata );
-						$imagethumburl_bases = explode('/', $new_url_attach);
-						$imagethumburl_base = rtrim($new_url_attach, end($imagethumburl_bases));
+						$imagethumburl_base = rtrim($new_url_attach, wp_basename($new_url_attach));
 						foreach ( $metadata as $key1 => $key2 ){
 							if ( $key1 === 'sizes' ) {
 								foreach ( $metadata[$key1] as $key2 => $key3 ){
-									$imagethumburls[$key2] = $imagethumburl_base.'/'.$metadata['sizes'][$key2]['file'];
+									$imagethumburls[$key2] = $imagethumburl_base.$metadata['sizes'][$key2]['file'];
 								}
 							}
 						}
