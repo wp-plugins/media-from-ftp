@@ -21,6 +21,8 @@
 
 class MediaFromFtpAdmin {
 
+	public $postcount;
+
 	/* ==================================================
 	 * Add a "Settings" link to the plugins page
 	 * @since	1.0
@@ -50,10 +52,21 @@ class MediaFromFtpAdmin {
 	 */
 	function load_custom_wp_admin_style() {
 		wp_enqueue_style( 'jquery-ui-tabs', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery-ui.css' );
+		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-tabs' );
 		wp_enqueue_script( 'jquery-ui-tabs-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-ui-tabs-in.js' );
 		wp_enqueue_script( 'jquery-check-selectall-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-check-selectall-in.js' );
+		wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
+
+	}
+
+	/* ==================================================
+	 * Add Script on footer
+	 * @since	2.24
+	 */
+	function load_custom_wp_admin_style2() {
+		echo $this->add_js();
 	}
 
 	/* ==================================================
@@ -178,6 +191,7 @@ class MediaFromFtpAdmin {
 		$extpattern = $mediafromftp->extpattern();
 		$files = $mediafromftp->scan_file($document_root, $extpattern);
 		$count = 0;
+		$this->postcount = 0;
 		$post_attachs = array();
 		$unregister_unwritable_count = 0;
 		$unregister_multibyte_file_count = 0;
@@ -222,10 +236,10 @@ class MediaFromFtpAdmin {
 							<form method="post" action="<?php echo $scriptname; ?>">
 								<td>
 									<div><input type="radio" name="dateset" value="new" checked>
-									<?php _e('Update to use of the current time.', 'mediafromftp'); ?>
+									<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
 									</div>
 									<div><input type="radio" name="dateset" value="server">
-									<?php _e('Update to use of time stamp of the file.', 'mediafromftp'); ?>
+									<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
 									</div>
 									<?php
 									if (get_option( 'uploads_use_yearmonth_folders' )) {
@@ -254,22 +268,40 @@ class MediaFromFtpAdmin {
 							?>
 							<table class="wp-list-table widefat">
 							<tbody>
-							<tr><td>
+							<tr>
+							<td>
 							<input type="checkbox" id="group_media-from-ftp" class="checkAll"><?php _e('Select all'); ?>
-							</td></tr>
-							</tbody>
-							</table>
-							<table class="wp-list-table widefat" border="1">
-							<tbody>
+							</td>
+							</tr>
+							<tr>
+							<td><?php _e('Select'); ?></td>
+							<td>
+							<?php _e('Full URL path to files'); ?>
+							</td>
+							<td>
+							<?php _e('Edit date and time'); ?>
+							</td>
+							</tr>
 							<?php
 						}
 					}
 					if ( $adddb <> 'TRUE' ) {
 						?>
-							<tr><td>
-							 <input name="new_url_attaches[]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp"><?php echo $new_url; ?>
-							</td></tr>
+							<tr>
+							<td>
+								<input name="new_url_attaches[<?php echo $this->postcount; ?>][url]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp">
+							</td>
+							<td><?php echo $new_url; ?></td>
+							<?php
+							$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
+							$newdate = substr( $date , 0 , strlen($date)-3 );
+							?>
+							<td>
+								<input type="text" id="datetimepicker-mediafromftp<?php echo $this->postcount; ?>" name="new_url_attaches[<?php echo $this->postcount; ?>][datetime]" value="<?php echo $newdate; ?>">
+							</td>
+							</tr>
 						<?php
+						++$this->postcount;
 					}
 				}
 			}
@@ -311,174 +343,178 @@ class MediaFromFtpAdmin {
 				ob_end_flush();
 				ob_start('mb_output_handler');
 
-				foreach ( $new_url_attaches as $new_url_attach ){
-					$exts = explode('.', wp_basename($new_url_attach));
-					$ext = end($exts);
-					$suffix_attach_file = '.'.$ext;
-					$new_attach_titlenames = explode('/', $new_url_attach);
-					$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
-					$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
-					$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
-					if ( $_POST["dateset"] === 'server' ) {
-						$postdategmt = date("Y-m-d H:i:s", @filemtime($dir_root.'/'.$filename));
-					}
-					if ( strpos($filename, ' ' ) ) {
-						$oldfilename = $filename;
-						$filename = str_replace(' ', '-', $oldfilename);
-						$new_url_attach = str_replace(' ', '-', $new_url_attach);
-						copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
-						unlink( $dir_root.'/'.$oldfilename );
-					}
-					if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
-						if ( strpos( $filename ,'/' ) === FALSE ) {
-							$currentdir = '';
-							$currentfile = str_replace($suffix_attach_file, '', $filename);
-						} else {
-							$currentfiles = explode('/', $filename);
-							$currentfile = end($currentfiles);
-							$currentdir = str_replace($currentfile, '', $filename);
-							$currentfile = str_replace($suffix_attach_file, '', $currentfile);
-						}
-						if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
-							$currentdir = mb_convert_encoding($currentdir, "sjis-win", "auto");
-							$currentfile = mb_convert_encoding($currentfile, "sjis-win", "auto");
-						} else {
-							$currentdir = mb_convert_encoding($currentdir, "UTF-8", "auto");
-							$currentfile = mb_convert_encoding($currentfile, "UTF-8", "auto");
-						}
-						$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
-						$filename = $currentdir.md5($currentfile).$suffix_attach_file;
-						if ( $_POST["dateset"] === 'server' ) {
-							$postdategmt = date("Y-m-d H:i:s", filemtime($dir_root.'/'.$oldfilename));
-						}
-						$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
-						copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
-						unlink( $dir_root.'/'.$oldfilename );
-						$filename = mb_convert_encoding($filename, "UTF-8", "auto");
-						$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
-					}
+				foreach ( $new_url_attaches as $postkey1 => $postval1 ){
+					foreach ( $postval1 as $postkey2 => $postval2 ){
+						if ( $postkey2 === 'url' ) {
+							$new_url_attach = $postval1[$postkey2];
 
-					if ( get_option( 'uploads_use_yearmonth_folders' ) ) {
-						if ( $_POST["move_yearmonth_folders"] == 1 ) {
-							$y = substr( $postdategmt, 0, 4 );
-							$m = substr( $postdategmt, 5, 2 );
-							$subdir = "/$y/$m";
-							if ( $dir_root.'/'.$filename <> $dir_root.$subdir.'/'.wp_basename($filename) ) {
-								if ( !file_exists($dir_root.$subdir) ) {
-									mkdir($dir_root.$subdir, 0757, true);
+							$exts = explode('.', wp_basename($new_url_attach));
+							$ext = end($exts);
+							$suffix_attach_file = '.'.$ext;
+							$new_attach_titlenames = explode('/', $new_url_attach);
+							$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
+							$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
+							$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
+							if ( $_POST["dateset"] === 'server' ) {
+								$postdategmt = get_gmt_from_date($postval1['datetime'].':00');
+							}
+							if ( strpos($filename, ' ' ) ) {
+								$oldfilename = $filename;
+								$filename = str_replace(' ', '-', $oldfilename);
+								$new_url_attach = str_replace(' ', '-', $new_url_attach);
+								copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
+								unlink( $dir_root.'/'.$oldfilename );
+							}
+							if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
+								if ( strpos( $filename ,'/' ) === FALSE ) {
+									$currentdir = '';
+									$currentfile = str_replace($suffix_attach_file, '', $filename);
+								} else {
+									$currentfiles = explode('/', $filename);
+									$currentfile = end($currentfiles);
+									$currentdir = str_replace($currentfile, '', $filename);
+									$currentfile = str_replace($suffix_attach_file, '', $currentfile);
 								}
-								copy( $dir_root.'/'.$filename, $dir_root.$subdir.'/'.wp_basename($filename) );
-								unlink( $dir_root.'/'.$filename );
-								$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
+								if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+									$currentdir = mb_convert_encoding($currentdir, "sjis-win", "auto");
+									$currentfile = mb_convert_encoding($currentfile, "sjis-win", "auto");
+								} else {
+									$currentdir = mb_convert_encoding($currentdir, "UTF-8", "auto");
+									$currentfile = mb_convert_encoding($currentfile, "UTF-8", "auto");
+								}
+								$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
+								$filename = $currentdir.md5($currentfile).$suffix_attach_file;
 								$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
+								copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
+								unlink( $dir_root.'/'.$oldfilename );
+								$filename = mb_convert_encoding($filename, "UTF-8", "auto");
+								$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
 							}
-						}
-					}
 
-					$newfile_post = array(
-						'post_title' => $new_attach_title,
-						'post_content' => '',
-						'guid' => $new_url_attach,
-						'post_status' => 'inherit', 
-						'post_type' => 'attachment',
-						'post_mime_type' => $mediafromftp->mime_type($suffix_attach_file)
-						);
-					$attach_id = wp_insert_attachment( $newfile_post, $filename );
-
-					if ( $_POST["dateset"] === 'server' ) {
-						$postdate = get_date_from_gmt($postdategmt);
-						$up_post = array(
-										'ID' => $attach_id,
-										'post_date' => $postdate,
-										'post_date_gmt' => $postdategmt,
-										'post_modified' => $postdate,
-										'post_modified_gmt' => $postdategmt
-									);
-						wp_update_post( $up_post );
-					}
-
-					if ( wp_ext2type($ext) === 'image' ){
-						$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
-						wp_update_attachment_metadata( $attach_id, $metadata );
-						$imagethumburl_base = rtrim($new_url_attach, wp_basename($new_url_attach));
-						foreach ( $metadata as $key1 => $key2 ){
-							if ( $key1 === 'sizes' ) {
-								foreach ( $metadata[$key1] as $key2 => $key3 ){
-									$imagethumburls[$key2] = $imagethumburl_base.$metadata['sizes'][$key2]['file'];
+							if ( get_option( 'uploads_use_yearmonth_folders' ) ) {
+								if (!empty($_POST['move_yearmonth_folders'])){
+									if ( $_POST["move_yearmonth_folders"] == 1 ) {
+										$y = substr( $postdategmt, 0, 4 );
+										$m = substr( $postdategmt, 5, 2 );
+										$subdir = "/$y/$m";
+										if ( $dir_root.'/'.$filename <> $dir_root.$subdir.'/'.wp_basename($filename) ) {
+											if ( !file_exists($dir_root.$subdir) ) {
+												mkdir($dir_root.$subdir, 0757, true);
+											}
+											copy( $dir_root.'/'.$filename, $dir_root.$subdir.'/'.wp_basename($filename) );
+											unlink( $dir_root.'/'.$filename );
+											$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
+											$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
+										}
+									}
 								}
 							}
+
+							$newfile_post = array(
+								'post_title' => $new_attach_title,
+								'post_content' => '',
+								'guid' => $new_url_attach,
+								'post_status' => 'inherit', 
+								'post_type' => 'attachment',
+								'post_mime_type' => $mediafromftp->mime_type($suffix_attach_file)
+								);
+							$attach_id = wp_insert_attachment( $newfile_post, $filename );
+
+							if ( $_POST["dateset"] === 'server' ) {
+								$postdate = get_date_from_gmt($postdategmt);
+								$up_post = array(
+												'ID' => $attach_id,
+												'post_date' => $postdate,
+												'post_date_gmt' => $postdategmt,
+												'post_modified' => $postdate,
+												'post_modified_gmt' => $postdategmt
+											);
+								wp_update_post( $up_post );
+							}
+
+							if ( wp_ext2type($ext) === 'image' ){
+								$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
+								wp_update_attachment_metadata( $attach_id, $metadata );
+								$imagethumburl_base = rtrim($new_url_attach, wp_basename($new_url_attach));
+								foreach ( $metadata as $key1 => $key2 ){
+									if ( $key1 === 'sizes' ) {
+										foreach ( $metadata[$key1] as $key2 => $key3 ){
+											$imagethumburls[$key2] = $imagethumburl_base.$metadata['sizes'][$key2]['file'];
+										}
+									}
+								}
+								$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
+								$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
+								$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
+							}else if ( wp_ext2type($ext) === 'video' ){
+								$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
+								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
+								$length = $metadata['length_formatted'];
+								wp_update_attachment_metadata( $attach_id, $metadata );
+							}else if ( wp_ext2type($ext) === 'audio' ){
+								$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
+								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
+								$length = $metadata['length_formatted'];
+								wp_update_attachment_metadata( $attach_id, $metadata );
+							} else {
+								$metadata = NULL;
+							}
+
+							$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
+
+							$stamptime = get_the_time( 'Y-n-j ', $attach_id ).get_the_time( 'G:i', $attach_id );
+							if ( isset( $metadata['filesize'] ) ) {
+								$file_size = $metadata['filesize'];
+							} else {
+								$file_size = filesize( get_attached_file($attach_id) );
+								$filetype = strtoupper($ext);
+							}
+
+							$output_html = NULL;
+							$output_html .= '<tr>';
+							$output_html .= '<td><img width="50" height="50" src="'.$image_attr_thumbnail[0].'"></td>';
+							$output_html .= '<td>';
+							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
+							$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
+							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
+							$new_url_attachs = explode('/', $new_url_attach);
+							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
+							$output_html .= '</td>';
+
+							$output_html .= '<td>';
+							if ( wp_ext2type($ext) === 'image' ) {
+								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+								$output_html .= '<div>'.__('Images').': ';
+								foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
+									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank">'.$thumbsize.'</a>]';
+								}
+								$output_html .= '</div>';
+							} else if ( wp_ext2type($ext) === 'video' ) {
+								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+							} else if ( wp_ext2type($ext) === 'audio' ) {
+								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+							} else {
+								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+							}
+
+							$output_html .= '</td>';
+							$output_html .= '</tr>';
+
+							echo $output_html;
+							ob_flush();
+							flush();
 						}
-						$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
-						$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
-						$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
-					}else if ( wp_ext2type($ext) === 'video' ){
-						$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
-						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
-						$length = $metadata['length_formatted'];
-						wp_update_attachment_metadata( $attach_id, $metadata );
-					}else if ( wp_ext2type($ext) === 'audio' ){
-						$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
-						$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
-						$length = $metadata['length_formatted'];
-						wp_update_attachment_metadata( $attach_id, $metadata );
-					} else {
-						$metadata = NULL;
 					}
-
-					$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
-
-					$stamptime = get_the_time( 'Y-n-j ', $attach_id ).get_the_time( 'G:i', $attach_id );
-					if ( isset( $metadata['filesize'] ) ) {
-						$file_size = $metadata['filesize'];
-					} else {
-						$file_size = filesize( get_attached_file($attach_id) );
-						$filetype = strtoupper($ext);
-					}
-
-					$output_html = NULL;
-					$output_html .= '<tr>';
-					$output_html .= '<td><img width="50" height="50" src="'.$image_attr_thumbnail[0].'"></td>';
-					$output_html .= '<td>';
-					$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
-					$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
-					$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
-					$new_url_attachs = explode('/', $new_url_attach);
-					$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
-					$output_html .= '</td>';
-
-					$output_html .= '<td>';
-					if ( wp_ext2type($ext) === 'image' ) {
-						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-						$output_html .= '<div>'.__('Images').': ';
-						foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
-							$output_html .= '[<a href="'.$imagethumburl.'" target="_blank">'.$thumbsize.'</a>]';
-						}
-						$output_html .= '</div>';
-					} else if ( wp_ext2type($ext) === 'video' ) {
-						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-						$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
-					} else if ( wp_ext2type($ext) === 'audio' ) {
-						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-						$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-						$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
-					} else {
-						$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-						$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
-						$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-					}
-
-					$output_html .= '</td>';
-					$output_html .= '</tr>';
-
-					echo $output_html;
-					ob_flush();
-					flush();
-
 				}
-				ob_end_clean();
+//				ob_end_clean();
 				?>
 				</tbody>
 				</table>
@@ -641,6 +677,45 @@ class MediaFromFtpAdmin {
 		</div>
 		</div>
 		<?php
+
+	}
+
+	/* ==================================================
+	 * Add js
+	 * @since	2.24
+	 */
+	function add_js(){
+
+// JS
+$mediafromftp_add_js = <<<MEDIAFROMFTP1
+
+<!-- BEGIN: Media from FTP -->
+<script type="text/javascript">
+jQuery(function(){
+MEDIAFROMFTP1;
+
+		for ($i = 0; $i < $this->postcount; $i++) {
+
+$mediafromftp_add_js .= <<<MEDIAFROMFTP2
+
+jQuery('#datetimepicker-mediafromftp
+MEDIAFROMFTP2;
+			$mediafromftp_add_js .= $i;
+$mediafromftp_add_js .= <<<MEDIAFROMFTP3
+').datetimepicker({format:'Y-m-d H:i'});
+MEDIAFROMFTP3;
+
+		}
+
+$mediafromftp_add_js .= <<<MEDIAFROMFTP4
+
+});
+</script>
+<!-- END: Media from FTP -->
+
+MEDIAFROMFTP4;
+
+		return $mediafromftp_add_js;
 
 	}
 
