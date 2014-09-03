@@ -51,12 +51,10 @@ class MediaFromFtpAdmin {
 	 * @since	2.23
 	 */
 	function load_custom_wp_admin_style() {
-		wp_enqueue_style( 'jquery-ui-tabs', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery-ui.css' );
+		wp_enqueue_style( 'jquery-ui-tabs-mediafromftp', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery-ui.css' );
 		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-ui-tabs' );
-		wp_enqueue_script( 'jquery-ui-tabs-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-ui-tabs-in.js' );
-		wp_enqueue_script( 'jquery-check-selectall-in', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery-check-selectall-in.js' );
 		wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
 
 	}
@@ -106,16 +104,16 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 
 		<h2>Media from FTP</h2>
-			<div id="tabs">
+			<div id="mediafromftp-tabs">
 				<ul>
-				<li><a href="#tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
-				<li><a href="#tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
-				<li><a href="#tabs-3"><?php _e('Uploading Files'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-3"><?php _e('Uploading Files'); ?></a></li>
 				<!--
-				<li><a href="#tabs-4">FAQ</a></li>
+				<li><a href="#mediafromftp-tabs-4">FAQ</a></li>
 				 -->
 				</ul>
-				<div id="tabs-1">
+				<div id="mediafromftp-tabs-1">
 
 		<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
 
@@ -633,7 +631,7 @@ class MediaFromFtpAdmin {
 		?>
 		</div>
 
-		<div id="tabs-2">
+		<div id="mediafromftp-tabs-2">
 		<div class="wrap">
 		<form method="post" action="options.php">
 		<?php settings_fields('mediafromftp-settings-group'); ?>
@@ -647,7 +645,7 @@ class MediaFromFtpAdmin {
 		</div>
 		</div>
 
-		<div id="tabs-3">
+		<div id="mediafromftp-tabs-3">
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h2><?php _e('Uploading Files'); ?></h2>
@@ -690,6 +688,18 @@ class MediaFromFtpAdmin {
 $mediafromftp_add_js = <<<MEDIAFROMFTP1
 
 <!-- BEGIN: Media from FTP -->
+<script type="text/javascript">
+jQuery(function() {
+  jQuery( "#mediafromftp-tabs" ).tabs();
+});
+</script>
+<script type="text/javascript">
+jQuery(function(){
+  jQuery('.checkAll').on('change', function() {
+    jQuery('.' + this.id).prop('checked', this.checked);
+  });
+});
+</script>
 <script type="text/javascript">
 jQuery(function(){
 MEDIAFROMFTP1;
