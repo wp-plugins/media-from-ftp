@@ -51,10 +51,13 @@ class MediaFromFtpAdmin {
 	 * @since	2.23
 	 */
 	function load_custom_wp_admin_style() {
-		wp_enqueue_style( 'jquery-ui-tabs-mediafromftp', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery-ui.css' );
+		wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
+		wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
+		wp_enqueue_script('jquery');
+
 		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-ui-tabs' );
+		wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
 		wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
 
 	}
@@ -157,25 +160,13 @@ class MediaFromFtpAdmin {
 			$linkselectbox = $linkselectbox.$linkdirs;
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
-				<table>
-				<tbody>
-					<tr>
-					<td>
+				<div style="display:block;padding:20px 0">
 					<?php _e('Find the following directories.', 'mediafromftp'); ?>
-					</td>
-					<td>
-						<select name="searchdir">
-						<?php echo $linkselectbox; ?>
-						</select>
-					</td>
-					<td>
-						<div class="submit">
-							<input type="submit" value="<?php _e('Search'); ?>" />
-						</div>
-					</td>
-					</tr>
-				</tbody>
-				</table>
+					<select name="searchdir" style="width: 100%">
+					<?php echo $linkselectbox; ?>
+					</select>
+					<input type="submit" value="<?php _e('Search'); ?>" />
+				</div>
 			</form>
 			<?php
 		}
@@ -225,58 +216,49 @@ class MediaFromFtpAdmin {
 					++$count;
 					if ( $count == 1 ) {
 						?>
-						<table>
-						<tbody>
-						<tr>
 						<?php
 						if ( $adddb <> 'TRUE' ) {
 							?>
 							<form method="post" action="<?php echo $scriptname; ?>">
-								<td>
-									<div><input type="radio" name="dateset" value="new" checked>
-									<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
+								<div style="display:block;padding:5px 0">
+								<input type="radio" name="dateset" value="new" checked>
+								<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
+								</div>
+								<div style="display:block;padding:5px 0">
+								<input type="radio" name="dateset" value="server">
+								<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
+								</div>
+								<?php
+								if (get_option( 'uploads_use_yearmonth_folders' )) {
+								?>
+									<div style="display:block;padding:5px 0">
+									<input name="move_yearmonth_folders" type="checkbox" value="1"<?php checked('1', get_option( 'uploads_use_yearmonth_folders' )); ?> />
+									<?php _e('Organize my uploads into month- and year-based folders'); ?>
 									</div>
-									<div><input type="radio" name="dateset" value="server">
-									<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
-									</div>
-									<?php
-									if (get_option( 'uploads_use_yearmonth_folders' )) {
-									?>
-										<div>
-										<input name="move_yearmonth_folders" type="checkbox" value="1"<?php checked('1', get_option( 'uploads_use_yearmonth_folders' )); ?> />
-										<?php _e('Organize my uploads into month- and year-based folders'); ?>
-										</div>
-									<?php
-									}
-									?>
-									<div class="submit">
-										<input type="hidden" name="adddb" value="TRUE">
-										<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-										<input type="submit" value="<?php _e('Update Media'); ?>" />
-									</div>
-								</td>
+								<?php
+								}
+								?>
+								<div class="submit">
+									<input type="hidden" name="adddb" value="TRUE">
+									<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+									<input type="submit" value="<?php _e('Update Media'); ?>" />
+								</div>
 							<?php
 						}
 						?>
-						</tr>
-						</tbody>
-						</table>
 						<?php
 						if ( $adddb <> 'TRUE' ) {
 							?>
-							<table class="wp-list-table widefat">
+							<table class="wp-list-table widefat" border="1">
 							<tbody>
 							<tr>
 							<td>
-							<input type="checkbox" id="group_media-from-ftp" class="checkAll"><?php _e('Select all'); ?>
+							<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
 							</td>
 							</tr>
 							<tr>
-							<td><?php _e('Select'); ?></td>
-							<td>
-							<?php _e('Full URL path to files'); ?>
-							</td>
-							<td>
+							<td><?php _e('Select'); ?>&nbsp-&nbsp
+							<?php _e('Full URL path to files'); ?>&nbsp-&nbsp
 							<?php _e('Edit date and time'); ?>
 							</td>
 							</tr>
@@ -288,13 +270,12 @@ class MediaFromFtpAdmin {
 							<tr>
 							<td>
 								<input name="new_url_attaches[<?php echo $this->postcount; ?>][url]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp">
-							</td>
-							<td><?php echo $new_url; ?></td>
+<?php echo $new_url; ?>
 							<?php
 							$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
 							$newdate = substr( $date , 0 , strlen($date)-3 );
 							?>
-							<td>
+							
 								<input type="text" id="datetimepicker-mediafromftp<?php echo $this->postcount; ?>" name="new_url_attaches[<?php echo $this->postcount; ?>][datetime]" value="<?php echo $newdate; ?>">
 							</td>
 							</tr>
@@ -313,28 +294,15 @@ class MediaFromFtpAdmin {
 			$new_url_attaches = $_POST["new_url_attaches"];
 			if (!empty($new_url_attaches)) {
 				?>
-				<table>
-				<tbody>
-				<tr>
-				<td>
-					<form method="post" action="<?php echo $scriptname; ?>">
-						<div class="submit">
-							<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-							<input type="submit" value="<?php _e('Back'); ?>" />
-							<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
-						</div>
-					</form>
-				</td>
-				</tr>
-				</tbody>
-				</table>
+				<form method="post" action="<?php echo $scriptname; ?>">
+					<div class="submit">
+						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+						<input type="submit" value="<?php _e('Back'); ?>" />
+						<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
+					</div>
+				</form>
 				<table class="wp-list-table widefat" border="1">
 				<tbody>
-				<tr>
-				<td><?php _e('Thumbnail'); ?></td>
-				<td><?php _e('Media File'); ?></td>
-				<td><?php _e('Metadata'); ?></td>
-				</tr>
 				<?php
 
 				echo str_pad(' ',4096)."\n";
@@ -469,17 +437,14 @@ class MediaFromFtpAdmin {
 							}
 
 							$output_html = NULL;
-							$output_html .= '<tr>';
-							$output_html .= '<td><img width="50" height="50" src="'.$image_attr_thumbnail[0].'"></td>';
-							$output_html .= '<td>';
+							$output_html .= '<tr><td>';
+							$output_html .= '<img width="50" height="50" src="'.$image_attr_thumbnail[0].'">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
 							$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
 							$new_url_attachs = explode('/', $new_url_attach);
 							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
-							$output_html .= '</td>';
 
-							$output_html .= '<td>';
 							if ( wp_ext2type($ext) === 'image' ) {
 								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('Images').': ';
@@ -512,7 +477,7 @@ class MediaFromFtpAdmin {
 						}
 					}
 				}
-//				ob_end_clean();
+				ob_end_clean();
 				?>
 				</tbody>
 				</table>
@@ -523,27 +488,16 @@ class MediaFromFtpAdmin {
 			}
 
 			?>
-			<table>
-			<tbody>
-				<tr>
-				<td>
-					<form method="post" action="<?php echo $scriptname; ?>">
-						<div class="submit">
-							<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-							<input type="submit" value="<?php _e('Back'); ?>" />
-						</div>
-					</form>
-				</td>
-				<td>
-					<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-						<div class="submit">
-							<input type="submit" value="<?php _e('Media Library'); ?>" />
-						</div>
-					</form>
-				</td>
-				</tr>
-			</tbody>
-			</table>
+			<div class="submit">
+			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
+				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+				<input type="submit" value="<?php _e('Back'); ?>" />
+			</form>
+			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
+				<input type="submit" value="<?php _e('Media Library'); ?>" />
+			</form>
+			</div>
+			<div style="clear:both"></div>
 			<?php
 		} else {
 			if ( $count == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
@@ -561,22 +515,13 @@ class MediaFromFtpAdmin {
 					</div>
 					<?php
 				}
-				?>
-				<table>
-				<tbody>
-					<tr>
-						<td>
-							<div class="submit">
-								<input type="hidden" name="adddb" value="TRUE">
-								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-								<input type="submit" value="<?php _e('Update Media'); ?>" />
-							</div>
-						</td>
-					</form>
-					</tr>
-				</tbody>
-				</table>
-				<?php
+					?>
+					<div class="submit">
+						<input type="hidden" name="adddb" value="TRUE">
+						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+						<input type="submit" value="<?php _e('Update Media'); ?>" />
+					</div>
+					<?php
 				if ( !empty($unregisters_unwritable) ) {
 					?>
 					<p>
@@ -587,10 +532,10 @@ class MediaFromFtpAdmin {
 						?>
 						<tr>
 						<td>
-						<?php echo $unregister_unwritable_url; ?>
-						</td>
-						<td>
+						<div><?php echo $unregister_unwritable_url; ?></div>
+						<div>
 						<?php _e('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
+						</div>
 						</td>
 						</tr>
 						<?php
@@ -611,10 +556,10 @@ class MediaFromFtpAdmin {
 						?>
 						<tr>
 						<td>
-						<?php echo $unregister_multibyte_file_url; ?>
-						</td>
-						<td>
+						<div><?php echo $unregister_multibyte_file_url; ?></div>
+						<div>
 						<?php _e('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
+						</div>
 						</td>
 						</tr>
 						<?php
@@ -636,11 +581,11 @@ class MediaFromFtpAdmin {
 		<form method="post" action="options.php">
 		<?php settings_fields('mediafromftp-settings-group'); ?>
 			<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>
-			<p><?php _e('| Specify separated by. Regular expression is possible.', 'mediafromftp'); ?></p>
-				<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" cols="40"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
-			<p class="submit">
+			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
+			<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" style="width: 250px;"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
+			<div class="submit">
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
-			</p>
+			</div>
 		</form>
 		</div>
 		</div>
@@ -649,25 +594,25 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h2><?php _e('Uploading Files'); ?></h2>
-			<table>
-			<tbody>
-				<tr>
-					<td align="right" valign="middle"><?php _e('Store uploads in this folder'); ?></td>
-					<td valign="middle"><input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr(get_option('upload_path')); ?>" /></td>
-					<td align="left" valign="middle"><?php _e('Default is <code>wp-content/uploads</code>'); ?></td>
-				</tr>
-				<tr>
-					<td align="right" valign="middle"><?php _e('Full URL path to files'); ?></td>
-					<td valign="middle"><input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option('upload_url_path')); ?>" /></td>
-					<td align="left" valign="middle"><?php _e('Configuring this is optional. By default, it should be blank.'); ?></td>
-				</tr>
-			</tbody>
-			</table>
-			<p><font color="red"><?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?></font></p>
-			<p><font color="red"><?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?></font></p>
-			<p class="submit">
+			<div style="display:block;padding:20px 0">
+			<div><?php _e('Store uploads in this folder'); ?></div>
+			<input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr(get_option('upload_path')); ?>" />
+			<div><?php _e('Default is <code>wp-content/uploads</code>'); ?></div>
+			</div>
+			<div style="display:block;padding:20px 0">
+			<div><?php _e('Full URL path to files'); ?></div>
+			<input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option('upload_url_path')); ?>" />
+			<div><?php _e('Configuring this is optional. By default, it should be blank.'); ?></div>
+			</div>
+			<div style="display:block;padding:20px 0">
+			<font color="red"><?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?></font>
+			</div>
+			<div style="display:block;padding:20px 0">
+			<font color="red"><?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?></font>
+			</div>
+			<div class="submit">
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
-			</p>
+			</div>
 		</form>
 		</div>
 		</div>
@@ -689,13 +634,15 @@ $mediafromftp_add_js = <<<MEDIAFROMFTP1
 
 <!-- BEGIN: Media from FTP -->
 <script type="text/javascript">
-jQuery(function() {
-  jQuery( "#mediafromftp-tabs" ).tabs();
-});
+	jQuery(document).ready(function () {
+		jQuery('#mediafromftp-tabs').responsiveTabs({
+			startCollapsed: 'accordion'
+		});
+	});
 </script>
 <script type="text/javascript">
 jQuery(function(){
-  jQuery('.checkAll').on('change', function() {
+  jQuery('.mediafromftp-checkAll').on('change', function() {
     jQuery('.' + this.id).prop('checked', this.checked);
   });
 });

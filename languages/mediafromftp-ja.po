@@ -56,8 +56,8 @@ msgstr ""
 "要なファイルを含むディレクトリの属性が書き込み可能（757または777）である必要"
 "があります。"
 
-msgid "| Specify separated by. Regular expression is possible."
-msgstr "| で区切って指定します。正規表現が可能です。"
+msgid "Regular expression is possible."
+msgstr "正規表現が可能です。"
 
 msgid ""
 "If you change the settings, you must be re-register the file to the media "

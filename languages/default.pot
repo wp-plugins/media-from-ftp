@@ -46,7 +46,7 @@ msgid ""
 "required for registration."
 msgstr ""
 
-msgid "| Specify separated by. Regular expression is possible."
+msgid "Regular expression is possible."
 msgstr ""
 
 msgid ""
