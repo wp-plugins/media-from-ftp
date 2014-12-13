@@ -27,7 +27,7 @@ class MediaFromFtpRegist {
 	 */
 	function register_settings(){
 		register_setting( 'mediafromftp-settings-group', 'mediafromftp_exclude_file');
-		add_option('mediafromftp_exclude_file','.php|.js');
+		add_option('mediafromftp_exclude_file','(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js');
 	}
 
 }

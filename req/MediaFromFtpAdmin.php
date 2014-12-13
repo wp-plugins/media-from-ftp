@@ -82,6 +82,10 @@ class MediaFromFtpAdmin {
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
+
+		if ( !empty($_POST['mediafromftp_exclude_file']) ) {
+			update_option( 'mediafromftp_exclude_file', $_POST['mediafromftp_exclude_file'] );
+		}
 		if ( !empty($_POST['upload_path']) ) {
 			update_option( 'upload_path', $_POST['upload_path'] );
 		}
@@ -162,7 +166,7 @@ class MediaFromFtpAdmin {
 			<form method="post" action="<?php echo $scriptname; ?>">
 				<div style="display:block;padding:20px 0">
 					<?php _e('Find the following directories.', 'mediafromftp'); ?>
-					<select name="searchdir" style="width: 100%">
+					<select name="searchdir">
 					<?php echo $linkselectbox; ?>
 					</select>
 					<input type="submit" value="<?php _e('Search'); ?>" />
@@ -578,8 +582,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-2">
 		<div class="wrap">
-		<form method="post" action="options.php">
-		<?php settings_fields('mediafromftp-settings-group'); ?>
+		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-2'; ?>">
 			<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>
 			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
 			<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" style="width: 250px;"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
@@ -592,7 +595,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-3">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
+		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-3'; ?>">
 			<h2><?php _e('Uploading Files'); ?></h2>
 			<div style="display:block;padding:20px 0">
 			<div><?php _e('Store uploads in this folder'); ?></div>
