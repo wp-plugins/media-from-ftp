@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.0.1
-Stable tag: 2.27
+Stable tag: 2.28
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,10 @@ none
 6. Change the upload directory
 
 == Changelog ==
+
+= 2.28 =
+Fixed a problem of Java Script.
+Modification of the appearance of the select boxes of directory.
 
 = 2.27 =
 Fixed a problem of when save the exclude file.
@@ -162,6 +166,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.28 =
 = 2.27 =
 = 2.26 =
 = 2.25 =

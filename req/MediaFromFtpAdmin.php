@@ -82,7 +82,6 @@ class MediaFromFtpAdmin {
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
-
 		if ( !empty($_POST['mediafromftp_exclude_file']) ) {
 			update_option( 'mediafromftp_exclude_file', $_POST['mediafromftp_exclude_file'] );
 		}
@@ -166,7 +165,7 @@ class MediaFromFtpAdmin {
 			<form method="post" action="<?php echo $scriptname; ?>">
 				<div style="display:block;padding:20px 0">
 					<?php _e('Find the following directories.', 'mediafromftp'); ?>
-					<select name="searchdir">
+					<select name="searchdir" style="width: 100%">
 					<?php echo $linkselectbox; ?>
 					</select>
 					<input type="submit" value="<?php _e('Search'); ?>" />
@@ -637,11 +636,9 @@ $mediafromftp_add_js = <<<MEDIAFROMFTP1
 
 <!-- BEGIN: Media from FTP -->
 <script type="text/javascript">
-	jQuery(document).ready(function () {
-		jQuery('#mediafromftp-tabs').responsiveTabs({
-			startCollapsed: 'accordion'
-		});
-	});
+jQuery('#mediafromftp-tabs').responsiveTabs({
+  startCollapsed: 'accordion'
+});
 </script>
 <script type="text/javascript">
 jQuery(function(){
