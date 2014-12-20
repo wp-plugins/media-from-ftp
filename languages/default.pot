@@ -70,3 +70,6 @@ msgid ""
 "Get the date/time of the file, and updated based on it. Change it if "
 "necessary."
 msgstr ""
+
+msgid "If you want to change the upload directory, you can do so by changing the options.php upload_path, the upload_url_path. It is also possible from below. However, if it is necessary to complex settings such as the use of multi-site and sub-domains, is not recommended."
+msgstr ""

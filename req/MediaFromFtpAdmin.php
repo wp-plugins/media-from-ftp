@@ -596,21 +596,24 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-3'; ?>">
 			<h2><?php _e('Uploading Files'); ?></h2>
-			<div style="display:block;padding:20px 0">
+			<div style="display:block; padding: 10px; border:4px red solid;width:98%; color:red; font-size: 120%;">
+			<?php _e('If you want to change the upload directory, you can do so by changing the options.php upload_path, the upload_url_path. It is also possible from below. However, if it is necessary to complex settings such as the use of multi-site and sub-domains, is not recommended.', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:20px 0;">
 			<div><?php _e('Store uploads in this folder'); ?></div>
 			<input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr(get_option('upload_path')); ?>" />
 			<div><?php _e('Default is <code>wp-content/uploads</code>'); ?></div>
 			</div>
-			<div style="display:block;padding:20px 0">
+			<div style="display:block;padding:20px 0;">
 			<div><?php _e('Full URL path to files'); ?></div>
 			<input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option('upload_url_path')); ?>" />
 			<div><?php _e('Configuring this is optional. By default, it should be blank.'); ?></div>
 			</div>
-			<div style="display:block;padding:20px 0">
-			<font color="red"><?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?></font>
+			<div style="display:block; padding:10px 0; color:red;">
+			<?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?>
 			</div>
-			<div style="display:block;padding:20px 0">
-			<font color="red"><?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?></font>
+			<div style="display:block; padding:10px 0; color:red;">
+			<?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?>
 			</div>
 			<div class="submit">
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
