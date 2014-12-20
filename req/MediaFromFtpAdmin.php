@@ -229,7 +229,7 @@ class MediaFromFtpAdmin {
 								</div>
 								<div style="display:block;padding:5px 0">
 								<input type="radio" name="dateset" value="server">
-								<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
+								<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary. Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?>
 								</div>
 								<?php
 								if (get_option( 'uploads_use_yearmonth_folders' )) {
@@ -273,12 +273,22 @@ class MediaFromFtpAdmin {
 							<tr>
 							<td>
 								<input name="new_url_attaches[<?php echo $this->postcount; ?>][url]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp">
-<?php echo $new_url; ?>
 							<?php
+							echo $new_url;
 							$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
+
+							$exifdata = wp_read_image_metadata( $file );
+							if ( $exifdata ) {
+								foreach ( $exifdata as $key ){
+									$exif_ux_time = $exifdata['created_timestamp'];
+									if ( !empty($exif_ux_time) ) {
+										$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+									}
+								}
+							}
+
 							$newdate = substr( $date , 0 , strlen($date)-3 );
 							?>
-							
 								<input type="text" id="datetimepicker-mediafromftp<?php echo $this->postcount; ?>" name="new_url_attaches[<?php echo $this->postcount; ?>][datetime]" value="<?php echo $newdate; ?>">
 							</td>
 							</tr>

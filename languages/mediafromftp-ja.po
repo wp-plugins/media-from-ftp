@@ -81,8 +81,10 @@ msgstr "現在の日時で更新"
 
 msgid ""
 "Get the date/time of the file, and updated based on it. Change it if "
-"necessary."
-msgstr "ファイルの日時を取得し、それに基づいて更新。必要に応じて変更。"
+"necessary. Get by priority if there is date and time of the Exif information."
+msgstr ""
+"ファイルの日時を取得し、それに基づいて更新。必要に応じて変更。Exif情報の日時"
+"がある場合に優先的に取得する。"
 
 msgid ""
 "If you want to change the upload directory, you can do so by changing the "

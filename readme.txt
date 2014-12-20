@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 2.29
+Stable tag: 2.30
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,6 +43,10 @@ none
 6. Change the upload directory
 
 == Changelog ==
+
+= 2.30 =
+Can get the Exif information.
+Change /languages.
 
 = 2.29 =
 Additional note about the change of upload directory.
@@ -170,6 +174,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 2.30 =
 = 2.29 =
 = 2.28 =
 = 2.27 =
