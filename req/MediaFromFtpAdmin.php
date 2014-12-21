@@ -75,6 +75,8 @@ class MediaFromFtpAdmin {
 	 */
 	function manage_page() {
 
+		ini_set('max_execution_time', 300); 
+
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
@@ -110,6 +112,7 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 
 		<h2>Media from FTP</h2>
+
 			<div id="mediafromftp-tabs">
 				<ul>
 				<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
@@ -279,11 +282,9 @@ class MediaFromFtpAdmin {
 
 							$exifdata = wp_read_image_metadata( $file );
 							if ( $exifdata ) {
-								foreach ( $exifdata as $key ){
-									$exif_ux_time = $exifdata['created_timestamp'];
-									if ( !empty($exif_ux_time) ) {
-										$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
-									}
+								$exif_ux_time = $exifdata['created_timestamp'];
+								if ( !empty($exif_ux_time) ) {
+									$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
 								}
 							}
 
