@@ -132,6 +132,11 @@ class MediaFromFtpAdmin {
 		$document_root = $wordpress_root.$searchdir;
 		$dir_root = $wp_uploads['basedir'];
 
+		// Make tmp dir
+		if ( !is_dir( $dir_root.'/media-from-ftp-tmp' ) ) {
+			mkdir( $dir_root.'/media-from-ftp-tmp', 0755 );
+		}
+
 		if( WPLANG === 'ja' ) {
 			mb_language('Japanese');
 		} else if( WPLANG === 'en' ) {
@@ -243,57 +248,129 @@ class MediaFromFtpAdmin {
 									</div>
 								<?php
 								}
-								?>
-								<div class="submit">
-									<input type="hidden" name="adddb" value="TRUE">
-									<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-									<input type="submit" value="<?php _e('Update Media'); ?>" />
-								</div>
-							<?php
-						}
-						?>
-						<?php
-						if ( $adddb <> 'TRUE' ) {
 							?>
+							<div class="submit">
+								<input type="hidden" name="adddb" value="TRUE">
+								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+								<input type="submit" value="<?php _e('Update Media'); ?>" />
+							</div>
 							<table class="wp-list-table widefat" border="1">
 							<tbody>
+							<col span="2" width="50px">
 							<tr>
-							<td>
+							<td colspan="3">
 							<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
 							</td>
 							</tr>
 							<tr>
-							<td><?php _e('Select'); ?>&nbsp-&nbsp
-							<?php _e('Full URL path to files'); ?>&nbsp-&nbsp
-							<?php _e('Edit date and time'); ?>
-							</td>
+							<td><?php _e('Select'); ?></td>
+							<td><?php _e('Thumbnail'); ?></td>
+							<td><?php _e('Metadata'); ?></td>
 							</tr>
 							<?php
+							// Delete tmpfile
+							$deltmpdir = $wordpress_root.$wp_uploads_path.'/media-from-ftp-tmp';
+							if ( $tmpdirhandle = opendir ( $deltmpdir )) {
+								while ( false !== ( $deltmpfile = readdir ( $tmpdirhandle ) ) ) {
+									if ( $deltmpfile != "." && $deltmpfile != ".." ) {
+										unlink ( $deltmpdir.'/'.$deltmpfile );
+									}
+								}
+							}
+					        closedir ( $tmpdirhandle );
 						}
 					}
 					if ( $adddb <> 'TRUE' ) {
-						?>
-							<tr>
-							<td>
-								<input name="new_url_attaches[<?php echo $this->postcount; ?>][url]" type="checkbox" value="<?php echo $new_url; ?>" class="group_media-from-ftp">
-							<?php
-							echo $new_url;
+							$input_html = NULL;
+							$input_html .= '<tr><td>';
+							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp">';
+							$input_html .= '</td>';
 							$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
 
-							$exifdata = wp_read_image_metadata( $file );
-							if ( $exifdata ) {
-								$exif_ux_time = $exifdata['created_timestamp'];
-								if ( !empty($exif_ux_time) ) {
-									$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+							$metadata_org = NULL;
+							if ( wp_ext2type($ext) === 'image' ){
+								$viewthumb = wp_get_image_editor( $file );
+								if ( ! is_wp_error( $viewthumb ) ) {
+									$viewthumb->resize( 50 ,50, true );
+									$viewthumb->save( $dir_root.'/media-from-ftp-tmp/'.$count.$suffix_file );
+									$viewthumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$count.$suffix_file;
+								} else {
+									$viewthumb_url = site_url('/'). WPINC . '/images/media/default.png';
 								}
+								$exifdata = wp_read_image_metadata( $file );
+								if ( $exifdata ) {
+									$exif_ux_time = $exifdata['created_timestamp'];
+									if ( !empty($exif_ux_time) ) {
+										$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+									}
+								}
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'audio' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/audio.png';
+								$metadata_audio = wp_read_audio_metadata( $file );
+								$file_size_audio = $metadata_audio['filesize'];
+								$mimetype_audio = $metadata_audio['fileformat'].'('.$metadata_audio['mime_type'].')';
+								$length_audio = $metadata_audio['length_formatted'];
+								$metadata_org = '<div>'.__('File type:').' '.$mimetype_audio.'</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_audio).'</div>';
+								$metadata_org .= '<div>'.__('Length:').' '.$length_audio.'</div>';
+							} else if ( wp_ext2type($ext) === 'video' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/video.png';
+								$metadata_video = wp_read_video_metadata( $file );
+								$file_size_video = $metadata_video['filesize'];
+								$mimetype_video = $metadata_video['fileformat'].'('.$metadata_video['mime_type'].')';
+								$length_video = $metadata_video['length_formatted'];
+								$metadata_org = '<div>'.__('File type:').' '.$mimetype_video.'</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_video).'</div>';
+								$metadata_org .= '<div>'.__('Length:').' '.$length_video.'</div>';
+							} else if ( wp_ext2type($ext) === 'document' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/document.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'spreadsheet' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/spreadsheet.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'interactive' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/interactive.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'text' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/text.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'archive' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/archive.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else if ( wp_ext2type($ext) === 'code' ) {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/code.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else {
+								$viewthumb_url = site_url('/'). WPINC . '/images/media/default.png';
+								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
+								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							}
 
+							$input_html .= '<td>';
+							$input_html .= '<img width="50" height="50" src="'.$viewthumb_url.'">';
+							$input_html .= '</td>';
+							$input_html .= '<td>';
+							$input_html .= '<div>URL: <a href="'.$new_url.'" target="_blank">'.$new_url.'</a></div>';
+							$input_html .= $metadata_org;
+
 							$newdate = substr( $date , 0 , strlen($date)-3 );
-							?>
-								<input type="text" id="datetimepicker-mediafromftp<?php echo $this->postcount; ?>" name="new_url_attaches[<?php echo $this->postcount; ?>][datetime]" value="<?php echo $newdate; ?>">
-							</td>
-							</tr>
-						<?php
+
+							$input_html .= '<div>'.__('Edit date and time').'</div>';
+							$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$newdate.'">';
+
+							$input_html .= '</td>';
+							$input_html .= '</tr>';
+
+							echo $input_html;
+
 						++$this->postcount;
 					}
 				}
