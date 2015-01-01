@@ -268,16 +268,6 @@ class MediaFromFtpAdmin {
 							<td><?php _e('Metadata'); ?></td>
 							</tr>
 							<?php
-							// Delete tmpfile
-							$deltmpdir = $wordpress_root.$wp_uploads_path.'/media-from-ftp-tmp';
-							if ( $tmpdirhandle = opendir ( $deltmpdir )) {
-								while ( false !== ( $deltmpfile = readdir ( $tmpdirhandle ) ) ) {
-									if ( $deltmpfile != "." && $deltmpfile != ".." ) {
-										unlink ( $deltmpdir.'/'.$deltmpfile );
-									}
-								}
-							}
-					        closedir ( $tmpdirhandle );
 						}
 					}
 					if ( $adddb <> 'TRUE' ) {
@@ -289,13 +279,30 @@ class MediaFromFtpAdmin {
 
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
-								$viewthumb = wp_get_image_editor( $file );
-								if ( ! is_wp_error( $viewthumb ) ) {
-									$viewthumb->resize( 50 ,50, true );
-									$viewthumb->save( $dir_root.'/media-from-ftp-tmp/'.$count.$suffix_file );
-									$viewthumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$count.$suffix_file;
+								$cash_thumb_key = md5($new_url);
+								$cash_thumb_filename = $dir_root.'/media-from-ftp-tmp/'.$cash_thumb_key.$suffix_file;
+								$value_cash = get_transient( $cash_thumb_key );
+								if ( $value_cash <> FALSE ) {
+									if ( ! file_exists( $cash_thumb_filename )) {
+										delete_transient( $cash_thumb_key );
+										$value_cash = FALSE;
+									}
+								}
+								if ( $value_cash == FALSE ) {
+									if ( ! file_exists( $cash_thumb_filename )) {
+										$cash_thumb = wp_get_image_editor( $file );
+										if ( ! is_wp_error( $cash_thumb ) ) {
+											$cash_thumb->resize( 50 ,50, true );
+											$cash_thumb->save( $cash_thumb_filename );
+											$view_thumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$cash_thumb_key.$suffix_file;
+										} else {
+											$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+										}
+										set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
+									}
 								} else {
-									$viewthumb_url = site_url('/'). WPINC . '/images/media/default.png';
+									$view_thumb_url = $value_cash;
+									set_transient( $cash_thumb_key, $value_cash, DAY_IN_SECONDS);
 								}
 								$exifdata = wp_read_image_metadata( $file );
 								if ( $exifdata ) {
@@ -307,7 +314,7 @@ class MediaFromFtpAdmin {
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'audio' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/audio.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/audio.png';
 								$metadata_audio = wp_read_audio_metadata( $file );
 								$file_size_audio = $metadata_audio['filesize'];
 								$mimetype_audio = $metadata_audio['fileformat'].'('.$metadata_audio['mime_type'].')';
@@ -316,7 +323,7 @@ class MediaFromFtpAdmin {
 								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_audio).'</div>';
 								$metadata_org .= '<div>'.__('Length:').' '.$length_audio.'</div>';
 							} else if ( wp_ext2type($ext) === 'video' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/video.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/video.png';
 								$metadata_video = wp_read_video_metadata( $file );
 								$file_size_video = $metadata_video['filesize'];
 								$mimetype_video = $metadata_video['fileformat'].'('.$metadata_video['mime_type'].')';
@@ -325,37 +332,37 @@ class MediaFromFtpAdmin {
 								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_video).'</div>';
 								$metadata_org .= '<div>'.__('Length:').' '.$length_video.'</div>';
 							} else if ( wp_ext2type($ext) === 'document' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/document.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/document.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'spreadsheet' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/spreadsheet.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/spreadsheet.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'interactive' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/interactive.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/interactive.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'text' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/text.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/text.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'archive' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/archive.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/archive.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'code' ) {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/code.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/code.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else {
-								$viewthumb_url = site_url('/'). WPINC . '/images/media/default.png';
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							}
 
 							$input_html .= '<td>';
-							$input_html .= '<img width="50" height="50" src="'.$viewthumb_url.'">';
+							$input_html .= '<img width="50" height="50" src="'.$view_thumb_url.'">';
 							$input_html .= '</td>';
 							$input_html .= '<td>';
 							$input_html .= '<div>URL: <a href="'.$new_url.'" target="_blank">'.$new_url.'</a></div>';
