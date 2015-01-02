@@ -411,10 +411,23 @@ class MediaFromFtpAdmin {
 					foreach ( $postval1 as $postkey2 => $postval2 ){
 						if ( $postkey2 === 'url' ) {
 							$new_url_attach = $postval1[$postkey2];
-
 							$exts = explode('.', wp_basename($new_url_attach));
 							$ext = end($exts);
 							$suffix_attach_file = '.'.$ext;
+
+							// Delete Cash
+							if ( wp_ext2type($ext) === 'image' ){
+								$del_cash_thumb_key = md5($new_url_attach);
+								$del_cash_thumb_filename = $dir_root.'/media-from-ftp-tmp/'.$del_cash_thumb_key.$suffix_attach_file;
+								$value_del_cash = get_transient( $del_cash_thumb_key );
+								if ( $value_del_cash <> FALSE ) {
+									if ( file_exists( $del_cash_thumb_filename )) {
+										delete_transient( $del_cash_thumb_key );
+										unlink( $dir_root.'/media-from-ftp-tmp/'.$del_cash_thumb_key.$suffix_attach_file );
+									}
+								}
+							}
+
 							$new_attach_titlenames = explode('/', $new_url_attach);
 							$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 							$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
