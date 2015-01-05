@@ -195,6 +195,11 @@ class MediaFromFtpAdmin {
 		$post_attachs = array();
 		$unregister_unwritable_count = 0;
 		$unregister_multibyte_file_count = 0;
+
+		echo str_pad(' ',4096)."\n";
+		ob_end_flush();
+		ob_start('mb_output_handler');
+
 		foreach ( $files as $file ){
 			if ( is_dir($file) ) { // dirctory
 				$new_file = FALSE;
@@ -377,12 +382,15 @@ class MediaFromFtpAdmin {
 							$input_html .= '</tr>';
 
 							echo $input_html;
+							ob_flush();
+							flush();
 
 						++$this->postcount;
 					}
 				}
 			}
 		}
+		ob_end_clean();
 		?>
 		</tbody>
 		</table>
