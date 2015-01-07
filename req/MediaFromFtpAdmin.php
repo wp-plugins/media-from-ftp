@@ -84,26 +84,25 @@ class MediaFromFtpAdmin {
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
-		if ( !empty($_POST['mediafromftp_exclude_file']) ) {
-			update_option( 'mediafromftp_exclude_file', $_POST['mediafromftp_exclude_file'] );
+		$wp_uploads_path = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+		$searchdir = $mediafromftp_settings['searchdir'];
+
+		if ( empty($_POST['mediafromftp-tabs']) ) {
+			$tabs = 1;
+		} else {
+			$tabs = intval($_POST['mediafromftp-tabs']);
 		}
-		if ( !empty($_POST['upload_path']) ) {
-			update_option( 'upload_path', $_POST['upload_path'] );
-		}
-		if ( !empty($_POST['upload_url_path']) ) {
-			update_option( 'upload_url_path', $_POST['upload_url_path'] );
-		}
+
+		$this->options_updated($tabs);
+
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+		$searchdir = $mediafromftp_settings['searchdir'];
 
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
-		}
-
-		$wp_uploads = wp_upload_dir();
-		$wp_uploads_path = str_replace(site_url('/'), '', $wp_uploads['baseurl']);
-		$searchdir = $wp_uploads_path;
-		if (!empty($_POST['searchdir'])){
-			$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
 		}
 
 		$scriptname = admin_url('tools.php?page=mediafromftp');
@@ -128,14 +127,7 @@ class MediaFromFtpAdmin {
 
 		<?php
 
-		$wordpress_root = ABSPATH;
-		$document_root = $wordpress_root.$searchdir;
-		$dir_root = $wp_uploads['basedir'];
-
-		// Make tmp dir
-		if ( !is_dir( $dir_root.'/media-from-ftp-tmp' ) ) {
-			mkdir( $dir_root.'/media-from-ftp-tmp', 0755 );
-		}
+		$document_root = ABSPATH.$searchdir;
 
 		if( WPLANG === 'ja' ) {
 			mb_language('Japanese');
@@ -152,10 +144,11 @@ class MediaFromFtpAdmin {
 		}
 
 		if ( $adddb <> 'TRUE' ) {
-			$dirs = $mediafromftp->scan_dir($dir_root);
+			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
 			$linkselectbox = NULL;
 			foreach ($dirs as $linkdir) {
-				$linkdirenc = mb_convert_encoding(str_replace($wordpress_root, "", $linkdir), "UTF-8", "auto");
+
+				$linkdirenc = mb_convert_encoding(str_replace(ABSPATH, "", $linkdir), "UTF-8", "auto");
 				if( $searchdir === $linkdirenc ){
 					$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
 				}else{
@@ -176,6 +169,7 @@ class MediaFromFtpAdmin {
 					<select name="searchdir" style="width: 100%">
 					<?php echo $linkselectbox; ?>
 					</select>
+					<input type="hidden" name="mediafromftp-tabs" value="1" />
 					<input type="submit" value="<?php _e('Search'); ?>" />
 				</div>
 			</form>
@@ -201,26 +195,10 @@ class MediaFromFtpAdmin {
 		ob_start('mb_output_handler');
 
 		foreach ( $files as $file ){
-			if ( is_dir($file) ) { // dirctory
-				$new_file = FALSE;
-			} else {
-				$exts = explode('.', wp_basename($file));
-				$ext = end($exts);
-				$suffix_file = '.'.$ext;
-				$new_url = site_url('/').str_replace($wordpress_root, '', $file);
-				$new_titles = explode('/', $new_url);
-				$new_title = str_replace($suffix_file, '', end($new_titles));
-				$new_title_md5 = md5($new_title);
-				$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
-				$new_file = TRUE;
-				foreach ( $attachments as $attachment ){
-					$attach_url = $attachment->guid;
-					if ( $attach_url === $new_url || $attach_url === $new_url_md5 ) {
-						$new_file = FALSE;
-					}
-				}
-				$new_url = mb_convert_encoding($new_url, "UTF-8", "auto");
-			}
+
+			// Input URL
+			list($new_file, $ext, $new_url) = $mediafromftp->input_url($file, $attachments);
+
 			if ($new_file) {
 				if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
 					$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
@@ -237,24 +215,19 @@ class MediaFromFtpAdmin {
 							?>
 							<form method="post" action="<?php echo $scriptname; ?>">
 								<div style="display:block;padding:5px 0">
-								<input type="radio" name="dateset" value="new" checked>
+								<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
 								<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
 								</div>
 								<div style="display:block;padding:5px 0">
-								<input type="radio" name="dateset" value="server">
+								<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
 								<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary. Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?>
 								</div>
-								<?php
-								if (get_option( 'uploads_use_yearmonth_folders' )) {
-								?>
-									<div style="display:block;padding:5px 0">
-									<input name="move_yearmonth_folders" type="checkbox" value="1"<?php checked('1', get_option( 'uploads_use_yearmonth_folders' )); ?> />
-									<?php _e('Organize my uploads into month- and year-based folders'); ?>
-									</div>
-								<?php
-								}
-							?>
+								<div style="display:block;padding:5px 0">
+								<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
+								<?php _e('Organize my uploads into month- and year-based folders'); ?>
+								</div>
 							<div class="submit">
+								<input type="hidden" name="mediafromftp-tabs" value="1" />
 								<input type="hidden" name="adddb" value="TRUE">
 								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 								<input type="submit" value="<?php _e('Update Media'); ?>" />
@@ -285,7 +258,7 @@ class MediaFromFtpAdmin {
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
 								$cash_thumb_key = md5($new_url);
-								$cash_thumb_filename = $dir_root.'/media-from-ftp-tmp/'.$cash_thumb_key.$suffix_file;
+								$cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$cash_thumb_key.'.'.$ext;
 								$value_cash = get_transient( $cash_thumb_key );
 								if ( $value_cash <> FALSE ) {
 									if ( ! file_exists( $cash_thumb_filename )) {
@@ -299,7 +272,7 @@ class MediaFromFtpAdmin {
 										if ( ! is_wp_error( $cash_thumb ) ) {
 											$cash_thumb->resize( 50 ,50, true );
 											$cash_thumb->save( $cash_thumb_filename );
-											$view_thumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$cash_thumb_key.$suffix_file;
+											$view_thumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$cash_thumb_key.'.'.$ext;
 										} else {
 											$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
 										}
@@ -402,6 +375,7 @@ class MediaFromFtpAdmin {
 				?>
 				<form method="post" action="<?php echo $scriptname; ?>">
 					<div class="submit">
+						<input type="hidden" name="mediafromftp-tabs" value="1" />
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 						<input type="submit" value="<?php _e('Back'); ?>" />
 						<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
@@ -410,117 +384,30 @@ class MediaFromFtpAdmin {
 				<table class="wp-list-table widefat" border="1">
 				<tbody>
 				<?php
+				$mediafromftp_settings_new = get_option('mediafromftp_settings');
+				$dateset = $mediafromftp_settings_new['dateset'];
+				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
 				echo str_pad(' ',4096)."\n";
-				ob_end_flush();
 				ob_start('mb_output_handler');
 
 				foreach ( $new_url_attaches as $postkey1 => $postval1 ){
 					foreach ( $postval1 as $postkey2 => $postval2 ){
 						if ( $postkey2 === 'url' ) {
 							$new_url_attach = $postval1[$postkey2];
+							$new_url_datetime = $postval1['datetime'];
 							$exts = explode('.', wp_basename($new_url_attach));
 							$ext = end($exts);
-							$suffix_attach_file = '.'.$ext;
 
 							// Delete Cash
-							if ( wp_ext2type($ext) === 'image' ){
-								$del_cash_thumb_key = md5($new_url_attach);
-								$del_cash_thumb_filename = $dir_root.'/media-from-ftp-tmp/'.$del_cash_thumb_key.$suffix_attach_file;
-								$value_del_cash = get_transient( $del_cash_thumb_key );
-								if ( $value_del_cash <> FALSE ) {
-									if ( file_exists( $del_cash_thumb_filename )) {
-										delete_transient( $del_cash_thumb_key );
-										unlink( $dir_root.'/media-from-ftp-tmp/'.$del_cash_thumb_key.$suffix_attach_file );
-									}
-								}
-							}
+							$mediafromftp->delete_cash($ext, $new_url_attach);
 
-							$new_attach_titlenames = explode('/', $new_url_attach);
-							$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
-							$filename = str_replace($wp_uploads['baseurl'].'/', '', $new_url_attach);
-							$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
-							if ( $_POST["dateset"] === 'server' ) {
-								$postdategmt = get_gmt_from_date($postval1['datetime'].':00');
-							}
-							if ( strpos($filename, ' ' ) ) {
-								$oldfilename = $filename;
-								$filename = str_replace(' ', '-', $oldfilename);
-								$new_url_attach = str_replace(' ', '-', $new_url_attach);
-								copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
-								unlink( $dir_root.'/'.$oldfilename );
-							}
-							if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
-								if ( strpos( $filename ,'/' ) === FALSE ) {
-									$currentdir = '';
-									$currentfile = str_replace($suffix_attach_file, '', $filename);
-								} else {
-									$currentfiles = explode('/', $filename);
-									$currentfile = end($currentfiles);
-									$currentdir = str_replace($currentfile, '', $filename);
-									$currentfile = str_replace($suffix_attach_file, '', $currentfile);
-								}
-								if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
-									$currentdir = mb_convert_encoding($currentdir, "sjis-win", "auto");
-									$currentfile = mb_convert_encoding($currentfile, "sjis-win", "auto");
-								} else {
-									$currentdir = mb_convert_encoding($currentdir, "UTF-8", "auto");
-									$currentfile = mb_convert_encoding($currentfile, "UTF-8", "auto");
-								}
-								$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
-								$filename = $currentdir.md5($currentfile).$suffix_attach_file;
-								$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
-								copy( $dir_root.'/'.$oldfilename, $dir_root.'/'.$filename );
-								unlink( $dir_root.'/'.$oldfilename );
-								$filename = mb_convert_encoding($filename, "UTF-8", "auto");
-								$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
-							}
-
-							if ( get_option( 'uploads_use_yearmonth_folders' ) ) {
-								if (!empty($_POST['move_yearmonth_folders'])){
-									if ( $_POST["move_yearmonth_folders"] == 1 ) {
-										$y = substr( $postdategmt, 0, 4 );
-										$m = substr( $postdategmt, 5, 2 );
-										$subdir = "/$y/$m";
-										if ( $dir_root.'/'.$filename <> $dir_root.$subdir.'/'.wp_basename($filename) ) {
-											if ( !file_exists($dir_root.$subdir) ) {
-												mkdir($dir_root.$subdir, 0757, true);
-											}
-											copy( $dir_root.'/'.$filename, $dir_root.$subdir.'/'.wp_basename($filename) );
-											unlink( $dir_root.'/'.$filename );
-											$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
-											$new_url_attach = $wp_uploads['baseurl'].'/'.$filename;
-										}
-									}
-								}
-							}
-
-							$newfile_post = array(
-								'post_title' => $new_attach_title,
-								'post_content' => '',
-								'guid' => $new_url_attach,
-								'post_status' => 'inherit', 
-								'post_type' => 'attachment',
-								'post_mime_type' => $mediafromftp->mime_type($suffix_attach_file)
-								);
-							$attach_id = wp_insert_attachment( $newfile_post, $filename );
-
-							if ( $_POST["dateset"] === 'server' ) {
-								$postdate = get_date_from_gmt($postdategmt);
-								$up_post = array(
-												'ID' => $attach_id,
-												'post_date' => $postdate,
-												'post_date_gmt' => $postdategmt,
-												'post_modified' => $postdate,
-												'post_modified_gmt' => $postdategmt
-											);
-								wp_update_post( $up_post );
-							}
+							// Regist
+							list($attach_id, $new_attach_title, $new_url_attach) = $mediafromftp->regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders);
 
 							if ( wp_ext2type($ext) === 'image' ){
-								$metadata = wp_generate_attachment_metadata( $attach_id, get_attached_file($attach_id) );
-								wp_update_attachment_metadata( $attach_id, $metadata );
-								$imagethumburl_base = rtrim($new_url_attach, wp_basename($new_url_attach));
+								$metadata = wp_get_attachment_metadata( $attach_id );
+								$imagethumburl_base = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.rtrim($metadata['file'], wp_basename($metadata['file']));
 								foreach ( $metadata as $key1 => $key2 ){
 									if ( $key1 === 'sizes' ) {
 										foreach ( $metadata[$key1] as $key2 => $key3 ){
@@ -535,12 +422,10 @@ class MediaFromFtpAdmin {
 								$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
 								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
 								$length = $metadata['length_formatted'];
-								wp_update_attachment_metadata( $attach_id, $metadata );
 							}else if ( wp_ext2type($ext) === 'audio' ){
 								$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
 								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
 								$length = $metadata['length_formatted'];
-								wp_update_attachment_metadata( $attach_id, $metadata );
 							} else {
 								$metadata = NULL;
 							}
@@ -609,6 +494,7 @@ class MediaFromFtpAdmin {
 			?>
 			<div class="submit">
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
+				<input type="hidden" name="mediafromftp-tabs" value="1" />
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="submit" value="<?php _e('Back'); ?>" />
 			</form>
@@ -636,10 +522,12 @@ class MediaFromFtpAdmin {
 				}
 					?>
 					<div class="submit">
+						<input type="hidden" name="mediafromftp-tabs" value="1" />
 						<input type="hidden" name="adddb" value="TRUE">
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 						<input type="submit" value="<?php _e('Update Media'); ?>" />
 					</div>
+					</form>
 					<?php
 				if ( !empty($unregisters_unwritable) ) {
 					?>
@@ -700,8 +588,10 @@ class MediaFromFtpAdmin {
 		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-2'; ?>">
 			<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>
 			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
-			<textarea id="mediafromftp_exclude_file" name="mediafromftp_exclude_file" rows="4" style="width: 250px;"><?php echo get_option('mediafromftp_exclude_file'); ?></textarea>
+			<?php $mediafromftp_settings_tabs_2 = get_option('mediafromftp_settings'); ?>
+			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_2['exclude']; ?></textarea>
 			<div class="submit">
+				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
@@ -732,6 +622,7 @@ class MediaFromFtpAdmin {
 			<?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?>
 			</div>
 			<div class="submit">
+				<input type="hidden" name="mediafromftp-tabs" value="3" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
@@ -741,6 +632,65 @@ class MediaFromFtpAdmin {
 		</div>
 		</div>
 		<?php
+
+	}
+
+	/* ==================================================
+	 * Update wp_options table.
+	 * @param	string	$tabs
+	 * @since	3.0
+	 */
+	function options_updated($tabs){
+
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+
+		switch ($tabs) {
+			case 1:
+					if (!empty($_POST['searchdir'])){
+						$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
+					} else {
+						$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+					}
+					if ( !empty($_POST['mediafromftp_dateset']) ) {
+						$mediafromftp_tbl = array(
+											'searchdir' => $searchdir,
+											'dateset' => $_POST['mediafromftp_dateset'],
+											'exclude' => $mediafromftp_settings['exclude']
+											);
+						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+						if ( !empty($_POST['move_yearmonth_folders']) ) {
+							update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
+						} else {
+							update_option( 'uploads_use_yearmonth_folders', '0' );
+						}
+					} else {
+						$mediafromftp_tbl = array(
+											'searchdir' => $searchdir,
+											'dateset' => $mediafromftp_settings['dateset'],
+											'exclude' => $mediafromftp_settings['exclude']
+											);
+						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					}
+				break;
+			case 2:
+				if ( !empty($_POST['mediafromftp_exclude']) ) {
+					$mediafromftp_tbl = array(
+										'searchdir' => $mediafromftp_settings['searchdir'],
+										'dateset' => $mediafromftp_settings['dateset'],
+										'exclude' => $_POST['mediafromftp_exclude']
+										);
+					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+				}
+				break;
+			case 3:
+				if ( !empty($_POST['upload_path']) ) {
+					update_option( 'upload_path', $_POST['upload_path'] );
+				}
+				if ( !empty($_POST['upload_url_path']) ) {
+					update_option( 'upload_url_path', $_POST['upload_url_path'] );
+				}
+				break;
+		}
 
 	}
 

@@ -26,8 +26,29 @@ class MediaFromFtpRegist {
 	 * @since	2.3
 	 */
 	function register_settings(){
-		register_setting( 'mediafromftp-settings-group', 'mediafromftp_exclude_file');
-		add_option('mediafromftp_exclude_file','(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js');
+
+		$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+
+		$exclude_settings = '(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js';
+
+		// << version 2.35
+		if ( get_option('mediafromftp_exclude_file') ) {
+
+			$exclude_settings = get_option('mediafromftp_exclude_file');
+
+			delete_option( 'mediafromftp_exclude_file' );
+
+		}
+
+		if ( !get_option('mediafromftp_settings') ) {
+			$mediafromftp_tbl = array(
+								'searchdir' => $searchdir,
+								'dateset' => 'new',
+								'exclude' => $exclude_settings
+							);
+			update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+		}
+
 	}
 
 }

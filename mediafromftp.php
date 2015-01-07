@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 2.35
+Version: 2.36
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
@@ -29,6 +29,15 @@ Domain Path: /languages
 	define("MEDIAFROMFTP_PLUGIN_BASE_FILE", plugin_basename(__FILE__));
 	define("MEDIAFROMFTP_PLUGIN_BASE_DIR", dirname(__FILE__));
 	define("MEDIAFROMFTP_PLUGIN_URL", plugins_url($path='',$scheme=null).'/media-from-ftp');
+	$wp_uploads = wp_upload_dir();
+	define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+	define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
+	define("MEDIAFROMFTP_PLUGIN_TMP_DIR", MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/media-from-ftp-tmp');
+
+	// Make tmp dir
+	if ( !is_dir( MEDIAFROMFTP_PLUGIN_TMP_DIR ) ) {
+		mkdir( MEDIAFROMFTP_PLUGIN_TMP_DIR, 0755 );
+	}
 
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpRegist.php' );
 	$mediafromftpregist = new MediaFromFtpRegist();

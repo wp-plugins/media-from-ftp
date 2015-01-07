@@ -4,7 +4,7 @@
 if ( !defined( 'WP_UNINSTALL_PLUGIN' ) ) 
     exit();
 
-$option_name = 'mediafromftp_exclude_file';
+$option_name = 'mediafromftp_settings';
 
 // For Single site
 if ( !is_multisite() ) 
