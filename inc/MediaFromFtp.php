@@ -131,9 +131,48 @@ class MediaFromFtp {
 
 	/* ==================================================
 	 * @param	string	$ext
+	 * @param	string	$file
+	 * @param	string	$new_url
+	 * @return	string 	$view_thumb_url
+	 * @since	2.36
+	 */
+	function create_cash($ext, $file, $new_url){
+
+		$cash_thumb_key = md5($new_url);
+		$cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$cash_thumb_key.'.'.$ext;
+		$value_cash = get_transient( $cash_thumb_key );
+		if ( $value_cash <> FALSE ) {
+			if ( ! file_exists( $cash_thumb_filename )) {
+				delete_transient( $cash_thumb_key );
+				$value_cash = FALSE;
+			}
+		}
+		if ( $value_cash == FALSE ) {
+			if ( ! file_exists( $cash_thumb_filename )) {
+				$cash_thumb = wp_get_image_editor( $file );
+				if ( ! is_wp_error( $cash_thumb ) ) {
+					$cash_thumb->resize( 50 ,50, true );
+					$cash_thumb->save( $cash_thumb_filename );
+					$view_thumb_url = MEDIAFROMFTP_PLUGIN_TMP_URL.'/'.$cash_thumb_key.'.'.$ext;
+				} else {
+					$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+				}
+				set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
+			}
+		} else {
+			$view_thumb_url = $value_cash;
+			set_transient( $cash_thumb_key, $value_cash, DAY_IN_SECONDS);
+		}
+
+		return $view_thumb_url;
+
+	}
+
+	/* ==================================================
+	 * @param	string	$ext
 	 * @param	string	$new_url_attach
 	 * @return	none
-	 * @since	3.0
+	 * @since	2.36
 	 */
 	function delete_cash($ext, $new_url_attach){
 
@@ -155,7 +194,7 @@ class MediaFromFtp {
 	 * @param	string	$file
 	 * @param	array	$attachments
 	 * @return	array	$new_file(bool), $ext(string), $new_url(string)
-	 * @since	3.0
+	 * @since	2.36
 	 */
 	function input_url($file, $attachments){
 
@@ -194,7 +233,7 @@ class MediaFromFtp {
 	 * @param	string	$dateset
 	 * @param	bool	$yearmonth_folders
 	 * @return	array	$attach_id(int), $new_attach_title(string), $new_url_attach(string)
-	 * @since	3.0
+	 * @since	2.36
 	 */
 	function regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders){
 

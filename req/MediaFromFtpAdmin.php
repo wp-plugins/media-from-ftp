@@ -84,8 +84,6 @@ class MediaFromFtpAdmin {
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
-		$wp_uploads_path = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
-
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$searchdir = $mediafromftp_settings['searchdir'];
 
@@ -156,10 +154,10 @@ class MediaFromFtpAdmin {
 				}
 				$linkselectbox = $linkselectbox.$linkdirs;
 			}
-			if( empty($_POST['searchdir']) || $searchdir ===  $wp_uploads_path ){
-				$linkdirs = '<option value="" selected>'.$wp_uploads_path.'</option>';
+			if( empty($_POST['searchdir']) || $searchdir ===  MEDIAFROMFTP_PLUGIN_UPLOAD_PATH ){
+				$linkdirs = '<option value="" selected>'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
 			}else{
-				$linkdirs = '<option value="">'.$wp_uploads_path.'</option>';
+				$linkdirs = '<option value="">'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
 			}
 			$linkselectbox = $linkselectbox.$linkdirs;
 			?>
@@ -257,31 +255,7 @@ class MediaFromFtpAdmin {
 
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
-								$cash_thumb_key = md5($new_url);
-								$cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$cash_thumb_key.'.'.$ext;
-								$value_cash = get_transient( $cash_thumb_key );
-								if ( $value_cash <> FALSE ) {
-									if ( ! file_exists( $cash_thumb_filename )) {
-										delete_transient( $cash_thumb_key );
-										$value_cash = FALSE;
-									}
-								}
-								if ( $value_cash == FALSE ) {
-									if ( ! file_exists( $cash_thumb_filename )) {
-										$cash_thumb = wp_get_image_editor( $file );
-										if ( ! is_wp_error( $cash_thumb ) ) {
-											$cash_thumb->resize( 50 ,50, true );
-											$cash_thumb->save( $cash_thumb_filename );
-											$view_thumb_url = site_url('/').$wp_uploads_path.'/media-from-ftp-tmp/'.$cash_thumb_key.'.'.$ext;
-										} else {
-											$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
-										}
-										set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
-									}
-								} else {
-									$view_thumb_url = $value_cash;
-									set_transient( $cash_thumb_key, $value_cash, DAY_IN_SECONDS);
-								}
+								$view_thumb_url = $mediafromftp->create_cash($ext, $file, $new_url);
 								$exifdata = wp_read_image_metadata( $file );
 								if ( $exifdata ) {
 									$exif_ux_time = $exifdata['created_timestamp'];
@@ -638,7 +612,7 @@ class MediaFromFtpAdmin {
 	/* ==================================================
 	 * Update wp_options table.
 	 * @param	string	$tabs
-	 * @since	3.0
+	 * @since	2.36
 	 */
 	function options_updated($tabs){
 
