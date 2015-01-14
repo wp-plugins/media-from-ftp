@@ -115,9 +115,7 @@ class MediaFromFtpAdmin {
 				<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
 				<li><a href="#mediafromftp-tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
 				<li><a href="#mediafromftp-tabs-3"><?php _e('Uploading Files'); ?></a></li>
-				<!--
-				<li><a href="#mediafromftp-tabs-4">FAQ</a></li>
-				 -->
+				<li><a href="#mediafromftp-tabs-4"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
 				</ul>
 				<div id="mediafromftp-tabs-1">
 
@@ -127,9 +125,9 @@ class MediaFromFtpAdmin {
 
 		$document_root = ABSPATH.$searchdir;
 
-		if( WPLANG === 'ja' ) {
+		if( get_option('WPLANG') === 'ja' ) {
 			mb_language('Japanese');
-		} else if( WPLANG === 'en' ) {
+		} else if( get_option('WPLANG') === 'en' ) {
 			mb_language('English');
 		} else {
 			mb_language('uni');
@@ -251,18 +249,12 @@ class MediaFromFtpAdmin {
 							$input_html .= '<tr><td>';
 							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp">';
 							$input_html .= '</td>';
-							$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
+
+							$date = $mediafromftp->get_date_check($file);
 
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
 								$view_thumb_url = $mediafromftp->create_cash($ext, $file, $new_url);
-								$exifdata = wp_read_image_metadata( $file );
-								if ( $exifdata ) {
-									$exif_ux_time = $exifdata['created_timestamp'];
-									if ( !empty($exif_ux_time) ) {
-										$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
-									}
-								}
 								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'audio' ) {
@@ -320,10 +312,8 @@ class MediaFromFtpAdmin {
 							$input_html .= '<div>URL: <a href="'.$new_url.'" target="_blank">'.$new_url.'</a></div>';
 							$input_html .= $metadata_org;
 
-							$newdate = substr( $date , 0 , strlen($date)-3 );
-
 							$input_html .= '<div>'.__('Edit date and time').'</div>';
-							$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$newdate.'">';
+							$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
 
 							$input_html .= '</td>';
 							$input_html .= '</tr>';
@@ -603,6 +593,50 @@ class MediaFromFtpAdmin {
 		</div>
 		</div>
 
+		<div id="mediafromftp-tabs-4">
+		<div class="wrap">
+		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-4'; ?>">
+			<h2><?php _e('Schedule', 'mediafromftp'); ?></h2>
+			<div style="display:block;padding:5px 0">
+			<?php _e('Set the schedule.', 'mediafromftp'); ?>
+			<?php _e('Will take some time until the [Next Schedule] is reflected.', 'mediafromftp'); ?>
+			</div>
+			<?php
+			$mediafromftp_settings_tabs_4 = get_option('mediafromftp_settings');
+			if ( wp_next_scheduled( 'MediaFromFtpCronHook' ) ) {
+				$next_schedule = ' '.get_date_from_gmt(date("Y-m-d H:i:s", wp_next_scheduled( 'MediaFromFtpCronHook' )));
+			} else {
+				$next_schedule = ' '.__('None');
+			}
+			?>
+			<div style="display:block;padding:5px 0">
+			<?php echo __('Next Schedule:', 'mediafromftp').$next_schedule; ?>
+			</div>
+			<div style="display:block;padding:5px 0">
+			<input type="checkbox" name="mediafromftp_cron_apply" value="1" <?php checked('1', $mediafromftp_settings_tabs_4['cron']['apply']); ?> />
+			<?php _e('Apply Schedule', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			<input type="radio" name="mediafromftp_cron_schedule" value="hourly" <?php checked('hourly', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
+			<?php _e('hourly', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			<input type="radio" name="mediafromftp_cron_schedule" value="twicedaily" <?php checked('twicedaily', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
+			<?php _e('twice daily', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			<input type="radio" name="mediafromftp_cron_schedule" value="daily" <?php checked('daily', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
+			<?php _e('daily', 'mediafromftp'); ?>
+			</div>
+
+			<div class="submit">
+				<input type="hidden" name="mediafromftp-tabs" value="4" />
+				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+			</div>
+		</form>
+		</div>
+		</div>
+
 		</div>
 		</div>
 		<?php
@@ -629,7 +663,11 @@ class MediaFromFtpAdmin {
 						$mediafromftp_tbl = array(
 											'searchdir' => $searchdir,
 											'dateset' => $_POST['mediafromftp_dateset'],
-											'exclude' => $mediafromftp_settings['exclude']
+											'exclude' => $mediafromftp_settings['exclude'],
+											'cron' => array(
+														'apply' => $mediafromftp_settings['cron']['apply'],
+														'schedule' => $mediafromftp_settings['cron']['schedule']
+														)
 											);
 						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 						if ( !empty($_POST['move_yearmonth_folders']) ) {
@@ -641,7 +679,11 @@ class MediaFromFtpAdmin {
 						$mediafromftp_tbl = array(
 											'searchdir' => $searchdir,
 											'dateset' => $mediafromftp_settings['dateset'],
-											'exclude' => $mediafromftp_settings['exclude']
+											'exclude' => $mediafromftp_settings['exclude'],
+											'cron' => array(
+														'apply' => $mediafromftp_settings['cron']['apply'],
+														'schedule' => $mediafromftp_settings['cron']['schedule']
+														)
 											);
 						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 					}
@@ -651,7 +693,11 @@ class MediaFromFtpAdmin {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'dateset' => $mediafromftp_settings['dateset'],
-										'exclude' => $_POST['mediafromftp_exclude']
+										'exclude' => $_POST['mediafromftp_exclude'],
+										'cron' => array(
+													'apply' => $mediafromftp_settings['cron']['apply'],
+													'schedule' => $mediafromftp_settings['cron']['schedule']
+													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 				}
@@ -663,6 +709,33 @@ class MediaFromFtpAdmin {
 				if ( !empty($_POST['upload_url_path']) ) {
 					update_option( 'upload_url_path', $_POST['upload_url_path'] );
 				}
+				break;
+			case 4:
+				require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
+				$mediafromftpcron = new MediaFromFtpCron();
+				if ( !empty($_POST['mediafromftp_cron_schedule']) ) {
+					if ( !empty($_POST['mediafromftp_cron_apply']) ) {
+						$mediafromftp_cron_apply = $_POST['mediafromftp_cron_apply'];
+					} else {
+						$mediafromftp_cron_apply = FALSE;
+					}
+					$mediafromftp_tbl = array(
+										'searchdir' => $mediafromftp_settings['searchdir'],
+										'dateset' => $mediafromftp_settings['dateset'],
+										'exclude' => $mediafromftp_settings['exclude'],
+										'cron' => array(
+													'apply' => $mediafromftp_cron_apply,
+													'schedule' => $_POST['mediafromftp_cron_schedule']
+													)
+										);
+					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					if ( !$mediafromftp_cron_apply ) {
+						$mediafromftpcron->CronStop();
+					} else {
+						$mediafromftpcron->CronStart();
+					}
+				}
+				unset($mediafromftpcron);
 				break;
 		}
 

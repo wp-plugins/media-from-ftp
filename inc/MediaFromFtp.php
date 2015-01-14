@@ -192,6 +192,32 @@ class MediaFromFtp {
 
 	/* ==================================================
 	 * @param	string	$file
+	 * @return	string	$date
+	 * @since	2.36
+	 */
+	function get_date_check($file){
+
+		$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
+
+		// for wp_read_image_metadata
+		include_once( ABSPATH . 'wp-admin/includes/image.php' );
+		$exifdata = wp_read_image_metadata( $file );
+
+		if ( $exifdata ) {
+			$exif_ux_time = $exifdata['created_timestamp'];
+			if ( !empty($exif_ux_time) ) {
+				$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+			}
+		}
+
+		$date = substr( $date , 0 , strlen($date)-3 );
+
+		return $date;
+
+	}
+
+	/* ==================================================
+	 * @param	string	$file
 	 * @param	array	$attachments
 	 * @return	array	$new_file(bool), $ext(string), $new_url(string)
 	 * @since	2.36
@@ -237,6 +263,12 @@ class MediaFromFtp {
 	 */
 	function regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders){
 
+		if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
+			$char_code = 'sjis-win';
+		} else {
+			$char_code = 'UTF-8';
+		}
+
 		// Rename and Move file
 		$suffix_attach_file = '.'.$ext;
 		$new_attach_titlenames = explode('/', $new_url_attach);
@@ -253,7 +285,7 @@ class MediaFromFtp {
 			copy( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename );
 			unlink( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename );
 		}
-		if (strlen($new_url_attach) <> mb_strlen($new_url_attach)) {
+		if (strlen($new_url_attach) <> mb_strlen($new_url_attach, $char_code)) {
 			if ( strpos( $filename ,'/' ) === FALSE ) {
 				$currentdir = '';
 				$currentfile = str_replace($suffix_attach_file, '', $filename);
@@ -263,13 +295,9 @@ class MediaFromFtp {
 				$currentdir = str_replace($currentfile, '', $filename);
 				$currentfile = str_replace($suffix_attach_file, '', $currentfile);
 			}
-			if (DIRECTORY_SEPARATOR === '\\' && mb_language() === 'Japanese') {
-				$currentdir = mb_convert_encoding($currentdir, "sjis-win", "auto");
-				$currentfile = mb_convert_encoding($currentfile, "sjis-win", "auto");
-			} else {
-				$currentdir = mb_convert_encoding($currentdir, "UTF-8", "auto");
-				$currentfile = mb_convert_encoding($currentfile, "UTF-8", "auto");
-			}
+			$currentdir = mb_convert_encoding($currentdir, $char_code, "auto");
+			$currentfile = mb_convert_encoding($currentfile, $char_code, "auto");
+
 			$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
 			$filename = $currentdir.md5($currentfile).$suffix_attach_file;
 			$new_url_attach = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.$filename;
@@ -318,6 +346,9 @@ class MediaFromFtp {
 						);
 			wp_update_post( $up_post );
 		}
+
+		// for wp_generate_attachment_metadata
+		include_once( ABSPATH . 'wp-admin/includes/image.php' );
 
 		// Meta data Regist
 		if ( wp_ext2type($ext) === 'image' ){

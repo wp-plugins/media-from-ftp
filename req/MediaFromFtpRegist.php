@@ -30,23 +30,37 @@ class MediaFromFtpRegist {
 		$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
 
 		$exclude_settings = '(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js';
-
 		// << version 2.35
 		if ( get_option('mediafromftp_exclude_file') ) {
-
 			$exclude_settings = get_option('mediafromftp_exclude_file');
-
 			delete_option( 'mediafromftp_exclude_file' );
-
 		}
 
 		if ( !get_option('mediafromftp_settings') ) {
 			$mediafromftp_tbl = array(
 								'searchdir' => $searchdir,
 								'dateset' => 'new',
-								'exclude' => $exclude_settings
+								'exclude' => $exclude_settings,
+								'cron' => array(
+											'apply' => FALSE,
+											'schedule' => 'hourly'
+											)
 							);
 			update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+		} else {
+			$mediafromftp_settings = get_option('mediafromftp_settings');
+			if ( !array_key_exists('cron', $mediafromftp_settings) ) {
+				$mediafromftp_tbl = array(
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'dateset' => $mediafromftp_settings['dateset'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => FALSE,
+												'schedule' => 'hourly'
+												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			}
 		}
 
 	}

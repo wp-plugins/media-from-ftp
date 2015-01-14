@@ -77,3 +77,27 @@ msgid ""
 "below. However, if it is necessary to complex settings such as the use of "
 "multi-site and sub-domains, is not recommended."
 msgstr ""
+
+msgid "Schedule"
+msgstr ""
+
+msgid "Set the schedule."
+msgstr ""
+
+msgid "Will take some time until the [Next Schedule] is reflected."
+msgstr ""
+
+msgid "Next Schedule:"
+msgstr ""
+
+msgid "Apply Schedule"
+msgstr ""
+
+msgid "hourly"
+msgstr ""
+
+msgid "twice daily"
+msgstr ""
+
+msgid "daily"
+msgstr ""

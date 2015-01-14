@@ -96,3 +96,27 @@ msgstr ""
 "upload_url_pathを変更する事でできます。それは、以下からも可能です。しかし、マ"
 "ルチサイトやサブドメインの使用など複雑な設定が必要となる場合は、お勧めできま"
 "せん。"
+
+msgid "Schedule"
+msgstr "スケジュール"
+
+msgid "Set the schedule."
+msgstr "スケジュールを設定します。"
+
+msgid "Will take some time until the [Next Schedule] is reflected."
+msgstr "「次のスケジュール」が反映されるまでしばらく時間がかかります。"
+
+msgid "Next Schedule:"
+msgstr "次のスケジュール:"
+
+msgid "Apply Schedule"
+msgstr "スケジュールを適用"
+
+msgid "hourly"
+msgstr "１時間毎"
+
+msgid "twice daily"
+msgstr "１日２回"
+
+msgid "daily"
+msgstr "１日１回"
