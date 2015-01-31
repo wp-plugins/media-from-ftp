@@ -1,10 +1,10 @@
 === Media from FTP ===
 Contributors: Katsushi Kawamori
 Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
-Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, sync, synchronize, upload, uploader
+Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 3.0
+Stable tag: 3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,7 +17,7 @@ Register to media library from files that have been uploaded by FTP.
 * This create a metadata(Images, Videos, Audios).
 * Change the date/time.
 * Adopt [DateTimePicker](http://xdsoft.net/jqplugins/datetimepicker/). jQuery plugin select date/time.
-
+* If use the Schedule options, can periodically run.
 
 Why I made this?
 In the media uploader, you may not be able to upload by the environment of server.
@@ -43,6 +43,10 @@ none
 6. Change the upload directory
 
 == Changelog ==
+
+= 3.1 =
+Remove unnecessary code.
+Change readme.txt.
 
 = 3.0 =
 Add Schedule function.
@@ -200,6 +204,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 3.1 =
 = 3.0 =
 = 2.37 =
 = 2.36 =

@@ -104,7 +104,6 @@ class MediaFromFtpCron {
 					$date = $mediafromftp->get_date_check($file);
 					// Regist
 					list($attach_id, $new_attach_title, $new_url_attach) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
-					$new_url_attachs = explode('/', $new_url_attach);
 				}
 			}
 		}

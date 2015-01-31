@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 3.0
+Version: 3.1
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://gallerylink.nyanko.org/medialink/media-from-ftp/
