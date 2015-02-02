@@ -4,7 +4,7 @@ Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 3.1
+Stable tag: 3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,14 +35,19 @@ none
 
 == Screenshots ==
 
-1. Search directory selection
-2. Search file display
-3. Registration file selection
-4. File registration result
+1. Search file display
+2. Registration file selection
+3. File registration result
+4. Settings
 5. Search exclude file
 6. Change the upload directory
+7. Schedule
 
 == Changelog ==
+
+= 3.2 =
+Divided the setting section.
+Change /languages.
 
 = 3.1 =
 Remove unnecessary code.
@@ -204,6 +209,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 3.2 =
 = 3.1 =
 = 3.0 =
 = 2.37 =

@@ -81,12 +81,6 @@ class MediaFromFtpAdmin {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
-		$mediafromftp = new MediaFromFtp();
-
-		$mediafromftp_settings = get_option('mediafromftp_settings');
-		$searchdir = $mediafromftp_settings['searchdir'];
-
 		if ( empty($_POST['mediafromftp-tabs']) ) {
 			$tabs = 1;
 		} else {
@@ -95,6 +89,8 @@ class MediaFromFtpAdmin {
 
 		$this->options_updated($tabs);
 
+		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
+		$mediafromftp = new MediaFromFtp();
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$searchdir = $mediafromftp_settings['searchdir'];
 
@@ -113,9 +109,10 @@ class MediaFromFtpAdmin {
 			<div id="mediafromftp-tabs">
 				<ul>
 				<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-2"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-3"><?php _e('Uploading Files'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-4"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-2"><?php _e('Settings'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-3"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-4"><?php _e('Uploading Files'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-5"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
 				</ul>
 				<div id="mediafromftp-tabs-1">
 
@@ -210,18 +207,6 @@ class MediaFromFtpAdmin {
 						if ( $adddb <> 'TRUE' ) {
 							?>
 							<form method="post" action="<?php echo $scriptname; ?>">
-								<div style="display:block;padding:5px 0">
-								<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
-								<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
-								</div>
-								<div style="display:block;padding:5px 0">
-								<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
-								<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary. Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?>
-								</div>
-								<div style="display:block;padding:5px 0">
-								<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
-								<?php _e('Organize my uploads into month- and year-based folders'); ?>
-								</div>
 							<div class="submit">
 								<input type="hidden" name="mediafromftp-tabs" value="1" />
 								<input type="hidden" name="adddb" value="TRUE">
@@ -249,8 +234,6 @@ class MediaFromFtpAdmin {
 							$input_html .= '<tr><td>';
 							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp">';
 							$input_html .= '</td>';
-
-							$date = $mediafromftp->get_date_check($file);
 
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
@@ -312,8 +295,13 @@ class MediaFromFtpAdmin {
 							$input_html .= '<div>URL: <a href="'.$new_url.'" target="_blank">'.$new_url.'</a></div>';
 							$input_html .= $metadata_org;
 
-							$input_html .= '<div>'.__('Edit date and time').'</div>';
-							$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
+							$date = $mediafromftp->get_date_check($file, $mediafromftp_settings['dateset']);
+							if ( $mediafromftp_settings['dateset'] === 'new' ) {
+								$input_html .= '<input type="hidden" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
+							} else {
+								$input_html .= '<div>'.__('Edit date and time').'</div>';
+								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
+							}
 
 							$input_html .= '</td>';
 							$input_html .= '</tr>';
@@ -348,8 +336,7 @@ class MediaFromFtpAdmin {
 				<table class="wp-list-table widefat" border="1">
 				<tbody>
 				<?php
-				$mediafromftp_settings_new = get_option('mediafromftp_settings');
-				$dateset = $mediafromftp_settings_new['dateset'];
+				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
 				echo str_pad(' ',4096)."\n";
@@ -550,10 +537,26 @@ class MediaFromFtpAdmin {
 		<div id="mediafromftp-tabs-2">
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-2'; ?>">
-			<h2><?php _e('Exclude file', 'mediafromftp'); ?></h2>
-			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
-			<?php $mediafromftp_settings_tabs_2 = get_option('mediafromftp_settings'); ?>
-			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_2['exclude']; ?></textarea>
+			<h3><?php _e('Settings'); ?></h3>
+			<div style="display:block;padding:5px 0">
+			<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
+			<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 0">
+			<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
+			<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 0">
+			<input type="radio" name="mediafromftp_dateset" value="exif" <?php if ($mediafromftp_settings['dateset'] === 'exif') echo 'checked'; ?>>
+			<?php
+			_e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp');
+			_e('Get by priority if there is date and time of the Exif information.', 'mediafromftp');
+			?>
+			</div>
+			<div style="display:block;padding:5px 0">
+			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
+			<?php _e('Organize my uploads into month- and year-based folders'); ?>
+			</div>
 			<div class="submit">
 				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
@@ -565,7 +568,22 @@ class MediaFromFtpAdmin {
 		<div id="mediafromftp-tabs-3">
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-3'; ?>">
-			<h2><?php _e('Uploading Files'); ?></h2>
+			<h3><?php _e('Exclude file', 'mediafromftp'); ?></h3>
+			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
+			<?php $mediafromftp_settings_tabs_2 = get_option('mediafromftp_settings'); ?>
+			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_2['exclude']; ?></textarea>
+			<div class="submit">
+				<input type="hidden" name="mediafromftp-tabs" value="3" />
+				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+			</div>
+		</form>
+		</div>
+		</div>
+
+		<div id="mediafromftp-tabs-4">
+		<div class="wrap">
+		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-4'; ?>">
+			<h3><?php _e('Uploading Files'); ?></h3>
 			<div style="display:block; padding: 10px; border:4px red solid;width:98%; color:red; font-size: 120%;">
 			<?php _e('If you want to change the upload directory, you can do so by changing the options.php upload_path, the upload_url_path. It is also possible from below. However, if it is necessary to complex settings such as the use of multi-site and sub-domains, is not recommended.', 'mediafromftp'); ?>
 			</div>
@@ -586,17 +604,17 @@ class MediaFromFtpAdmin {
 			<?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?>
 			</div>
 			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="3" />
+				<input type="hidden" name="mediafromftp-tabs" value="4" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
 		</div>
 		</div>
 
-		<div id="mediafromftp-tabs-4">
+		<div id="mediafromftp-tabs-5">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-4'; ?>">
-			<h2><?php _e('Schedule', 'mediafromftp'); ?></h2>
+		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-5'; ?>">
+			<h3><?php _e('Schedule', 'mediafromftp'); ?></h3>
 			<div style="display:block;padding:5px 0">
 			<?php _e('Set the schedule.', 'mediafromftp'); ?>
 			<?php _e('Will take some time until the [Next Schedule] is reflected.', 'mediafromftp'); ?>
@@ -630,7 +648,7 @@ class MediaFromFtpAdmin {
 			</div>
 
 			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="4" />
+				<input type="hidden" name="mediafromftp-tabs" value="5" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
@@ -654,41 +672,42 @@ class MediaFromFtpAdmin {
 
 		switch ($tabs) {
 			case 1:
-					if (!empty($_POST['searchdir'])){
-						$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
-					} else {
-						$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
-					}
-					if ( !empty($_POST['mediafromftp_dateset']) ) {
-						$mediafromftp_tbl = array(
-											'searchdir' => $searchdir,
-											'dateset' => $_POST['mediafromftp_dateset'],
-											'exclude' => $mediafromftp_settings['exclude'],
-											'cron' => array(
-														'apply' => $mediafromftp_settings['cron']['apply'],
-														'schedule' => $mediafromftp_settings['cron']['schedule']
-														)
-											);
-						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-						if ( !empty($_POST['move_yearmonth_folders']) ) {
-							update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
-						} else {
-							update_option( 'uploads_use_yearmonth_folders', '0' );
-						}
-					} else {
-						$mediafromftp_tbl = array(
-											'searchdir' => $searchdir,
-											'dateset' => $mediafromftp_settings['dateset'],
-											'exclude' => $mediafromftp_settings['exclude'],
-											'cron' => array(
-														'apply' => $mediafromftp_settings['cron']['apply'],
-														'schedule' => $mediafromftp_settings['cron']['schedule']
-														)
-											);
-						update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-					}
+				if (!empty($_POST['searchdir'])){
+					$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
+				} else {
+					$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+				}
+				$mediafromftp_tbl = array(
+									'searchdir' => $searchdir,
+									'dateset' => $mediafromftp_settings['dateset'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $mediafromftp_settings['cron']['apply'],
+												'schedule' => $mediafromftp_settings['cron']['schedule']
+												)
+									);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 				break;
 			case 2:
+				if ( !empty($_POST['mediafromftp_dateset']) ) {
+					$mediafromftp_tbl = array(
+										'searchdir' => $mediafromftp_settings['searchdir'],
+										'dateset' => $_POST['mediafromftp_dateset'],
+										'exclude' => $mediafromftp_settings['exclude'],
+										'cron' => array(
+													'apply' => $mediafromftp_settings['cron']['apply'],
+													'schedule' => $mediafromftp_settings['cron']['schedule']
+													)
+										);
+					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					if ( !empty($_POST['move_yearmonth_folders']) ) {
+						update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
+					} else {
+						update_option( 'uploads_use_yearmonth_folders', '0' );
+					}
+				}
+				break;
+			case 3:
 				if ( !empty($_POST['mediafromftp_exclude']) ) {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
@@ -702,7 +721,7 @@ class MediaFromFtpAdmin {
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 				}
 				break;
-			case 3:
+			case 4:
 				if ( !empty($_POST['upload_path']) ) {
 					update_option( 'upload_path', $_POST['upload_path'] );
 				}
@@ -710,7 +729,7 @@ class MediaFromFtpAdmin {
 					update_option( 'upload_url_path', $_POST['upload_url_path'] );
 				}
 				break;
-			case 4:
+			case 5:
 				require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
 				$mediafromftpcron = new MediaFromFtpCron();
 				if ( !empty($_POST['mediafromftp_cron_schedule']) ) {

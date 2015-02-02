@@ -192,21 +192,24 @@ class MediaFromFtp {
 
 	/* ==================================================
 	 * @param	string	$file
+	 * @param	string	$dateset
 	 * @return	string	$date
 	 * @since	2.36
 	 */
-	function get_date_check($file){
+	function get_date_check($file, $dateset){
 
 		$date = get_date_from_gmt(date("Y-m-d H:i:s", filemtime($file)));
 
-		// for wp_read_image_metadata
-		include_once( ABSPATH . 'wp-admin/includes/image.php' );
-		$exifdata = wp_read_image_metadata( $file );
+		if ( $dateset === 'exif' ) {
+			// for wp_read_image_metadata
+			include_once( ABSPATH . 'wp-admin/includes/image.php' );
+			$exifdata = wp_read_image_metadata( $file );
 
-		if ( $exifdata ) {
-			$exif_ux_time = $exifdata['created_timestamp'];
-			if ( !empty($exif_ux_time) ) {
-				$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+			if ( $exifdata ) {
+				$exif_ux_time = $exifdata['created_timestamp'];
+				if ( !empty($exif_ux_time) ) {
+					$date = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+				}
 			}
 		}
 
@@ -275,7 +278,7 @@ class MediaFromFtp {
 		$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
 		$filename = str_replace(MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/', '', $new_url_attach);
 		$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
-		if ( $dateset === 'server' ) {
+		if ( $dateset === 'server' || $dateset === 'exif' ) {
 			$postdategmt = get_gmt_from_date($new_url_datetime.':00');
 		}
 		if ( strpos($filename, ' ' ) ) {
@@ -335,7 +338,7 @@ class MediaFromFtp {
 		$attach_id = wp_insert_attachment( $newfile_post, $filename );
 
 		// Date Time Regist
-		if ( $dateset === 'server' ) {
+		if ( $dateset <> 'new' ) {
 			$postdate = get_date_from_gmt($postdategmt);
 			$up_post = array(
 							'ID' => $attach_id,

@@ -68,7 +68,10 @@ msgstr ""
 
 msgid ""
 "Get the date/time of the file, and updated based on it. Change it if "
-"necessary. Get by priority if there is date and time of the Exif information."
+"necessary."
+msgstr ""
+
+msgid "Get by priority if there is date and time of the Exif information."
 msgstr ""
 
 msgid ""

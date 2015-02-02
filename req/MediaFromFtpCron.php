@@ -101,7 +101,7 @@ class MediaFromFtpCron {
 				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
 					// skip
 				} else {
-					$date = $mediafromftp->get_date_check($file);
+					$date = $mediafromftp->get_date_check($file, $dateset);
 					// Regist
 					list($attach_id, $new_attach_title, $new_url_attach) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
 				}
