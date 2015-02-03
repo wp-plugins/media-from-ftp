@@ -288,8 +288,8 @@ class MediaFromFtpAdmin {
 							if ( $mediafromftp_settings['dateset'] === 'new' ) {
 								$input_html .= '<input type="hidden" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
 							} else {
-								$input_html .= '<div>'.__('Edit date and time').'</div>';
-								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'" style="width: 90%;">';
+								$input_html .= '<div style="float: left; margin: 5px;">'.__('Edit date and time').'</div>';
+								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'" style="width: 160px;">';
 							}
 
 							$input_html .= '</div>';
@@ -379,7 +379,7 @@ class MediaFromFtpAdmin {
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
 							$output_html .= '<img width="50" height="50" src="'.$image_attr_thumbnail[0].'">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
-							$output_html .= '<div style="word-break: break-all;">'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
+							$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
 							$new_url_attachs = explode('/', $new_url_attach);
 							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
