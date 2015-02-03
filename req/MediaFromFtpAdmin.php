@@ -280,7 +280,7 @@ class MediaFromFtpAdmin {
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							}
 
-							$input_html .= '<img width="50" height="50" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
+							$input_html .= '<img width="40" height="40" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
 							$input_html .= '<div>URL:<a href="'.$new_url.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url.'</a></div>';
 							$input_html .= $metadata_org;
 
@@ -377,7 +377,7 @@ class MediaFromFtpAdmin {
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
-							$output_html .= '<img width="50" height="50" src="'.$image_attr_thumbnail[0].'">';
+							$output_html .= '<img width="40" height="40" src="'.$image_attr_thumbnail[0].'">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
 							$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';

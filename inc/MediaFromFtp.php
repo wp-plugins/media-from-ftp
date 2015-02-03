@@ -151,7 +151,7 @@ class MediaFromFtp {
 			if ( ! file_exists( $cash_thumb_filename )) {
 				$cash_thumb = wp_get_image_editor( $file );
 				if ( ! is_wp_error( $cash_thumb ) ) {
-					$cash_thumb->resize( 50 ,50, true );
+					$cash_thumb->resize( 40 ,40, true );
 					$cash_thumb->save( $cash_thumb_filename );
 					$view_thumb_url = MEDIAFROMFTP_PLUGIN_TMP_URL.'/'.$cash_thumb_key.'.'.$ext;
 				} else {
