@@ -213,27 +213,19 @@ class MediaFromFtpAdmin {
 								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 								<input type="submit" value="<?php _e('Update Media'); ?>" />
 							</div>
-							<table class="wp-list-table widefat" border="1">
-							<tbody>
-							<col span="2" width="50px">
-							<tr>
-							<td colspan="3">
+							<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 							<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
-							</td>
-							</tr>
-							<tr>
-							<td><?php _e('Select'); ?></td>
-							<td><?php _e('Thumbnail'); ?></td>
-							<td><?php _e('Metadata'); ?></td>
-							</tr>
+							</div>
+							<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
+							<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
+							</div>
 							<?php
 						}
 					}
 					if ( $adddb <> 'TRUE' ) {
 							$input_html = NULL;
-							$input_html .= '<tr><td>';
-							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp">';
-							$input_html .= '</td>';
+							$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
+							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp" style="float: left; margin: 5px;">';
 
 							$metadata_org = NULL;
 							if ( wp_ext2type($ext) === 'image' ){
@@ -288,11 +280,8 @@ class MediaFromFtpAdmin {
 								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							}
 
-							$input_html .= '<td>';
-							$input_html .= '<img width="50" height="50" src="'.$view_thumb_url.'">';
-							$input_html .= '</td>';
-							$input_html .= '<td>';
-							$input_html .= '<div>URL: <a href="'.$new_url.'" target="_blank">'.$new_url.'</a></div>';
+							$input_html .= '<img width="50" height="50" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
+							$input_html .= '<div>URL:<a href="'.$new_url.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url.'</a></div>';
 							$input_html .= $metadata_org;
 
 							$date = $mediafromftp->get_date_check($file, $mediafromftp_settings['dateset']);
@@ -300,11 +289,10 @@ class MediaFromFtpAdmin {
 								$input_html .= '<input type="hidden" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
 							} else {
 								$input_html .= '<div>'.__('Edit date and time').'</div>';
-								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
+								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'" style="width: 90%;">';
 							}
 
-							$input_html .= '</td>';
-							$input_html .= '</tr>';
+							$input_html .= '</div>';
 
 							echo $input_html;
 							ob_flush();
@@ -317,8 +305,6 @@ class MediaFromFtpAdmin {
 		}
 		ob_end_clean();
 		?>
-		</tbody>
-		</table>
 		<?php
 
 		if ( $adddb === 'TRUE' ) {
@@ -333,8 +319,6 @@ class MediaFromFtpAdmin {
 						<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
 					</div>
 				</form>
-				<table class="wp-list-table widefat" border="1">
-				<tbody>
 				<?php
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
@@ -392,11 +376,11 @@ class MediaFromFtpAdmin {
 							}
 
 							$output_html = NULL;
-							$output_html .= '<tr><td>';
+							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
 							$output_html .= '<img width="50" height="50" src="'.$image_attr_thumbnail[0].'">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
-							$output_html .= '<div>'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
-							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank">'.$new_url_attach.'</a></div>';
+							$output_html .= '<div style="word-break: break-all;">'.__('Permalink:').' '.wp_get_attachment_link($attach_id, '', true, false, get_attachment_link($attach_id)).'</div>';
+							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
 							$new_url_attachs = explode('/', $new_url_attach);
 							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
 
@@ -404,7 +388,7 @@ class MediaFromFtpAdmin {
 								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('Images').': ';
 								foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
-									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank">'.$thumbsize.'</a>]';
+									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
 								}
 								$output_html .= '</div>';
 							} else if ( wp_ext2type($ext) === 'video' ) {
@@ -423,8 +407,7 @@ class MediaFromFtpAdmin {
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
 							}
 
-							$output_html .= '</td>';
-							$output_html .= '</tr>';
+							$output_html .= '</div>';
 
 							echo $output_html;
 							ob_flush();
@@ -434,8 +417,6 @@ class MediaFromFtpAdmin {
 				}
 				ob_end_clean();
 				?>
-				</tbody>
-				</table>
 				<p>
 				<?php _e('The above file was registered to the media library.', 'mediafromftp'); ?>
 				</p>
@@ -483,48 +464,36 @@ class MediaFromFtpAdmin {
 				if ( !empty($unregisters_unwritable) ) {
 					?>
 					<p>
-					<table class="wp-list-table widefat" border="1">
-					<tbody>
 					<?php
 					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
 						?>
-						<tr>
-						<td>
+						<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 						<div><?php echo $unregister_unwritable_url; ?></div>
 						<div>
 						<?php _e('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
 						</div>
-						</td>
-						</tr>
+						</div>
 						<?php
 					}
 					?>
-					</tbody>
-					</table>
 					</p>
 					<?php
 				}
 				if ( !empty($unregisters_multibyte_file) ) {
 					?>
 					<p>
-					<table class="wp-list-table widefat" border="1">
-					<tbody>
 					<?php
 					foreach ( $unregisters_multibyte_file as $unregister_multibyte_file_url ) {
 						?>
-						<tr>
-						<td>
+						<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 						<div><?php echo $unregister_multibyte_file_url; ?></div>
 						<div>
 						<?php _e('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
 						</div>
-						</td>
-						</tr>
+						</div>
 						<?php
 					}
 					?>
-					</tbody>
-					</table>
 					</p>
 					<?php
 				}
