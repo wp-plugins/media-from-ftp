@@ -121,3 +121,9 @@ msgstr "１日２回"
 
 msgid "daily"
 msgstr "１日１回"
+
+msgid ""
+"I need a donation. This is because, I want to continue the development and "
+"support of plugins."
+msgstr ""
+"私はプラグインの開発とサポートを継続させるために寄付を必要としています。"

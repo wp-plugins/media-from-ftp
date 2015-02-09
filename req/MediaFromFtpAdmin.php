@@ -113,6 +113,7 @@ class MediaFromFtpAdmin {
 				<li><a href="#mediafromftp-tabs-3"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
 				<li><a href="#mediafromftp-tabs-4"><?php _e('Uploading Files'); ?></a></li>
 				<li><a href="#mediafromftp-tabs-5"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
+				<li><a href="#mediafromftp-tabs-6"><?php _e('Donate to this plugin &#187;'); ?></a></li>
 				</ul>
 				<div id="mediafromftp-tabs-1">
 
@@ -621,6 +622,15 @@ class MediaFromFtpAdmin {
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
+		</div>
+		</div>
+
+		<div id="mediafromftp-tabs-6">
+		<div class="wrap">
+			<h3><?php _e('I need a donation. This is because, I want to continue the development and support of plugins.', 'mediafromftp'); ?></h3>
+			<div align="right">Katsushi Kawamori</div>
+			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
+<a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
 		</div>
 		</div>
 

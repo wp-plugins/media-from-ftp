@@ -104,3 +104,8 @@ msgstr ""
 
 msgid "daily"
 msgstr ""
+
+msgid ""
+"I need a donation. This is because, I want to continue the development and "
+"support of plugins."
+msgstr ""

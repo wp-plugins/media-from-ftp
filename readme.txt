@@ -1,10 +1,10 @@
 === Media from FTP ===
 Contributors: Katsushi Kawamori
-Donate link: http://gallerylink.nyanko.org/medialink/media-from-ftp/
+Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.1
-Stable tag: 3.5
+Stable tag: 3.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -23,6 +23,9 @@ Why I made this?
 In the media uploader, you may not be able to upload by the environment of server.
 That's when the files are large.
 You do not mind the size of the file if FTP.
+
+Translators
+*   Japanese (ja) - [<a href="http://riverforest-wp.info/">Katsushi Kawamori</a>]
 
 == Installation ==
 
@@ -44,6 +47,12 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 3.6 =
+Fixed a problem of the cache files for the thumbnail of the search screen.
+Add screen of donate.
+Change readme.txt.
+Change /languages.
 
 = 3.5 =
 Fixed a problem of management screen.
@@ -218,6 +227,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 3.6 =
 = 3.5 =
 = 3.4 =
 = 3.3 =

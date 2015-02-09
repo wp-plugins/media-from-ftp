@@ -157,8 +157,14 @@ class MediaFromFtp {
 				} else {
 					$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
 				}
-				set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
+			} else {
+				if ( file_exists( $cash_thumb_filename )) {
+					$view_thumb_url = MEDIAFROMFTP_PLUGIN_TMP_URL.'/'.$cash_thumb_key.'.'.$ext;
+				} else {
+					$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+				}
 			}
+			set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
 		} else {
 			$view_thumb_url = $value_cash;
 			set_transient( $cash_thumb_key, $value_cash, DAY_IN_SECONDS);
