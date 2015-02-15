@@ -23,17 +23,17 @@ msgstr "FTPでアップロードされたファイルからメディアライブ
 msgid "Find the following directories."
 msgstr "次のディレクトリを検索します。"
 
-msgid "The above file was registered to the media library."
-msgstr "上記のファイルは、メディアライブラリに登録されました。"
+msgid "The following files was registered to the media library."
+msgstr "以下のファイルは、メディアライブラリに登録されました。"
 
 msgid "There is no file that is not registered in the media library."
 msgstr "メディアライブラリに登録されていないファイルはありません。"
 
 msgid ""
-"The above file is a file that is not registered in the media library. And "
-"can be registered."
+"The following files is a file that is not registered in the media library. "
+"And can be registered."
 msgstr ""
-"上記のファイルは、メディアライブラリに登録されていないファイルです。そして登"
+"以下のファイルは、メディアライブラリに登録されていないファイルです。そして登"
 "録が可能です。"
 
 msgid ""

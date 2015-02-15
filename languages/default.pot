@@ -22,15 +22,15 @@ msgstr ""
 msgid "Find the following directories."
 msgstr ""
 
-msgid "The above file was registered to the media library."
+msgid "The following files was registered to the media library."
 msgstr ""
 
 msgid "There is no file that is not registered in the media library."
 msgstr ""
 
 msgid ""
-"The above file is a file that is not registered in the media library. And "
-"can be registered."
+"The following files is a file that is not registered in the media library. "
+"And can be registered."
 msgstr ""
 
 msgid ""

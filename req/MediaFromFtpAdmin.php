@@ -317,10 +317,11 @@ class MediaFromFtpAdmin {
 						<input type="hidden" name="mediafromftp-tabs" value="1" />
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 						<input type="submit" value="<?php _e('Back'); ?>" />
-						<?php _e('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp'); ?>
 					</div>
 				</form>
 				<?php
+				echo'<div class="error"><ul><li>'.__('Please try again pressing Back button, if the processing is stopped on the way.', 'mediafromftp').'</li></ul></div>';
+
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
@@ -417,11 +418,7 @@ class MediaFromFtpAdmin {
 					}
 				}
 				ob_end_clean();
-				?>
-				<p>
-				<?php _e('The above file was registered to the media library.', 'mediafromftp'); ?>
-				</p>
-				<?php
+				echo '<div class="updated"><ul><li>'.__('The following files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
 			}
 
 			?>
@@ -439,19 +436,10 @@ class MediaFromFtpAdmin {
 			<?php
 		} else {
 			if ( $count == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
-				?>
-				<p>
-				<?php _e('There is no file that is not registered in the media library.', 'mediafromftp'); ?>
-				</p>
-				<?php
+				echo '<div class="updated"><ul><li>'.__('There is no file that is not registered in the media library.', 'mediafromftp').'</li></ul></div>';
 			} else {
 				if ( $count > 0 ) {
-					?>
-					<br>
-					<div>
-					<?php _e('The above file is a file that is not registered in the media library. And can be registered.', 'mediafromftp'); ?>
-					</div>
-					<?php
+					echo '<div class="updated"><ul><li>'.__('The following files is a file that is not registered in the media library. And can be registered.', 'mediafromftp').'</li></ul></div>';
 				}
 					?>
 					<div class="submit">
@@ -463,40 +451,14 @@ class MediaFromFtpAdmin {
 					</form>
 					<?php
 				if ( !empty($unregisters_unwritable) ) {
-					?>
-					<p>
-					<?php
 					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
-						?>
-						<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
-						<div><?php echo $unregister_unwritable_url; ?></div>
-						<div>
-						<?php _e('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
-						</div>
-						</div>
-						<?php
+						echo '<div class="error"><ul><li>'.$unregister_unwritable_url.' --> '.__('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp').'</li></ul></div>';
 					}
-					?>
-					</p>
-					<?php
 				}
 				if ( !empty($unregisters_multibyte_file) ) {
-					?>
-					<p>
-					<?php
 					foreach ( $unregisters_multibyte_file as $unregister_multibyte_file_url ) {
-						?>
-						<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
-						<div><?php echo $unregister_multibyte_file_url; ?></div>
-						<div>
-						<?php _e('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp'); ?>
-						</div>
-						</div>
-						<?php
+						echo '<div class="error"><ul><li>'.$unregister_multibyte_file_url.' --> '.__('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp').'</li></ul></div>';
 					}
-					?>
-					</p>
-					<?php
 				}
 			}
 		}
@@ -506,7 +468,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-2">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-2'; ?>">
+		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Settings'); ?></h3>
 			<div style="display:block;padding:5px 0">
 			<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
@@ -537,7 +499,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-3">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-3'; ?>">
+		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Exclude file', 'mediafromftp'); ?></h3>
 			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
 			<?php $mediafromftp_settings_tabs_2 = get_option('mediafromftp_settings'); ?>
@@ -552,7 +514,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-4">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-4'; ?>">
+		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Uploading Files'); ?></h3>
 			<div style="display:block; padding: 10px; border:4px red solid;width:98%; color:red; font-size: 120%;">
 			<?php _e('If you want to change the upload directory, you can do so by changing the options.php upload_path, the upload_url_path. It is also possible from below. However, if it is necessary to complex settings such as the use of multi-site and sub-domains, is not recommended.', 'mediafromftp'); ?>
@@ -583,7 +545,7 @@ class MediaFromFtpAdmin {
 
 		<div id="mediafromftp-tabs-5">
 		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname.'#mediafromftp-tabs-5'; ?>">
+		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Schedule', 'mediafromftp'); ?></h3>
 			<div style="display:block;padding:5px 0">
 			<?php _e('Set the schedule.', 'mediafromftp'); ?>
@@ -684,6 +646,7 @@ class MediaFromFtpAdmin {
 					} else {
 						update_option( 'uploads_use_yearmonth_folders', '0' );
 					}
+					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
 				}
 				break;
 			case 3:
@@ -698,14 +661,17 @@ class MediaFromFtpAdmin {
 													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					echo '<div class="updated"><ul><li>'.__('Exclude file', 'mediafromftp').' --> '.__('Changes saved.').'</li></ul></div>';
 				}
 				break;
 			case 4:
 				if ( !empty($_POST['upload_path']) ) {
 					update_option( 'upload_path', $_POST['upload_path'] );
+					echo '<div class="updated"><ul><li>'.__('Store uploads in this folder').' --> '.__('Changes saved.').'</li></ul></div>';
 				}
 				if ( !empty($_POST['upload_url_path']) ) {
 					update_option( 'upload_url_path', $_POST['upload_url_path'] );
+					echo '<div class="updated"><ul><li>'.__('Full URL path to files').' --> '.__('Changes saved.').'</li></ul></div>';
 				}
 				break;
 			case 5:
@@ -727,6 +693,7 @@ class MediaFromFtpAdmin {
 													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					echo '<div class="updated"><ul><li>'.__('Schedule', 'mediafromftp').' --> '.__('Changes saved.').'</li></ul></div>';
 					if ( !$mediafromftp_cron_apply ) {
 						$mediafromftpcron->CronStop();
 					} else {
