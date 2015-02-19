@@ -184,10 +184,6 @@ class MediaFromFtpAdmin {
 		$unregister_unwritable_count = 0;
 		$unregister_multibyte_file_count = 0;
 
-		echo str_pad(' ',4096)."\n";
-		ob_end_flush();
-		ob_start('mb_output_handler');
-
 		foreach ( $files as $file ){
 
 			// Input URL
@@ -296,15 +292,13 @@ class MediaFromFtpAdmin {
 							$input_html .= '</div>';
 
 							echo $input_html;
-							ob_flush();
-							flush();
 
 						++$this->postcount;
 					}
 				}
 			}
 		}
-		ob_end_clean();
+
 		?>
 		<?php
 
@@ -324,9 +318,6 @@ class MediaFromFtpAdmin {
 
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
-
-				echo str_pad(' ',4096)."\n";
-				ob_start('mb_output_handler');
 
 				foreach ( $new_url_attaches as $postkey1 => $postval1 ){
 					foreach ( $postval1 as $postkey2 => $postval2 ){
@@ -412,12 +403,10 @@ class MediaFromFtpAdmin {
 							$output_html .= '</div>';
 
 							echo $output_html;
-							ob_flush();
-							flush();
+
 						}
 					}
 				}
-				ob_end_clean();
 				echo '<div class="updated"><ul><li>'.__('The following files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
 			}
 
