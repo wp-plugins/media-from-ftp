@@ -75,7 +75,7 @@ class MediaFromFtpAdmin {
 	 */
 	function manage_page() {
 
-		ini_set('max_execution_time', 300); 
+		$def_max_execution_time = ini_get('max_execution_time');
 
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -93,6 +93,9 @@ class MediaFromFtpAdmin {
 		$mediafromftp = new MediaFromFtp();
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$searchdir = $mediafromftp_settings['searchdir'];
+		$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+
+		set_time_limit($max_execution_time);
 
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
@@ -478,6 +481,22 @@ class MediaFromFtpAdmin {
 			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
 			<?php _e('Organize my uploads into month- and year-based folders'); ?>
 			</div>
+			<div style="display:block;padding:5px 0">
+				<?php
+					$max_execution_time_text = __('Set the number of seconds a script is allowed to run.', 'mediafromftp').'('.__('The max_execution_time value defined in the php.ini.', 'mediafromftp').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
+					echo $max_execution_time_text;
+					$target_mediafromftp_max_execution_time = $mediafromftp_settings['max_execution_time'];
+				?>
+				<select id="mediafromftp_max_execution_time" name="mediafromftp_max_execution_time">
+					<option <?php if ('30' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>30</option>
+					<option <?php if ('60' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>60</option>
+					<option <?php if ('120' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>120</option>
+					<option <?php if ('180' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>180</option>
+					<option <?php if ('240' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>240</option>
+					<option <?php if ('300' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>300</option>
+					<option <?php if ('600' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>600</option>
+				</select>
+			</div>
 			<div class="submit">
 				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
@@ -610,6 +629,7 @@ class MediaFromFtpAdmin {
 				$mediafromftp_tbl = array(
 									'searchdir' => $searchdir,
 									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 									'exclude' => $mediafromftp_settings['exclude'],
 									'cron' => array(
 												'apply' => $mediafromftp_settings['cron']['apply'],
@@ -623,6 +643,7 @@ class MediaFromFtpAdmin {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'dateset' => $_POST['mediafromftp_dateset'],
+										'max_execution_time' => $_POST['mediafromftp_max_execution_time'],
 										'exclude' => $mediafromftp_settings['exclude'],
 										'cron' => array(
 													'apply' => $mediafromftp_settings['cron']['apply'],
@@ -643,6 +664,7 @@ class MediaFromFtpAdmin {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'dateset' => $mediafromftp_settings['dateset'],
+										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $_POST['mediafromftp_exclude'],
 										'cron' => array(
 													'apply' => $mediafromftp_settings['cron']['apply'],
@@ -675,6 +697,7 @@ class MediaFromFtpAdmin {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'dateset' => $mediafromftp_settings['dateset'],
+										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $mediafromftp_settings['exclude'],
 										'cron' => array(
 													'apply' => $mediafromftp_cron_apply,

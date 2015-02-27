@@ -27,9 +27,12 @@ class MediaFromFtpRegist {
 	 */
 	function register_settings(){
 
-		$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+		$plugin_datas = get_file_data( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/mediafromftp.php', array('version' => 'Version') );
+		$plugin_version = floatval($plugin_datas['version']);
 
+		$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
 		$exclude_settings = '(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js';
+
 		// << version 2.35
 		if ( get_option('mediafromftp_exclude_file') ) {
 			$exclude_settings = get_option('mediafromftp_exclude_file');
@@ -40,6 +43,7 @@ class MediaFromFtpRegist {
 			$mediafromftp_tbl = array(
 								'searchdir' => $searchdir,
 								'dateset' => 'new',
+								'max_execution_time' => 300,
 								'exclude' => $exclude_settings,
 								'cron' => array(
 											'apply' => FALSE,
@@ -49,7 +53,7 @@ class MediaFromFtpRegist {
 			update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 		} else {
 			$mediafromftp_settings = get_option('mediafromftp_settings');
-			if ( !array_key_exists('cron', $mediafromftp_settings) ) {
+			if ( $plugin_version >= 3.0 && $plugin_version < 3.9 ) {
 				$mediafromftp_tbl = array(
 									'searchdir' => $mediafromftp_settings['searchdir'],
 									'dateset' => $mediafromftp_settings['dateset'],
@@ -57,6 +61,18 @@ class MediaFromFtpRegist {
 									'cron' => array(
 												'apply' => FALSE,
 												'schedule' => 'hourly'
+												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			} else if ( $plugin_version >= 3.9 ) {
+				$mediafromftp_tbl = array(
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => 300,
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $mediafromftp_settings['cron']['apply'],
+												'schedule' => $mediafromftp_settings['cron']['schedule']
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );

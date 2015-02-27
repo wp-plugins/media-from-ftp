@@ -3,8 +3,8 @@ Contributors: Katsushi Kawamori
 Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
-Tested up to: 4.1
-Stable tag: 3.8
+Tested up to: 4.1.1
+Stable tag: 3.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Register to media library from files that have been uploaded by FTP.
 * This create a thumbnail of the image file.
 * This create a metadata(Images, Videos, Audios).
 * Change the date/time.
-* Adopt [DateTimePicker](http://xdsoft.net/jqplugins/datetimepicker/). jQuery plugin select date/time.
+* Work with [DateTimePicker](http://xdsoft.net/jqplugins/datetimepicker/). jQuery plugin select date/time.
 * If use the Schedule options, can periodically run.
 
 Why I made this?
@@ -47,6 +47,10 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 3.9 =
+Can set the number of seconds a script is allowed to run.
+Change /languages.
 
 = 3.8 =
 Fixed problem of the display of multi-byte characters.
@@ -234,6 +238,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 3.9 =
 = 3.8 =
 = 3.7 =
 = 3.6 =

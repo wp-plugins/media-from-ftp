@@ -59,12 +59,14 @@ class MediaFromFtpCron {
 	 */
 	function CronDo(){
 
-		ini_set('max_execution_time', 300); 
-
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
+
+		$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+		set_time_limit($max_execution_time);
+
 		$searchdir = $mediafromftp_settings['searchdir'];
 		$dateset = $mediafromftp_settings['dateset'];
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');

@@ -109,3 +109,9 @@ msgid ""
 "I need a donation. This is because, I want to continue the development and "
 "support of plugins."
 msgstr ""
+
+msgid "Set the number of seconds a script is allowed to run."
+msgstr ""
+
+msgid "The max_execution_time value defined in the php.ini."
+msgstr ""

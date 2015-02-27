@@ -127,3 +127,9 @@ msgid ""
 "support of plugins."
 msgstr ""
 "私はプラグインの開発とサポートを継続させるために寄付を必要としています。"
+
+msgid "Set the number of seconds a script is allowed to run."
+msgstr "スクリプトが実行可能な秒数を設定します。"
+
+msgid "The max_execution_time value defined in the php.ini."
+msgstr "php.iniで定義されたmax_execution_timeの値。"
