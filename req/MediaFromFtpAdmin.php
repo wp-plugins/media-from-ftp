@@ -53,8 +53,6 @@ class MediaFromFtpAdmin {
 	function load_custom_wp_admin_style() {
 		wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
 		wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
-		wp_enqueue_script('jquery');
-
 		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
 		wp_enqueue_script( 'jquery' );
 		wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
@@ -227,62 +225,36 @@ class MediaFromFtpAdmin {
 							$input_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
 							$input_html .= '<input name="new_url_attaches['.$this->postcount.'][url]" type="checkbox" value="'.$new_url.'" class="group_media-from-ftp" style="float: left; margin: 5px;">';
 
-							$metadata_org = NULL;
+							$file_size = size_format(filesize($file));
+							$mimetype = $ext.'('.$mediafromftp->mime_type($ext).')';
 							if ( wp_ext2type($ext) === 'image' ){
 								$view_thumb_url = $mediafromftp->create_cash($ext, $file, $new_url);
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
 							} else if ( wp_ext2type($ext) === 'audio' ) {
 								$view_thumb_url = site_url('/'). WPINC . '/images/media/audio.png';
 								$metadata_audio = wp_read_audio_metadata( $file );
-								$file_size_audio = $metadata_audio['filesize'];
-								$mimetype_audio = $metadata_audio['fileformat'].'('.$metadata_audio['mime_type'].')';
-								$length_audio = $metadata_audio['length_formatted'];
-								$metadata_org = '<div>'.__('File type:').' '.$mimetype_audio.'</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_audio).'</div>';
-								$metadata_org .= '<div>'.__('Length:').' '.$length_audio.'</div>';
+								$file_size = size_format($metadata_audio['filesize']);
+								$mimetype = $metadata_audio['fileformat'].'('.$metadata_audio['mime_type'].')';
+								$length = $metadata_audio['length_formatted'];
 							} else if ( wp_ext2type($ext) === 'video' ) {
 								$view_thumb_url = site_url('/'). WPINC . '/images/media/video.png';
 								$metadata_video = wp_read_video_metadata( $file );
-								$file_size_video = $metadata_video['filesize'];
-								$mimetype_video = $metadata_video['fileformat'].'('.$metadata_video['mime_type'].')';
-								$length_video = $metadata_video['length_formatted'];
-								$metadata_org = '<div>'.__('File type:').' '.$mimetype_video.'</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format($file_size_video).'</div>';
-								$metadata_org .= '<div>'.__('Length:').' '.$length_video.'</div>';
-							} else if ( wp_ext2type($ext) === 'document' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/document.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else if ( wp_ext2type($ext) === 'spreadsheet' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/spreadsheet.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else if ( wp_ext2type($ext) === 'interactive' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/interactive.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else if ( wp_ext2type($ext) === 'text' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/text.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else if ( wp_ext2type($ext) === 'archive' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/archive.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else if ( wp_ext2type($ext) === 'code' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/code.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
-							} else {
+								$file_size = size_format($metadata_video['filesize']);
+								$mimetype = $metadata_video['fileformat'].'('.$metadata_video['mime_type'].')';
+								$length = $metadata_video['length_formatted'];
+							} else if ( wp_ext2type($ext) === 'NULL' ) {
 								$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
-								$metadata_org = '<div>'.__('File type:').' '.$ext.'('.$mediafromftp->mime_type($ext).')</div>';
-								$metadata_org .= '<div>'.__('File size:').' '.size_format(filesize($file)).'</div>';
+							} else {
+								$view_thumb_url = site_url('/'). WPINC . '/images/media/'.wp_ext2type($ext).'.png';
 							}
 
 							$input_html .= '<img width="40" height="40" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
 							$input_html .= '<div>URL:<a href="'.$new_url.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url.'</a></div>';
-							$input_html .= $metadata_org;
+
+							$input_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+							$input_html .= '<div>'.__('File size:').' '.$file_size.'</div>';
+							if ( wp_ext2type($ext) === 'audio' || wp_ext2type($ext) === 'video' ) {
+								$input_html .= '<div>'.__('Length:').' '.$length.'</div>';
+							}
 
 							$date = $mediafromftp->get_date_check($file, $mediafromftp_settings['dateset']);
 							if ( $mediafromftp_settings['dateset'] === 'new' ) {
@@ -301,6 +273,7 @@ class MediaFromFtpAdmin {
 				}
 			}
 		}
+		unset($attachments);
 
 		?>
 		<?php
@@ -346,9 +319,6 @@ class MediaFromFtpAdmin {
 										}
 									}
 								}
-								$image_attr_medium = wp_get_attachment_image_src($attach_id, 'medium');
-								$image_attr_large = wp_get_attachment_image_src($attach_id, 'large');
-								$image_attr_full = wp_get_attachment_image_src($attach_id, 'full');
 							}else if ( wp_ext2type($ext) === 'video' ){
 								$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
 								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
@@ -380,27 +350,19 @@ class MediaFromFtpAdmin {
 							$new_url_attachs = explode('/', $new_url_attach);
 							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
 
+							$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 							if ( wp_ext2type($ext) === 'image' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('Images').': ';
 								foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
 									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
 								}
 								$output_html .= '</div>';
-							} else if ( wp_ext2type($ext) === 'video' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
-							} else if ( wp_ext2type($ext) === 'audio' ) {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-								$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
 							} else {
-								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
 								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+								if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
+									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+								}
 							}
 
 							$output_html .= '</div>';
@@ -412,6 +374,7 @@ class MediaFromFtpAdmin {
 				}
 				echo '<div class="updated"><ul><li>'.__('The following files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
 			}
+			unset($new_url_attaches);
 
 			?>
 			<div class="submit">

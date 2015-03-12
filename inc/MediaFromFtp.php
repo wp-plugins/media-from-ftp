@@ -249,7 +249,7 @@ class MediaFromFtp {
 			$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
 			$new_file = TRUE;
 			foreach ( $attachments as $attachment ){
-				$attach_url = $attachment->guid;
+				$attach_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.get_post_meta($attachment->ID, '_wp_attached_file', true);
 				if ( $attach_url === $new_url || $attach_url === $new_url_md5 ) {
 					$new_file = FALSE;
 				}
@@ -321,13 +321,17 @@ class MediaFromFtp {
 			$y = substr( $postdategmt, 0, 4 );
 			$m = substr( $postdategmt, 5, 2 );
 			$subdir = "/$y/$m";
-			if ( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename <> MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.wp_basename($filename) ) {
+			$filename_base = wp_basename($filename);
+			if ( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename <> MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base ) {
 				if ( !file_exists(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir) ) {
 					mkdir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir, 0757, true);
 				}
-				copy( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.wp_basename($filename) );
+				if ( file_exists(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base) ) {
+					$filename_base = wp_basename($filename, $suffix_attach_file).date_i18n( "dHis", FALSE, FALSE ).$suffix_attach_file;
+				}
+				copy( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base );
 				unlink( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename );
-				$filename = ltrim($subdir, '/').'/'.wp_basename($filename);
+				$filename = ltrim($subdir, '/').'/'.$filename_base;
 				$new_url_attach = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.$filename;
 			}
 		}
