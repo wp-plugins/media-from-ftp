@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.0.1
 Tested up to: 4.1.1
-Stable tag: 4.0
+Stable tag: 4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,9 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 4.1 =
+Fixed problem of file copy at SSL connection.
 
 = 4.0 =
 Fixed problem of overwriting when there is a file with the same name in years month based folders.
@@ -242,6 +245,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 4.1 =
 = 4.0 =
 = 3.9 =
 = 3.8 =
