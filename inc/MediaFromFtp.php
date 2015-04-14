@@ -360,6 +360,8 @@ class MediaFromFtp {
 			wp_update_post( $up_post );
 		}
 
+		// for wp_read_audio_metadata and wp_read_video_metadata
+		include_once( ABSPATH . 'wp-admin/includes/media.php' );
 		// for wp_generate_attachment_metadata
 		include_once( ABSPATH . 'wp-admin/includes/image.php' );
 

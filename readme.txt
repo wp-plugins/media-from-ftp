@@ -2,9 +2,9 @@
 Contributors: Katsushi Kawamori
 Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
-Requires at least: 3.0.1
+Requires at least: 3.6.0
 Tested up to: 4.1.1
-Stable tag: 4.1
+Stable tag: 4.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,6 +18,7 @@ Register to media library from files that have been uploaded by FTP.
 * Change the date/time.
 * Work with [DateTimePicker](http://xdsoft.net/jqplugins/datetimepicker/). jQuery plugin select date/time.
 * If use the Schedule options, can periodically run.
+* The execution of the command line is supported.(mediafromftpcmd.php)
 
 Why I made this?
 In the media uploader, you may not be able to upload by the environment of server.
@@ -47,6 +48,11 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 4.2 =
+Fixed problem of read of FileType for video and audio.
+Fixed problem of read of metadata for video and audio.
+Add a run in the command line.
 
 = 4.1 =
 Fixed problem of file copy at SSL connection.
@@ -245,6 +251,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 4.2 =
 = 4.1 =
 = 4.0 =
 = 3.9 =

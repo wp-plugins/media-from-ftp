@@ -338,8 +338,8 @@ class MediaFromFtpAdmin {
 								$file_size = $metadata['filesize'];
 							} else {
 								$file_size = filesize( get_attached_file($attach_id) );
-								$filetype = strtoupper($ext);
 							}
+							$filetype = strtoupper($ext);
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
