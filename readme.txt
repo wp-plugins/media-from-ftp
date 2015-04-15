@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.1.1
-Stable tag: 4.2
+Stable tag: 4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,9 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 4.3 =
+Add command line argument.
 
 = 4.2 =
 Fixed problem of read of FileType for video and audio.
@@ -251,6 +254,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 4.3 =
 = 4.2 =
 = 4.1 =
 = 4.0 =

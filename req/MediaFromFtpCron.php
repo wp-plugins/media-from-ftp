@@ -64,11 +64,32 @@ class MediaFromFtpCron {
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
-		$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+		// for mediafromftpcmd.php
+		$cmdoptions = getopt("m:s:d:");
+
+		if ( !empty($cmdoptions['m']) ) {
+			$max_execution_time = intval($cmdoptions['m']);
+		} else {
+			$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+		}
 		set_time_limit($max_execution_time);
 
-		$searchdir = $mediafromftp_settings['searchdir'];
-		$dateset = $mediafromftp_settings['dateset'];
+		if ( !empty($cmdoptions['s']) ) {
+			$searchdir = $cmdoptions['s'];
+		} else {
+			$searchdir = $mediafromftp_settings['searchdir'];
+		}
+
+		if ( !empty($cmdoptions['d']) ) {
+			if ( $cmdoptions['d'] === 'new' || $cmdoptions['d'] === 'server' || $cmdoptions['d'] === 'exif' ) {
+				$dateset = $cmdoptions['d'];
+			} else {
+				$dateset = $mediafromftp_settings['dateset'];
+			}
+		} else {
+			$dateset = $mediafromftp_settings['dateset'];
+		}
+
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 		$document_root = ABSPATH.$searchdir;
 

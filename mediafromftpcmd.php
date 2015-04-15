@@ -6,7 +6,6 @@
  * @subpackage mediafromftpcmd.php
  *
  * This program, run the Media from FTP on the command line.
- * Settings, please go in the normal management screen.
  *
 /*  Copyright (c) 2013- Katsushi Kawamori (email : dodesyoswift312@gmail.com)
     This program is free software; you can redistribute it and/or modify
@@ -23,6 +22,18 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
+/*
+ * command line argument list
+ *
+ * -m max_execution_time
+ *    example -m 300
+ * -s Search directory
+ *    example -s wp-content/uploads
+ * -d Date time settings (new, server, exif)
+ *    example -d exif
+ *
+ * If the argument is empty, use the set value of the management screen.
+*/
 	$_SERVER = array(
 		"HTTP_HOST" => "localhost",		// For your environment, please rewrite.
 		"SERVER_NAME" => "localhost",	// For your environment, please rewrite.
