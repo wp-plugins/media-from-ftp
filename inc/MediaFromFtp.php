@@ -38,11 +38,20 @@ class MediaFromFtp {
 		   	}
 		}
 
+		// for mediafromftpcmd.php
+		$cmdoptions = getopt("m:s:d:e:");
+
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file
-		if( get_option('mediafromftp_settings') ){
-			$excludefile .= '|'.$mediafromftp_settings['exclude'];
+		if ( !empty($cmdoptions['e']) ) {
+				$excludefile .= '|'.$cmdoptions['e'];
+		} else {
+			if( get_option('mediafromftp_settings') ){
+				$excludefile .= '|'.$mediafromftp_settings['exclude'];
+			}
 		}
+
+		unset($cmdoptions);
 
 		$searchfile = glob($dir . '/*', GLOB_BRACE);
 		if ( is_array($searchfile) ) {

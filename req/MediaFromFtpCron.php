@@ -65,7 +65,7 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("m:s:d:");
+		$cmdoptions = getopt("m:s:d:e:");
 
 		if ( !empty($cmdoptions['m']) ) {
 			$max_execution_time = intval($cmdoptions['m']);
@@ -89,6 +89,8 @@ class MediaFromFtpCron {
 		} else {
 			$dateset = $mediafromftp_settings['dateset'];
 		}
+
+		unset($cmdoptions);
 
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 		$document_root = ABSPATH.$searchdir;

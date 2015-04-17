@@ -31,6 +31,8 @@
  *    example -s wp-content/uploads
  * -d Date time settings (new, server, exif)
  *    example -d exif
+ * -e Exclude file (Regular expression is possible.)
+ *    example -e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"
  *
  * If the argument is empty, use the set value of the management screen.
 */
