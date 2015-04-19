@@ -33,6 +33,8 @@
  *    example -d exif
  * -e Exclude file (Regular expression is possible.)
  *    example -e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"
+ * -t File type (all, image, audio, video, document, spreadsheet, interactive, text, archive, code)
+ * 	  example -t image
  *
  * If the argument is empty, use the set value of the management screen.
 */

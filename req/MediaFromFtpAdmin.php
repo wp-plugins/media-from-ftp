@@ -91,6 +91,7 @@ class MediaFromFtpAdmin {
 		$mediafromftp = new MediaFromFtp();
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$searchdir = $mediafromftp_settings['searchdir'];
+		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
 		$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
 
 		set_time_limit($max_execution_time);
@@ -98,6 +99,9 @@ class MediaFromFtpAdmin {
 		$adddb = FALSE;
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
+		}
+		if (!empty($_POST['searchdir'])){
+			$searchdir = urldecode($_POST['searchdir']);
 		}
 
 		$scriptname = admin_url('tools.php?page=mediafromftp');
@@ -118,7 +122,7 @@ class MediaFromFtpAdmin {
 				</ul>
 				<div id="mediafromftp-tabs-1">
 
-		<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('Search & Register', 'mediafromftp'); ?></h3>
 
 		<?php
 
@@ -142,7 +146,6 @@ class MediaFromFtpAdmin {
 			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
 			$linkselectbox = NULL;
 			foreach ($dirs as $linkdir) {
-
 				$linkdirenc = mb_convert_encoding(str_replace(ABSPATH, "", $linkdir), "UTF-8", "auto");
 				if( $searchdir === $linkdirenc ){
 					$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
@@ -151,21 +154,34 @@ class MediaFromFtpAdmin {
 				}
 				$linkselectbox = $linkselectbox.$linkdirs;
 			}
-			if( empty($_POST['searchdir']) || $searchdir ===  MEDIAFROMFTP_PLUGIN_UPLOAD_PATH ){
-				$linkdirs = '<option value="" selected>'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
+			if( $searchdir ===  MEDIAFROMFTP_PLUGIN_UPLOAD_PATH ){
+				$linkdirs = '<option value="'.urlencode(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH).'" selected>'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
 			}else{
-				$linkdirs = '<option value="">'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
+				$linkdirs = '<option value="'.urlencode(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH).'">'.MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'</option>';
 			}
 			$linkselectbox = $linkselectbox.$linkdirs;
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
 				<div style="display:block;padding:20px 0">
-					<?php _e('Find the following directories.', 'mediafromftp'); ?>
-					<select name="searchdir" style="width: 100%">
+					<select name="searchdir" style="width: 250px">
 					<?php echo $linkselectbox; ?>
 					</select>
 					<input type="hidden" name="mediafromftp-tabs" value="1" />
 					<input type="submit" value="<?php _e('Search'); ?>" />
+					<span style="margin-right: 1em;"></span>
+					<select name="ext2type" style="width: 110px;">
+					<option value="all" <?php if ($ext2typefilter === 'all') echo 'selected';?>><?php echo esc_attr( __( 'All types' ) ); ?></option> 
+					<option value="image" <?php if ($ext2typefilter === 'image') echo 'selected';?>>image</option>
+					<option value="audio" <?php if ($ext2typefilter === 'audio') echo 'selected';?>>audio</option>
+					<option value="video" <?php if ($ext2typefilter === 'video') echo 'selected';?>>video</option>
+					<option value="document" <?php if ($ext2typefilter === 'document') echo 'selected';?>>document</option>
+					<option value="spreadsheet" <?php if ($ext2typefilter === 'spreadsheet') echo 'selected';?>>spreadsheet</option>
+					<option value="interactive" <?php if ($ext2typefilter === 'interactive') echo 'selected';?>>interactive</option>
+					<option value="text" <?php if ($ext2typefilter === 'text') echo 'selected';?>>text</option>
+					<option value="archive" <?php if ($ext2typefilter === 'archive') echo 'selected';?>>archive</option>
+					<option value="code" <?php if ($ext2typefilter === 'code') echo 'selected';?>>code</option>
+					</select>
+					<input type="submit" value="<?php _e('Filter'); ?>">
 				</div>
 			</form>
 			<?php
@@ -209,6 +225,7 @@ class MediaFromFtpAdmin {
 								<input type="hidden" name="mediafromftp-tabs" value="1" />
 								<input type="hidden" name="adddb" value="TRUE">
 								<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+								<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 								<input type="submit" value="<?php _e('Update Media'); ?>" />
 							</div>
 							<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
@@ -286,6 +303,7 @@ class MediaFromFtpAdmin {
 					<div class="submit">
 						<input type="hidden" name="mediafromftp-tabs" value="1" />
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+						<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 						<input type="submit" value="<?php _e('Back'); ?>" />
 					</div>
 				</form>
@@ -381,6 +399,7 @@ class MediaFromFtpAdmin {
 			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
 				<input type="hidden" name="mediafromftp-tabs" value="1" />
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 				<input type="submit" value="<?php _e('Back'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
@@ -401,6 +420,7 @@ class MediaFromFtpAdmin {
 						<input type="hidden" name="mediafromftp-tabs" value="1" />
 						<input type="hidden" name="adddb" value="TRUE">
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+						<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 						<input type="submit" value="<?php _e('Update Media'); ?>" />
 					</div>
 					</form>
@@ -585,12 +605,18 @@ class MediaFromFtpAdmin {
 		switch ($tabs) {
 			case 1:
 				if (!empty($_POST['searchdir'])){
-					$searchdir = str_replace(site_url('/'), '', urldecode($_POST['searchdir']));
+					$searchdir = urldecode($_POST['searchdir']);
 				} else {
-					$searchdir = str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL);
+					$searchdir = $mediafromftp_settings['searchdir'];
+				}
+				if (!empty($_POST['ext2type'])){
+					$ext2typefilter = $_POST['ext2type'];
+				} else {
+					$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
 				}
 				$mediafromftp_tbl = array(
 									'searchdir' => $searchdir,
+									'ext2typefilter' => $ext2typefilter,
 									'dateset' => $mediafromftp_settings['dateset'],
 									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 									'exclude' => $mediafromftp_settings['exclude'],
@@ -605,6 +631,7 @@ class MediaFromFtpAdmin {
 				if ( !empty($_POST['mediafromftp_dateset']) ) {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
+										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 										'dateset' => $_POST['mediafromftp_dateset'],
 										'max_execution_time' => $_POST['mediafromftp_max_execution_time'],
 										'exclude' => $mediafromftp_settings['exclude'],
@@ -626,6 +653,7 @@ class MediaFromFtpAdmin {
 				if ( !empty($_POST['mediafromftp_exclude']) ) {
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
+										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 										'dateset' => $mediafromftp_settings['dateset'],
 										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $_POST['mediafromftp_exclude'],
@@ -659,6 +687,7 @@ class MediaFromFtpAdmin {
 					}
 					$mediafromftp_tbl = array(
 										'searchdir' => $mediafromftp_settings['searchdir'],
+										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 										'dateset' => $mediafromftp_settings['dateset'],
 										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $mediafromftp_settings['exclude'],

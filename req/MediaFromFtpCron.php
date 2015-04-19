@@ -65,7 +65,7 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("m:s:d:e:");
+		$cmdoptions = getopt("m:s:d:e:t:");
 
 		if ( !empty($cmdoptions['m']) ) {
 			$max_execution_time = intval($cmdoptions['m']);

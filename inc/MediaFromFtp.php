@@ -39,7 +39,7 @@ class MediaFromFtp {
 		}
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("m:s:d:e:");
+		$cmdoptions = getopt("m:s:d:e:t:");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file
@@ -48,6 +48,15 @@ class MediaFromFtp {
 		} else {
 			if( get_option('mediafromftp_settings') ){
 				$excludefile .= '|'.$mediafromftp_settings['exclude'];
+			}
+		}
+
+		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
+		if ( !empty($cmdoptions['t']) ) {
+			$ext2typefilter = $cmdoptions['t'];
+		} else {
+			if (!empty($_POST['ext2type'])){
+				$ext2typefilter = $_POST['ext2type'];
 			}
 		}
 
@@ -61,7 +70,9 @@ class MediaFromFtp {
 						$exts = explode('.', $file);
 						$ext = end($exts);
 						if (preg_match("/".$extpattern."/", $ext)) {
-							$list[] = $file;
+							if ( $ext2typefilter === wp_ext2type($ext) || $ext2typefilter === 'all' ) {
+								$list[] = $file;
+							}
 						}
 					}
 				}
@@ -89,7 +100,9 @@ class MediaFromFtp {
 			}
 
 		    foreach($searchdir as $child_dir) {
-				$dirlist[] = $child_dir;
+				if (!preg_match("/". 'media-from-ftp-tmp'."/", $child_dir)) {
+					$dirlist[] = $child_dir;
+				}
 			}
 		}
 
