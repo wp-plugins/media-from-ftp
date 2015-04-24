@@ -40,6 +40,7 @@ class MediaFromFtpRegist {
 
 		if ( !get_option('mediafromftp_settings') ) {
 			$mediafromftp_tbl = array(
+								'pagemax' => 20,
 								'searchdir' => MEDIAFROMFTP_PLUGIN_UPLOAD_PATH,
 								'ext2typefilter' => 'all',
 								'dateset' => 'new',
@@ -88,7 +89,7 @@ class MediaFromFtpRegist {
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-			} else if ( $plugin_version >= 5.0 ) {
+			} else if ( $plugin_version >= 5.0 && $plugin_version < 6.0 ) {
 				if ( array_key_exists( "ext2typefilter", $mediafromftp_settings ) ) {
 					$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
 				} else {
@@ -97,6 +98,25 @@ class MediaFromFtpRegist {
 				$mediafromftp_tbl = array(
 									'searchdir' => $mediafromftp_settings['searchdir'],
 									'ext2typefilter' => $ext2typefilter,
+									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $mediafromftp_settings['cron']['apply'],
+												'schedule' => $mediafromftp_settings['cron']['schedule']
+												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			} else if ( $plugin_version >= 6.0 ) {
+				if ( array_key_exists( "pagemax", $mediafromftp_settings ) ) {
+					$pagemax = $mediafromftp_settings['pagemax'];
+				} else {
+					$pagemax = 20;
+				}
+				$mediafromftp_tbl = array(
+									'pagemax' => $pagemax,
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 									'dateset' => $mediafromftp_settings['dateset'],
 									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 									'exclude' => $mediafromftp_settings['exclude'],

@@ -47,6 +47,25 @@
 					);
 	require_once(dirname(__FILE__).'/../../../wp-load.php'); // For your environment, please rewrite.
 
+	$activeplugins = get_option('active_plugins');
+	$mediafromftp_active = FALSE;
+	foreach ( $activeplugins as $plugin_number => $plugin_name ) {
+		if ( $plugin_name === 'media-from-ftp/mediafromftp.php' ) {
+			$mediafromftp_active = TRUE;
+		}
+	}
+
+	if ( !$mediafromftp_active ) {
+		define("MEDIAFROMFTP_PLUGIN_BASE_DIR", dirname(__FILE__));
+		$wp_uploads = wp_upload_dir();
+		if(is_ssl()){
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $wp_uploads['baseurl']));
+		} else {
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+		}
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
+	}
+
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
 	$mediafromftpcron = new MediaFromFtpCron();
 	$mediafromftpcron->CronDo();

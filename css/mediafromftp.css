@@ -1,0 +1,36 @@
+.mediafromftp-pages {
+	width: 100%;
+	text-align: center;
+	margin: 30px;
+	height: 0;
+}
+
+.mediafromftp-pages .mediafromftp-links {
+	font-size: 18px;
+}
+
+.mediafromftp-pages .mediafromftp-links a {
+	padding: 8px 20px 11px;
+	font-size: 18px;
+	text-decoration: none;
+	background: #d3d3d3;
+}
+
+.mediafromftp-pages .mediafromftp-links a:hover {
+	color: #000000;
+	background: #d3d3d3;
+}
+
+.mediafromftp-pages .mediafromftp-links {
+	padding: 10px;
+	font-size: 14px;
+}
+
+#mediafromftp-loading-container{
+	display: none;
+}
+#mediafromftp-loading{
+	position: relative;
+	left: 40%;
+	top: 10%;
+}

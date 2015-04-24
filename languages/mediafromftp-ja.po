@@ -20,9 +20,6 @@ msgstr "除外ファイル"
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr "FTPでアップロードされたファイルからメディアライブラリに登録します。"
 
-msgid "Find the following directories."
-msgstr "次のディレクトリを検索します。"
-
 msgid "The following files was registered to the media library."
 msgstr "以下のファイルは、メディアライブラリに登録されました。"
 
@@ -69,12 +66,6 @@ msgstr ""
 msgid ""
 "When you want to restore the original settings of the above, please be blank."
 msgstr "上記の設定を元に戻したいときには、空白にしてください。"
-
-msgid ""
-"Please try again pressing Back button, if the processing is stopped on the "
-"way."
-msgstr ""
-"処理が途中で停止している場合は、[戻る]ボタンを押して再度お試しください。"
 
 msgid "Update to use of the current date/time."
 msgstr "現在の日時で更新"
@@ -123,13 +114,40 @@ msgid "daily"
 msgstr "１日１回"
 
 msgid ""
-"I need a donation. This is because, I want to continue the development and "
-"support of plugins."
+"Please make a donation if you like my work or would like to further the "
+"development of this plugin."
 msgstr ""
 "私はプラグインの開発とサポートを継続させるために寄付を必要としています。"
 
-msgid "Set the number of seconds a script is allowed to run."
-msgstr "スクリプトが実行可能な秒数を設定します。"
+msgid "The number of seconds a script is allowed to run."
+msgstr "スクリプトが実行可能な秒数。"
 
 msgid "The max_execution_time value defined in the php.ini."
 msgstr "php.iniで定義されたmax_execution_timeの値。"
+
+msgid "Number of titles to show to this page"
+msgstr "このページへ表示数するタイトルの数"
+
+msgid "The execution of the command line."
+msgstr "コマンドラインでの実行"
+
+msgid "command line argument list"
+msgstr "コマンドライン引数リスト"
+
+msgid "Command-line"
+msgstr "コマンドライン"
+
+msgid "Search directory"
+msgstr "検索ディレクトリ"
+
+msgid "Date time settings"
+msgstr "日時の設定"
+
+msgid "If the argument is empty, use the set value of the management screen."
+msgstr "引数が空の場合は、管理画面の設定値が使用されます。"
+
+msgid "Example:"
+msgstr "例:"
+
+msgid "Command-line works the at plug-in deactivate."
+msgstr "コマンドラインは、プラグインが停止している場合でも動作します。"

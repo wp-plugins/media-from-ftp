@@ -19,9 +19,6 @@ msgstr ""
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr ""
 
-msgid "Find the following directories."
-msgstr ""
-
 msgid "The following files was registered to the media library."
 msgstr ""
 
@@ -56,11 +53,6 @@ msgstr ""
 
 msgid ""
 "When you want to restore the original settings of the above, please be blank."
-msgstr ""
-
-msgid ""
-"Please try again pressing Back button, if the processing is stopped on the "
-"way."
 msgstr ""
 
 msgid "Update to use of the current date/time."
@@ -105,13 +97,38 @@ msgstr ""
 msgid "daily"
 msgstr ""
 
-msgid ""
-"I need a donation. This is because, I want to continue the development and "
-"support of plugins."
+msgid "Please make a donation if you like my work or would like to further the development of this plugin."
 msgstr ""
 
-msgid "Set the number of seconds a script is allowed to run."
+msgid "The number of seconds a script is allowed to run."
 msgstr ""
 
 msgid "The max_execution_time value defined in the php.ini."
+msgstr ""
+
+msgid "Number of titles to show to this page"
+msgstr ""
+
+msgid "The execution of the command line."
+msgstr ""
+
+msgid "command line argument list"
+msgstr ""
+
+msgid "Command-line"
+msgstr ""
+
+msgid "Search directory"
+msgstr ""
+
+msgid "Date time settings"
+msgstr ""
+
+msgid "If the argument is empty, use the set value of the management screen."
+msgstr ""
+
+msgid "Example:"
+msgstr ""
+
+msgid "Command-line works the at plug-in deactivate."
 msgstr ""

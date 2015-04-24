@@ -3,8 +3,8 @@ Contributors: Katsushi Kawamori
 Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
-Tested up to: 4.1.1
-Stable tag: 5.0
+Tested up to: 4.2
+Stable tag: 6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -48,6 +48,12 @@ none
 7. Schedule
 
 == Changelog ==
+
+= 6.0 =
+Add pagination.
+Add progress display.
+Command-line works the at plug-in deactivate.
+Change /languages.
 
 = 5.0 =
 Add FileType filter.
@@ -262,6 +268,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 6.0 =
 = 5.0 =
 = 4.4 =
 = 4.3 =
