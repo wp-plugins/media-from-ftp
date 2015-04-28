@@ -25,8 +25,6 @@
 /*
  * command line argument list
  *
- * -m max_execution_time
- *    example -m 300
  * -s Search directory
  *    example -s wp-content/uploads
  * -d Date time settings (new, server, exif)

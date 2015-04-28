@@ -65,14 +65,13 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("m:s:d:e:t:");
+		$cmdoptions = getopt("s:d:e:t:");
 
-		if ( !empty($cmdoptions['m']) ) {
-			$max_execution_time = intval($cmdoptions['m']);
-		} else {
-			$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+		$cmdlinedebugs = debug_backtrace();
+		if ( basename($cmdlinedebugs['0']['file']) <> 'mediafromftpcmd.php' ) {
+			$max_execution_time = $mediafromftp_settings['max_execution_time'];
+			set_time_limit($max_execution_time);
 		}
-		set_time_limit($max_execution_time);
 
 		if ( !empty($cmdoptions['s']) ) {
 			$searchdir = $cmdoptions['s'];

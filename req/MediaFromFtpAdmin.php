@@ -94,7 +94,7 @@ class MediaFromFtpAdmin {
 		$pagemax = $mediafromftp_settings['pagemax'];
 		$searchdir = $mediafromftp_settings['searchdir'];
 		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
-		$max_execution_time = intval($mediafromftp_settings['max_execution_time']);
+		$max_execution_time = $mediafromftp_settings['max_execution_time'];
 
 		set_time_limit($max_execution_time);
 
@@ -482,42 +482,33 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Settings'); ?></h3>
-			<div style="display:block;padding:5px 0">
+			<div style="display: block; padding:5px 5px">
 			<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
 			<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
 			</div>
-			<div style="display:block;padding:5px 0">
+			<div style="display: block;padding:5px 5px">
 			<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
 			<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
 			</div>
-			<div style="display:block;padding:5px 0">
+			<div style="display: block; padding:5px 5px">
 			<input type="radio" name="mediafromftp_dateset" value="exif" <?php if ($mediafromftp_settings['dateset'] === 'exif') echo 'checked'; ?>>
 			<?php
 			_e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp');
 			_e('Get by priority if there is date and time of the Exif information.', 'mediafromftp');
 			?>
 			</div>
-			<div style="display:block;padding:5px 0">
+			<div style="display: block; padding:5px 5px">
 			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
 			<?php _e('Organize my uploads into month- and year-based folders'); ?>
 			</div>
-			<div style="display:block;padding:5px 0">
+			<div style="display:block; padding:5px 5px">
 				<?php
 					$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'mediafromftp').'('.__('The max_execution_time value defined in the php.ini.', 'mediafromftp').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
-					echo $max_execution_time_text;
-					$target_mediafromftp_max_execution_time = $mediafromftp_settings['max_execution_time'];
-				?>
-				<select id="mediafromftp_max_execution_time" name="mediafromftp_max_execution_time">
-					<option <?php if ('30' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>30</option>
-					<option <?php if ('60' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>60</option>
-					<option <?php if ('120' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>120</option>
-					<option <?php if ('180' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>180</option>
-					<option <?php if ('240' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>240</option>
-					<option <?php if ('300' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>300</option>
-					<option <?php if ('600' == $target_mediafromftp_max_execution_time)echo 'selected="selected"'; ?>>600</option>
-				</select>
+					?>
+					<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="mediafromftp_max_execution_time" value="<?php echo $mediafromftp_settings['max_execution_time'] ?>" size="3" /></div>
 			</div>
-			<div class="submit">
+			<div style="clear: both;"></div>
+			<div style="display: block; padding:5px 5px">
 				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
 			</div>
@@ -623,12 +614,6 @@ class MediaFromFtpAdmin {
 			<code>$ php mediafromftpcmd.php</code>
 				<div style="display:block;padding:5px 20px">
 				<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-m</code> <?php _e('The number of seconds a script is allowed to run.', 'mediafromftp'); ?>(max_execution_time)</div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-m 300</code></div>
-						</div>
 					<div style="display:block;padding:5px 40px">
 					<div><code>-s</code> <?php _e('Search directory', 'mediafromftp'); ?></div>
 					</div>
@@ -765,7 +750,7 @@ class MediaFromFtpAdmin {
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 										'dateset' => $_POST['mediafromftp_dateset'],
-										'max_execution_time' => $_POST['mediafromftp_max_execution_time'],
+										'max_execution_time' => intval($_POST['mediafromftp_max_execution_time']),
 										'exclude' => $mediafromftp_settings['exclude'],
 										'cron' => array(
 													'apply' => $mediafromftp_settings['cron']['apply'],
