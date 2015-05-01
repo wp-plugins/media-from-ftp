@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 6.1
+Stable tag: 6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,10 +44,13 @@ none
 3. File registration result
 4. Settings
 5. Search exclude file
-6. Change the upload directory
-7. Schedule
+6. Schedule
 
 == Changelog ==
+
+= 6.2 =
+Remove item of the change of upload directory.
+Fixed display.
 
 = 6.1 =
 Fixed problem of max_execution_time.
@@ -271,6 +274,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 6.2 =
 = 6.1 =
 = 6.0 =
 = 5.0 =

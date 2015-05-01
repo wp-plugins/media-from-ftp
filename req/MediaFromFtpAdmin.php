@@ -130,24 +130,22 @@ class MediaFromFtpAdmin {
 
 		<h2>Media from FTP</h2>
 
-			<div id="mediafromftp-tabs">
-				<ul>
-				<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-2"><?php _e('Settings'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-3"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-4"><?php _e('Uploading Files'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-5"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-6"><?php _e('Command-line', 'mediafromftp'); ?></a></li>
-				<li><a href="#mediafromftp-tabs-7"><?php _e('Donate to this plugin &#187;'); ?></a></li>
-				</ul>
-				<div id="mediafromftp-tabs-1">
+		<div id="mediafromftp-tabs">
+		<ul>
+		<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
+		<li><a href="#mediafromftp-tabs-2"><?php _e('Settings'); ?></a></li>
+		<li><a href="#mediafromftp-tabs-3"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
+		<li><a href="#mediafromftp-tabs-4"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
+		<li><a href="#mediafromftp-tabs-5"><?php _e('Command-line', 'mediafromftp'); ?></a></li>
+		<li><a href="#mediafromftp-tabs-6"><?php _e('Donate to this plugin &#187;'); ?></a></li>
+		</ul>
 
+		<div id="mediafromftp-tabs-1">
 		<h3><?php _e('Search & Register', 'mediafromftp'); ?></h3>
+		<div id="mediafromftp-loading"><img src="<?php echo MEDIAFROMFTP_PLUGIN_URL.'/css/loading.gif'; ?>"></div>
+		<div id="mediafromftp-loading-container">
 
 		<?php
-		echo '<div id="mediafromftp-loading"><img src="'.MEDIAFROMFTP_PLUGIN_URL.'/css/loading.gif"></div>';
-		echo '<div id="mediafromftp-loading-container">';
-
 		if ( $adddb <> 'TRUE' ) { // Search mode
 			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
 			$linkselectbox = NULL;
@@ -169,7 +167,7 @@ class MediaFromFtpAdmin {
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
 				<div style="float:left;"><?php _e('Number of titles to show to this page', 'mediafromftp'); ?>:<input type="text" name="mediafromftp_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
-				<input type="submit" name="ShowToPage" value="<?php _e('Save') ?>" />
+				<input type="submit" name="ShowToPage" class="button" value="<?php _e('Save') ?>" />
 				<div style="clear:both"></div>
 				<div>
 					<select name="searchdir" style="width: 250px">
@@ -177,7 +175,7 @@ class MediaFromFtpAdmin {
 					</select>
 					<input type="hidden" name="mediafromftp-tabs" value="1" />
 					<input type="hidden" name="adddb" value="FALSE">
-					<input type="submit" value="<?php _e('Search'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 					<span style="margin-right: 1em;"></span>
 					<select name="ext2type" style="width: 110px;">
 					<option value="all" <?php if ($ext2typefilter === 'all') echo 'selected';?>><?php echo esc_attr( __( 'All types' ) ); ?></option> 
@@ -191,7 +189,7 @@ class MediaFromFtpAdmin {
 					<option value="archive" <?php if ($ext2typefilter === 'archive') echo 'selected';?>>archive</option>
 					<option value="code" <?php if ($ext2typefilter === 'code') echo 'selected';?>>code</option>
 					</select>
-					<input type="submit" value="<?php _e('Filter'); ?>">
+					<input type="submit" class="button" value="<?php _e('Filter'); ?>">
 				</div>
 			</form>
 			<?php
@@ -298,6 +296,7 @@ class MediaFromFtpAdmin {
 								$view_thumb_url = site_url('/'). WPINC . '/images/media/'.wp_ext2type($ext).'.png';
 							}
 							$input_html .= '<img width="40" height="40" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
+							$input_html .= '<div style="overflow: hidden;">';
 							$input_html .= '<div>URL:<a href="'.$new_url.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url.'</a></div>';
 							$input_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 							$input_html .= '<div>'.__('File size:').' '.$file_size.'</div>';
@@ -308,10 +307,10 @@ class MediaFromFtpAdmin {
 							if ( $mediafromftp_settings['dateset'] === 'new' ) {
 								$input_html .= '<input type="hidden" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'">';
 							} else {
-								$input_html .= '<div style="float: left; margin: 5px;">'.__('Edit date and time').'</div>';
+								$input_html .= '<div style="float: left; margin: 5px 5px 0px 0px;">'.__('Edit date and time').'</div>';
 								$input_html .= '<input type="text" id="datetimepicker-mediafromftp'.$this->postcount.'" name="new_url_attaches['.$this->postcount.'][datetime]" value="'.$date.'" style="width: 160px;">';
 							}
-							$input_html .= '</div>';
+							$input_html .= '</div></div>';
 
 							echo $input_html;
 
@@ -366,10 +365,10 @@ class MediaFromFtpAdmin {
 					<input type="hidden" name="mediafromftp-tabs" value="1" />
 					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
-					<input type="submit" value="<?php _e('Back'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-					<input type="submit" value="<?php _e('Media Library'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 				</form>
 				</div>
 				<div style="clear:both"></div>
@@ -425,7 +424,8 @@ class MediaFromFtpAdmin {
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
-							$output_html .= '<img width="40" height="40" src="'.$image_attr_thumbnail[0].'">';
+							$output_html .= '<img width="40" height="40" src="'.$image_attr_thumbnail[0].'" style="float: left; margin: 5px;">';
+							$output_html .= '<div style="overflow: hidden;">';
 							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
 							$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
 							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
@@ -446,8 +446,7 @@ class MediaFromFtpAdmin {
 									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
 								}
 							}
-
-							$output_html .= '</div>';
+							$output_html .= '</div></div>';
 
 							echo $output_html;
 
@@ -464,18 +463,17 @@ class MediaFromFtpAdmin {
 				<input type="hidden" name="mediafromftp-tabs" value="1" />
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
-				<input type="submit" value="<?php _e('Back'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-				<input type="submit" value="<?php _e('Media Library'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 			</form>
 			</div>
 			<div style="clear:both"></div>
 			<?php
 		}
-		echo '</div>';
-
 		?>
+		</div>
 		</div>
 
 		<div id="mediafromftp-tabs-2">
@@ -510,7 +508,7 @@ class MediaFromFtpAdmin {
 			<div style="clear: both;"></div>
 			<div style="display: block; padding:5px 5px">
 				<input type="hidden" name="mediafromftp-tabs" value="2" />
-				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
 		</div>
@@ -521,48 +519,17 @@ class MediaFromFtpAdmin {
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Exclude file', 'mediafromftp'); ?></h3>
 			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
-			<?php $mediafromftp_settings_tabs_2 = get_option('mediafromftp_settings'); ?>
-			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_2['exclude']; ?></textarea>
+			<?php $mediafromftp_settings_tabs_3 = get_option('mediafromftp_settings'); ?>
+			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_3['exclude']; ?></textarea>
 			<div class="submit">
 				<input type="hidden" name="mediafromftp-tabs" value="3" />
-				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
 		</div>
 		</div>
 
 		<div id="mediafromftp-tabs-4">
-		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<h3><?php _e('Uploading Files'); ?></h3>
-			<div style="display:block; padding: 10px; border:4px red solid;width:98%; color:red; font-size: 120%;">
-			<?php _e('If you want to change the upload directory, you can do so by changing the options.php upload_path, the upload_url_path. It is also possible from below. However, if it is necessary to complex settings such as the use of multi-site and sub-domains, is not recommended.', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:20px 0;">
-			<div><?php _e('Store uploads in this folder'); ?></div>
-			<input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr(get_option('upload_path')); ?>" />
-			<div><?php _e('Default is <code>wp-content/uploads</code>'); ?></div>
-			</div>
-			<div style="display:block;padding:20px 0;">
-			<div><?php _e('Full URL path to files'); ?></div>
-			<input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option('upload_url_path')); ?>" />
-			<div><?php _e('Configuring this is optional. By default, it should be blank.'); ?></div>
-			</div>
-			<div style="display:block; padding:10px 0; color:red;">
-			<?php _e('If you change the settings, you must be re-register the file to the media library.', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block; padding:10px 0; color:red;">
-			<?php _e('When you want to restore the original settings of the above, please be blank.', 'mediafromftp'); ?>
-			</div>
-			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="4" />
-				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
-			</div>
-		</form>
-		</div>
-		</div>
-
-		<div id="mediafromftp-tabs-5">
 		<div class="wrap">
 		<form method="post" action="<?php echo $scriptname; ?>">
 			<h3><?php _e('Schedule', 'mediafromftp'); ?></h3>
@@ -599,14 +566,14 @@ class MediaFromFtpAdmin {
 			</div>
 
 			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="5" />
-				<input type="submit" name="Submit" value="<?php _e('Save Changes'); ?>" />
+				<input type="hidden" name="mediafromftp-tabs" value="4" />
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
 			</div>
 		</form>
 		</div>
 		</div>
 
-		<div id="mediafromftp-tabs-6">
+		<div id="mediafromftp-tabs-5">
 		<div class="wrap">
 			<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
 			<div style="display:block;padding:5px 10px">
@@ -645,7 +612,7 @@ class MediaFromFtpAdmin {
 		</div>
 		</div>
 
-		<div id="mediafromftp-tabs-7">
+		<div id="mediafromftp-tabs-6">
 		<div class="wrap">
 			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
 			<div align="right">Katsushi Kawamori</div>
@@ -785,16 +752,6 @@ class MediaFromFtpAdmin {
 				}
 				break;
 			case 4:
-				if ( !empty($_POST['upload_path']) ) {
-					update_option( 'upload_path', $_POST['upload_path'] );
-					echo '<div class="updated"><ul><li>'.__('Store uploads in this folder').' --> '.__('Changes saved.').'</li></ul></div>';
-				}
-				if ( !empty($_POST['upload_url_path']) ) {
-					update_option( 'upload_url_path', $_POST['upload_url_path'] );
-					echo '<div class="updated"><ul><li>'.__('Full URL path to files').' --> '.__('Changes saved.').'</li></ul></div>';
-				}
-				break;
-			case 5:
 				require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
 				$mediafromftpcron = new MediaFromFtpCron();
 				if ( !empty($_POST['mediafromftp_cron_schedule']) ) {

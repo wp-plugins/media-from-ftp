@@ -56,17 +56,6 @@ msgstr ""
 msgid "Regular expression is possible."
 msgstr "正規表現が可能です。"
 
-msgid ""
-"If you change the settings, you must be re-register the file to the media "
-"library."
-msgstr ""
-"設定を変更する場合は、メディアライブラリにファイルを再登録する必要がありま"
-"す。"
-
-msgid ""
-"When you want to restore the original settings of the above, please be blank."
-msgstr "上記の設定を元に戻したいときには、空白にしてください。"
-
 msgid "Update to use of the current date/time."
 msgstr "現在の日時で更新"
 
@@ -77,17 +66,6 @@ msgstr "ファイルの日時を取得し、それに基づいて更新。必要
 
 msgid "Get by priority if there is date and time of the Exif information."
 msgstr "Exif情報の日時がある場合に優先的に取得する。"
-
-msgid ""
-"If you want to change the upload directory, you can do so by changing the "
-"options.php upload_path, the upload_url_path. It is also possible from "
-"below. However, if it is necessary to complex settings such as the use of "
-"multi-site and sub-domains, is not recommended."
-msgstr ""
-"アップロードディレクトリを変更するには、options.phpのupload_path,"
-"upload_url_pathを変更する事でできます。それは、以下からも可能です。しかし、マ"
-"ルチサイトやサブドメインの使用など複雑な設定が必要となる場合は、お勧めできま"
-"せん。"
 
 msgid "Schedule"
 msgstr "スケジュール"
