@@ -94,6 +94,7 @@ class MediaFromFtpAdmin {
 		$pagemax = $mediafromftp_settings['pagemax'];
 		$searchdir = $mediafromftp_settings['searchdir'];
 		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
+		$extfilter = $mediafromftp_settings['extfilter'];
 		$max_execution_time = $mediafromftp_settings['max_execution_time'];
 
 		set_time_limit($max_execution_time);
@@ -178,7 +179,7 @@ class MediaFromFtpAdmin {
 					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 					<span style="margin-right: 1em;"></span>
 					<select name="ext2type" style="width: 110px;">
-					<option value="all" <?php if ($ext2typefilter === 'all') echo 'selected';?>><?php echo esc_attr( __( 'All types' ) ); ?></option> 
+					<option value="all" <?php if ($ext2typefilter === 'all') echo 'selected';?>><?php echo esc_attr( __('All types', 'mediafromftp') ); ?></option> 
 					<option value="image" <?php if ($ext2typefilter === 'image') echo 'selected';?>>image</option>
 					<option value="audio" <?php if ($ext2typefilter === 'audio') echo 'selected';?>>audio</option>
 					<option value="video" <?php if ($ext2typefilter === 'video') echo 'selected';?>>video</option>
@@ -188,6 +189,26 @@ class MediaFromFtpAdmin {
 					<option value="text" <?php if ($ext2typefilter === 'text') echo 'selected';?>>text</option>
 					<option value="archive" <?php if ($ext2typefilter === 'archive') echo 'selected';?>>archive</option>
 					<option value="code" <?php if ($ext2typefilter === 'code') echo 'selected';?>>code</option>
+					</select>
+					<select name="extension" style="width: 120px;">
+					<option value="all" <?php if ($extfilter === 'all') echo 'selected';?>><?php echo esc_attr( __('All extensions', 'mediafromftp') ); ?></option>
+					<?php
+					$mimes = wp_get_mime_types();
+					foreach ($mimes as $extselect => $mime) {
+						if( strpos( $extselect, '|' ) ){
+							$extselects = explode('|',$extselect);
+							foreach ( $extselects as $extselect2 ) {
+								?>
+								<option value="<?php echo $extselect2; ?>" <?php if ($extfilter === $extselect2) echo 'selected';?>><?php echo $extselect2; ?></option>
+								<?php
+							}
+						} else {
+							?>
+							<option value="<?php echo $extselect; ?>" <?php if ($extfilter === $extselect) echo 'selected';?>><?php echo $extselect; ?></option>
+							<?php
+						}
+					}
+					?>
 					</select>
 					<input type="submit" class="button" value="<?php _e('Filter'); ?>">
 				</div>
@@ -199,7 +220,7 @@ class MediaFromFtpAdmin {
 				);
 			$attachments = get_posts($args);
 
-			$extpattern = $mediafromftp->extpattern();
+			$extpattern = $mediafromftp->extpattern($extfilter);
 			$files = $mediafromftp->scan_file($document_root, $extpattern);
 
 			$unregister_unwritable_count = 0;
@@ -232,6 +253,9 @@ class MediaFromFtpAdmin {
 			if( !empty($_GET['ext2typefilter']) ) {
 				$ext2typefilter = $_GET['ext2typefilter'];
 			}
+			if( !empty($_GET['extfilter']) ) {
+				$extfilter = $_GET['extfilter'];
+			}
 			if (!empty($_GET['p'])){
 				$page = $_GET['p'];
 			} else {
@@ -242,7 +266,7 @@ class MediaFromFtpAdmin {
 			$pagelast = ceil($pageallcount / $pagemax);
 
 			if ( $pagelast > 1 ) {
-				$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter);
+				$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter, $extfilter);
 			}
 			if ( $pageallcount > 0 ) {
 			?>
@@ -252,6 +276,7 @@ class MediaFromFtpAdmin {
 				<input type="hidden" name="adddb" value="TRUE">
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+				<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
 				<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
 			</div>
 			<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
@@ -338,12 +363,13 @@ class MediaFromFtpAdmin {
 						<input type="hidden" name="adddb" value="TRUE">
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 						<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+						<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
 						<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
 					</div>
 					</form>
 					<?php
 					if ( $pagelast > 1 ) {
-						$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter);
+						$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter, $extfilter);
 					}
 				if ( !empty($unregisters_unwritable) ) {
 					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
@@ -365,6 +391,7 @@ class MediaFromFtpAdmin {
 					<input type="hidden" name="mediafromftp-tabs" value="1" />
 					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+					<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
 					<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
@@ -463,6 +490,7 @@ class MediaFromFtpAdmin {
 				<input type="hidden" name="mediafromftp-tabs" value="1" />
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+				<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
 				<input type="submit" class="button" value="<?php _e('Back'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
@@ -577,7 +605,25 @@ class MediaFromFtpAdmin {
 		<div class="wrap">
 			<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
 			<div style="display:block;padding:5px 10px">
-			<?php _e('The execution of the command line.', 'mediafromftp'); ?>
+			1. <?php _e('Change directoy to media-from-ftp.', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			2. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 20px">
+<pre>
+$_SERVER = array(
+    "HTTP_HOST" => "<?php echo $_SERVER['HTTP_HOST']; ?>",
+    "SERVER_NAME" => "<?php echo $_SERVER['SERVER_NAME']; ?>",
+    "REQUEST_URI" => "/",
+    "REQUEST_METHOD" => "GET",
+    "HTTP_USER_AGENT" => "mediafromftp"
+                );
+require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
+</pre>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			3. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
 			<code>$ php mediafromftpcmd.php</code>
 				<div style="display:block;padding:5px 20px">
 				<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
@@ -604,6 +650,12 @@ class MediaFromFtpAdmin {
 					</div>
 						<div style="display:block;padding:5px 60px">
 						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-t image</code></div>
+						</div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-x</code> <?php _e('File extension' , 'mediafromftp'); ?></div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-x jpg</code></div>
 						</div>
 				<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
 				</div>
@@ -636,16 +688,17 @@ class MediaFromFtpAdmin {
 	 * string	$pagelast
 	 * string	$scriptname
 	 * string	$ext2typefilter
+	 * string	$extfilter
 	 * return	$html
 	 */
-	function pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter){
+	function pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter, $extfilter){
 
 			$pageprev = $page - 1;
 			$pagenext = $page + 1;
-			$scriptnamefirst = add_query_arg( array('p' => '1', 'ext2typefilter' => $ext2typefilter ),  $scriptname);
-			$scriptnameprev = add_query_arg( array('p' => $pageprev, 'ext2typefilter' => $ext2typefilter ),  $scriptname);
-			$scriptnamenext = add_query_arg( array('p' => $pagenext, 'ext2typefilter' => $ext2typefilter ),  $scriptname);
-			$scriptnamelast = add_query_arg( array('p' => $pagelast, 'ext2typefilter' => $ext2typefilter ),  $scriptname);
+			$scriptnamefirst = add_query_arg( array('p' => '1', 'ext2typefilter' => $ext2typefilter, 'extfilter' => $extfilter ),  $scriptname);
+			$scriptnameprev = add_query_arg( array('p' => $pageprev, 'ext2typefilter' => $ext2typefilter, 'extfilter' => $extfilter ),  $scriptname);
+			$scriptnamenext = add_query_arg( array('p' => $pagenext, 'ext2typefilter' => $ext2typefilter, 'extfilter' => $extfilter ),  $scriptname);
+			$scriptnamelast = add_query_arg( array('p' => $pagelast, 'ext2typefilter' => $ext2typefilter, 'extfilter' => $extfilter ),  $scriptname);
 			?>
 			<div class="mediafromftp-pages">
 			<span class="mediafromftp-links">
@@ -693,13 +746,16 @@ class MediaFromFtpAdmin {
 				}
 				if (!empty($_POST['ext2type'])){
 					$ext2typefilter = $_POST['ext2type'];
+					$extfilter = $_POST['extension'];
 				} else {
 					$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
+					$extfilter = $mediafromftp_settings['extfilter'];
 				}
 				$mediafromftp_tbl = array(
 									'pagemax' => $pagemax,
 									'searchdir' => $searchdir,
 									'ext2typefilter' => $ext2typefilter,
+									'extfilter' => $extfilter,
 									'dateset' => $mediafromftp_settings['dateset'],
 									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 									'exclude' => $mediafromftp_settings['exclude'],
@@ -716,6 +772,7 @@ class MediaFromFtpAdmin {
 										'pagemax' => $mediafromftp_settings['pagemax'],
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+										'extfilter' => $mediafromftp_settings['extfilter'],
 										'dateset' => $_POST['mediafromftp_dateset'],
 										'max_execution_time' => intval($_POST['mediafromftp_max_execution_time']),
 										'exclude' => $mediafromftp_settings['exclude'],
@@ -739,6 +796,7 @@ class MediaFromFtpAdmin {
 										'pagemax' => $mediafromftp_settings['pagemax'],
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+										'extfilter' => $mediafromftp_settings['extfilter'],
 										'dateset' => $mediafromftp_settings['dateset'],
 										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $_POST['mediafromftp_exclude'],
@@ -764,6 +822,7 @@ class MediaFromFtpAdmin {
 										'pagemax' => $mediafromftp_settings['pagemax'],
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+										'extfilter' => $mediafromftp_settings['extfilter'],
 										'dateset' => $mediafromftp_settings['dateset'],
 										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
 										'exclude' => $mediafromftp_settings['exclude'],

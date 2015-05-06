@@ -39,7 +39,7 @@ class MediaFromFtp {
 		}
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:");
+		$cmdoptions = getopt("s:d:e:t:x:");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file
@@ -112,19 +112,23 @@ class MediaFromFtp {
 	}
 
 	/* ==================================================
-	 * @param	none
+	 * @param	string	$extfilter
 	 * @return	string	$extpattern
 	 * @since	2.2
 	 */
-	function extpattern(){
-
-		$mimes = wp_get_mime_types();
+	function extpattern($extfilter){
 
 		$extpattern = NULL;
-		foreach ($mimes as $ext => $mime) {
-			$extpattern .= $ext.'|'.strtoupper($ext).'|';
+
+		if ( $extfilter === 'all' ) {
+			$mimes = wp_get_mime_types();
+			foreach ($mimes as $ext => $mime) {
+				$extpattern .= $ext.'|'.strtoupper($ext).'|';
+			}
+			$extpattern = substr($extpattern, 0, -1);
+		} else {
+			$extpattern = $extfilter.'|'.strtoupper($extfilter);
 		}
-		$extpattern = substr($extpattern, 0, -1);
 
 		return $extpattern;
 

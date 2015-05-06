@@ -65,7 +65,7 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:");
+		$cmdoptions = getopt("s:d:e:t:x:");
 
 		$cmdlinedebugs = debug_backtrace();
 		if ( basename($cmdlinedebugs['0']['file']) <> 'mediafromftpcmd.php' ) {
@@ -87,6 +87,12 @@ class MediaFromFtpCron {
 			}
 		} else {
 			$dateset = $mediafromftp_settings['dateset'];
+		}
+
+		if ( !empty($cmdoptions['x']) ) {
+			$extfilter = $cmdoptions['x'];
+		} else {
+			$extfilter = $mediafromftp_settings['extfilter'];
 		}
 
 		unset($cmdoptions);
@@ -113,7 +119,7 @@ class MediaFromFtpCron {
 			);
 		$attachments = get_posts($args);
 
-		$extpattern = $mediafromftp->extpattern();
+		$extpattern = $mediafromftp->extpattern($extfilter);
 		$files = $mediafromftp->scan_file($document_root, $extpattern);
 
 		foreach ( $files as $file ){

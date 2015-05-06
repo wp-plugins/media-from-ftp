@@ -33,17 +33,21 @@
  *    example -e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"
  * -t File type (all, image, audio, video, document, spreadsheet, interactive, text, archive, code)
  * 	  example -t image
+ * -x File extension
+ * 	  example -x jpg
  *
  * If the argument is empty, use the set value of the management screen.
 */
+// For your environment, please rewrite.
 	$_SERVER = array(
-		"HTTP_HOST" => "localhost",		// For your environment, please rewrite.
-		"SERVER_NAME" => "localhost",	// For your environment, please rewrite.
+		"HTTP_HOST" => "localhost",
+		"SERVER_NAME" => "localhost",
 		"REQUEST_URI" => "/",
 		"REQUEST_METHOD" => "GET",
 		"HTTP_USER_AGENT" => "mediafromftp"
 					);
-	require_once(dirname(__FILE__).'/../../../wp-load.php'); // For your environment, please rewrite.
+	require_once(dirname(__FILE__).'/../../../wp-load.php');
+// For your environment, please rewrite.
 
 	$activeplugins = get_option('active_plugins');
 	$mediafromftp_active = FALSE;

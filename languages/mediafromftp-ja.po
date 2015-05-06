@@ -129,3 +129,21 @@ msgstr "例:"
 
 msgid "Command-line works the at plug-in deactivate."
 msgstr "コマンドラインは、プラグインが停止している場合でも動作します。"
+
+msgid "All types"
+msgstr "全てのタイプ"
+
+msgid "All extensions"
+msgstr "全ての拡張子"
+
+msgid "File extension"
+msgstr "ファイル拡張子"
+
+msgid "Change directoy to media-from-ftp."
+msgstr "カレントディレクトリをmedia-from-ftpにします。"
+
+msgid ""
+"Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from "
+"line 42)"
+msgstr ""
+"【mediafromftpcmd.php]を、以下のように書き換えてください。（42行から49行）"
