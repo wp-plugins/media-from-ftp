@@ -131,3 +131,6 @@ msgstr ""
 
 msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)"
 msgstr ""
+
+msgid "Execution time"
+msgstr ""

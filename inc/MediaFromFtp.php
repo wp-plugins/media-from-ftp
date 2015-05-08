@@ -275,7 +275,7 @@ class MediaFromFtp {
 			$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
 			$new_file = TRUE;
 			foreach ( $attachments as $attachment ){
-				$attach_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.get_post_meta($attachment->ID, '_wp_attached_file', true);
+				$attach_url = $attachment->guid;
 				if ( $attach_url === $new_url || $attach_url === $new_url_md5 ) {
 					$new_file = FALSE;
 				}

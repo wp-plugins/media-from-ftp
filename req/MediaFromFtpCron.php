@@ -113,11 +113,12 @@ class MediaFromFtpCron {
 			$document_root = mb_convert_encoding($document_root, "UTF-8", "auto");
 		}
 
-		$args = array(
-			'post_type' => 'attachment',
-			'numberposts' => -1
-			);
-		$attachments = get_posts($args);
+		global $wpdb;
+		$attachments = $wpdb->get_results("
+						SELECT guid
+						FROM $wpdb->posts
+						WHERE post_type = 'attachment'
+						");
 
 		$extpattern = $mediafromftp->extpattern($extfilter);
 		$files = $mediafromftp->scan_file($document_root, $extpattern);

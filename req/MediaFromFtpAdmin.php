@@ -33,7 +33,7 @@ class MediaFromFtpAdmin {
 			$this_plugin = MEDIAFROMFTP_PLUGIN_BASE_FILE;
 		}
 		if ( $file == $this_plugin ) {
-			$links[] = '<a href="'.admin_url('tools.php?page=mediafromftp').'">'.__( 'Settings').'</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=mediafromftp').'">'.__( 'Settings').'</a>';
 		}
 			return $links;
 	}
@@ -43,7 +43,29 @@ class MediaFromFtpAdmin {
 	 * @since	1.0
 	 */
 	function add_pages() {
-		add_management_page('Media from FTP', 'Media from FTP', 'manage_options', 'mediafromftp', array($this, 'manage_page'));
+		add_menu_page(
+				'Media from FTP',
+				'Media from FTP',
+				'manage_options',
+				'mediafromftp',
+				array($this, 'manage_page')
+		);
+		add_submenu_page(
+				'mediafromftp',
+				__('Settings'),
+				__('Settings'),
+				'manage_options',
+				'mediafromftp-settings',
+				array($this, 'settings_page')
+		);
+		add_submenu_page(
+				'mediafromftp',
+				__('Search & Register', 'mediafromftp'),
+				__('Search & Register', 'mediafromftp'),
+				'manage_options',
+				'mediafromftp-search-register',
+				array($this, 'search_register_page')
+		);
 	}
 
 	/* ==================================================
@@ -51,12 +73,9 @@ class MediaFromFtpAdmin {
 	 * @since	2.23
 	 */
 	function load_custom_wp_admin_style() {
-		wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
-		wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
 		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
 		wp_enqueue_style( 'mediafromftp',  MEDIAFROMFTP_PLUGIN_URL.'/css/mediafromftp.css' );
 		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
 		wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
 
 	}
@@ -74,18 +93,221 @@ class MediaFromFtpAdmin {
 	 */
 	function manage_page() {
 
-		$def_max_execution_time = ini_get('max_execution_time');
+		if ( !current_user_can( 'manage_options' ) )  {
+			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+		}
+
+		$scriptname_settings = admin_url('admin.php?page=mediafromftp-settings');
+		$scriptname_search_register = admin_url('admin.php?page=mediafromftp-search-register');
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+		$searchdir = $mediafromftp_settings['searchdir'];
+		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
+		$extfilter = $mediafromftp_settings['extfilter'];
+
+		?>
+		<div class="wrap">
+
+		<h2>Media from FTP</h2>
+
+		<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
+
+		<div class="wrap">
+			<div class="item-mediafromftp-settings">
+			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
+			<div align="right">Katsushi Kawamori</div>
+			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
+<a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
+			</div>
+		</div>
+
+		</div>
+		<?php
+	}
+
+	/* ==================================================
+	 * Sub Menu
+	 */
+	function settings_page() {
 
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		if ( empty($_POST['mediafromftp-tabs']) ) {
-			$tabs = 1;
-		} else {
-			$tabs = intval($_POST['mediafromftp-tabs']);
+		$tabs = 1;
+		$this->options_updated($tabs);
+
+		$def_max_execution_time = ini_get('max_execution_time');
+		$scriptname = admin_url('admin.php?page=mediafromftp-settings');
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+
+		?>
+		<div class="wrap">
+		<h2>Media from FTP <?php _e('Settings'); ?></h2>
+		<div style="display: block; padding: 5px 15px">
+		<form method="post" action="<?php echo $scriptname; ?>">
+
+			<div class="item-mediafromftp-settings">
+				<h3><?php _e('Execution time', 'mediafromftp'); ?></h3>
+				<div style="display:block; padding:5px 5px">
+					<?php
+						$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'mediafromftp').'('.__('The max_execution_time value defined in the php.ini.', 'mediafromftp').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
+						?>
+						<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="mediafromftp_max_execution_time" value="<?php echo $mediafromftp_settings['max_execution_time'] ?>" size="3" /></div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+
+			<div class="item-mediafromftp-settings">
+				<h3><?php _e('Date'); ?></h3>
+				<div style="display: block;padding:5px 5px">
+				<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
+				<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
+				</div>
+				<div style="display: block;padding:5px 5px">
+				<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
+				<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
+				</div>
+				<div style="display: block; padding:5px 5px">
+				<input type="radio" name="mediafromftp_dateset" value="exif" <?php if ($mediafromftp_settings['dateset'] === 'exif') echo 'checked'; ?>>
+				<?php
+				_e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp');
+				_e('Get by priority if there is date and time of the Exif information.', 'mediafromftp');
+				?>
+				</div>
+				<div style="display: block; padding:5px 5px">
+				<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
+				<?php _e('Organize my uploads into month- and year-based folders'); ?>
+				</div>
+			</div>
+
+			<div class="item-mediafromftp-settings">
+				<h3><?php _e('Exclude file', 'mediafromftp'); ?></h3>
+				<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
+
+				<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings['exclude']; ?></textarea>
+				<div style="clear: both;"></div>
+			</div>
+
+			<div class="item-mediafromftp-settings">
+				<h3><?php _e('Schedule', 'mediafromftp'); ?></h3>
+				<div style="display:block;padding:5px 0">
+				<?php _e('Set the schedule.', 'mediafromftp'); ?>
+				<?php _e('Will take some time until the [Next Schedule] is reflected.', 'mediafromftp'); ?>
+				</div>
+				<?php
+				if ( wp_next_scheduled( 'MediaFromFtpCronHook' ) ) {
+					$next_schedule = ' '.get_date_from_gmt(date("Y-m-d H:i:s", wp_next_scheduled( 'MediaFromFtpCronHook' )));
+				} else {
+					$next_schedule = ' '.__('None');
+				}
+				?>
+				<div style="display:block;padding:5px 0">
+				<?php echo __('Next Schedule:', 'mediafromftp').$next_schedule; ?>
+				</div>
+				<div style="display:block;padding:5px 0">
+				<input type="checkbox" name="mediafromftp_cron_apply" value="1" <?php checked('1', $mediafromftp_settings['cron']['apply']); ?> />
+				<?php _e('Apply Schedule', 'mediafromftp'); ?>
+				</div>
+				<div style="display:block;padding:5px 10px">
+				<input type="radio" name="mediafromftp_cron_schedule" value="hourly" <?php checked('hourly', $mediafromftp_settings['cron']['schedule']); ?>>
+				<?php _e('hourly', 'mediafromftp'); ?>
+				</div>
+				<div style="display:block;padding:5px 10px">
+				<input type="radio" name="mediafromftp_cron_schedule" value="twicedaily" <?php checked('twicedaily', $mediafromftp_settings['cron']['schedule']); ?>>
+				<?php _e('twice daily', 'mediafromftp'); ?>
+				</div>
+				<div style="display:block;padding:5px 10px">
+				<input type="radio" name="mediafromftp_cron_schedule" value="daily" <?php checked('daily', $mediafromftp_settings['cron']['schedule']); ?>>
+				<?php _e('daily', 'mediafromftp'); ?>
+				</div>
+			</div>
+
+			<div style="clear: both;"></div>
+			<div class="submit">
+				<input type="hidden" name="mediafromftp-tabs" value="1" />
+				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
+			</div>
+		</form>
+
+		<div class="item-mediafromftp-settings">
+			<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
+			<div style="display:block;padding:5px 10px">
+			1. <?php _e('Change directoy to media-from-ftp.', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			2. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)', 'mediafromftp'); ?>
+			</div>
+			<div style="display:block;padding:5px 20px">
+<pre>
+$_SERVER = array(
+    "HTTP_HOST" => "<?php echo $_SERVER['HTTP_HOST']; ?>",
+    "SERVER_NAME" => "<?php echo $_SERVER['SERVER_NAME']; ?>",
+    "REQUEST_URI" => "/",
+    "REQUEST_METHOD" => "GET",
+    "HTTP_USER_AGENT" => "mediafromftp"
+                );
+require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
+</pre>
+			</div>
+			<div style="display:block;padding:5px 10px">
+			3. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
+			<code>$ php mediafromftpcmd.php</code>
+				<div style="display:block;padding:5px 20px">
+				<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-s</code> <?php _e('Search directory', 'mediafromftp'); ?></div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-s wp-content/uploads</code></div>
+						</div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-d</code> <?php _e('Date time settings', 'mediafromftp'); ?> (new, server, exif)</div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-d exif</code></div>
+						</div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-e</code> <?php _e('Exclude file', 'mediafromftp'); ?> (<?php _e('Regular expression is possible.', 'mediafromftp'); ?>)</div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"</code></div>
+						</div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-t</code> <?php _e('File type:'); ?> (all, image, audio, video, document, spreadsheet, interactive, text, archive, code)</div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-t image</code></div>
+						</div>
+					<div style="display:block;padding:5px 40px">
+					<div><code>-x</code> <?php _e('File extension' , 'mediafromftp'); ?></div>
+					</div>
+						<div style="display:block;padding:5px 60px">
+						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-x jpg</code></div>
+						</div>
+				<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
+				</div>
+				<div><?php _e('Command-line works the at plug-in deactivate.', 'mediafromftp'); ?></div>
+			</div>
+		</div>
+
+		</div>
+		</div>
+		<?php
+
+	}
+
+	/* ==================================================
+	 * Sub Menu
+	 */
+	function search_register_page() {
+
+		if ( !current_user_can( 'manage_options' ) )  {
+			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
+		$def_max_execution_time = ini_get('max_execution_time');
+
+		$tabs = 2;
 		$this->options_updated($tabs);
 
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
@@ -110,7 +332,7 @@ class MediaFromFtpAdmin {
 			$searchdir = urldecode($_POST['searchdir']);
 		}
 
-		$scriptname = admin_url('tools.php?page=mediafromftp');
+		$scriptname = admin_url('admin.php?page=mediafromftp-search-register');
 
 		$document_root = ABSPATH.$searchdir;
 		if( get_option('WPLANG') === 'ja' ) {
@@ -129,20 +351,8 @@ class MediaFromFtpAdmin {
 		?>
 		<div class="wrap">
 
-		<h2>Media from FTP</h2>
+		<h2>Media from FTP <?php _e('Search & Register', 'mediafromftp'); ?></h2>
 
-		<div id="mediafromftp-tabs">
-		<ul>
-		<li><a href="#mediafromftp-tabs-1"><?php _e('Search & Register', 'mediafromftp'); ?></a></li>
-		<li><a href="#mediafromftp-tabs-2"><?php _e('Settings'); ?></a></li>
-		<li><a href="#mediafromftp-tabs-3"><?php _e('Exclude file', 'mediafromftp'); ?></a></li>
-		<li><a href="#mediafromftp-tabs-4"><?php _e('Schedule', 'mediafromftp'); ?></a></li>
-		<li><a href="#mediafromftp-tabs-5"><?php _e('Command-line', 'mediafromftp'); ?></a></li>
-		<li><a href="#mediafromftp-tabs-6"><?php _e('Donate to this plugin &#187;'); ?></a></li>
-		</ul>
-
-		<div id="mediafromftp-tabs-1">
-		<h3><?php _e('Search & Register', 'mediafromftp'); ?></h3>
 		<div id="mediafromftp-loading"><img src="<?php echo MEDIAFROMFTP_PLUGIN_URL.'/css/loading.gif'; ?>"></div>
 		<div id="mediafromftp-loading-container">
 
@@ -174,7 +384,7 @@ class MediaFromFtpAdmin {
 					<select name="searchdir" style="width: 250px">
 					<?php echo $linkselectbox; ?>
 					</select>
-					<input type="hidden" name="mediafromftp-tabs" value="1" />
+					<input type="hidden" name="mediafromftp-tabs" value="2" />
 					<input type="hidden" name="adddb" value="FALSE">
 					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 					<span style="margin-right: 1em;"></span>
@@ -214,11 +424,12 @@ class MediaFromFtpAdmin {
 				</div>
 			</form>
 			<?php
-			$args = array(
-				'post_type' => 'attachment',
-				'numberposts' => -1
-				);
-			$attachments = get_posts($args);
+			global $wpdb;
+			$attachments = $wpdb->get_results("
+							SELECT guid
+							FROM $wpdb->posts
+							WHERE post_type = 'attachment'
+							");
 
 			$extpattern = $mediafromftp->extpattern($extfilter);
 			$files = $mediafromftp->scan_file($document_root, $extpattern);
@@ -272,7 +483,7 @@ class MediaFromFtpAdmin {
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
 			<div class="submit" style="padding-top: 5px; padding-bottom: 5px;">
-				<input type="hidden" name="mediafromftp-tabs" value="1" />
+				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="hidden" name="adddb" value="TRUE">
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
@@ -359,7 +570,7 @@ class MediaFromFtpAdmin {
 					<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
 					</div>
 					<div class="submit" style="padding-top: 5px; padding-bottom: 5px;">
-						<input type="hidden" name="mediafromftp-tabs" value="1" />
+						<input type="hidden" name="mediafromftp-tabs" value="2" />
 						<input type="hidden" name="adddb" value="TRUE">
 						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 						<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
@@ -387,12 +598,12 @@ class MediaFromFtpAdmin {
 			if (!empty($new_url_attaches)) {
 				?>
 				<div class="submit">
-				<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
-					<input type="hidden" name="mediafromftp-tabs" value="1" />
+				<form method="post" style="float: left; margin-right: 1em;" action="<?php echo $scriptname; ?>">
+					<input type="hidden" name="mediafromftp-tabs" value="2" />
 					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 					<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-					<input type="submit" class="button" value="<?php _e('Back'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
@@ -486,12 +697,12 @@ class MediaFromFtpAdmin {
 
 			?>
 			<div class="submit">
-			<form method="post" style="float: left;" action="<?php echo $scriptname; ?>">
-				<input type="hidden" name="mediafromftp-tabs" value="1" />
+			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo $scriptname; ?>">
+				<input type="hidden" name="mediafromftp-tabs" value="2" />
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 				<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-				<input type="submit" class="button" value="<?php _e('Back'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
@@ -503,180 +714,7 @@ class MediaFromFtpAdmin {
 		?>
 		</div>
 		</div>
-
-		<div id="mediafromftp-tabs-2">
-		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<h3><?php _e('Settings'); ?></h3>
-			<div style="display: block; padding:5px 5px">
-			<input type="radio" name="mediafromftp_dateset" value="new" <?php if ($mediafromftp_settings['dateset'] === 'new') echo 'checked'; ?>>
-			<?php _e('Update to use of the current date/time.', 'mediafromftp'); ?>
-			</div>
-			<div style="display: block;padding:5px 5px">
-			<input type="radio" name="mediafromftp_dateset" value="server" <?php if ($mediafromftp_settings['dateset'] === 'server') echo 'checked'; ?>>
-			<?php _e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?>
-			</div>
-			<div style="display: block; padding:5px 5px">
-			<input type="radio" name="mediafromftp_dateset" value="exif" <?php if ($mediafromftp_settings['dateset'] === 'exif') echo 'checked'; ?>>
-			<?php
-			_e('Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp');
-			_e('Get by priority if there is date and time of the Exif information.', 'mediafromftp');
-			?>
-			</div>
-			<div style="display: block; padding:5px 5px">
-			<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
-			<?php _e('Organize my uploads into month- and year-based folders'); ?>
-			</div>
-			<div style="display:block; padding:5px 5px">
-				<?php
-					$max_execution_time_text = __('The number of seconds a script is allowed to run.', 'mediafromftp').'('.__('The max_execution_time value defined in the php.ini.', 'mediafromftp').'[<font color="red">'.$def_max_execution_time.'</font>]'.')';
-					?>
-					<div style="float: left;"><?php echo $max_execution_time_text; ?>:<input type="text" name="mediafromftp_max_execution_time" value="<?php echo $mediafromftp_settings['max_execution_time'] ?>" size="3" /></div>
-			</div>
-			<div style="clear: both;"></div>
-			<div style="display: block; padding:5px 5px">
-				<input type="hidden" name="mediafromftp-tabs" value="2" />
-				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
-			</div>
-		</form>
-		</div>
-		</div>
-
-		<div id="mediafromftp-tabs-3">
-		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<h3><?php _e('Exclude file', 'mediafromftp'); ?></h3>
-			<p><?php _e('Regular expression is possible.', 'mediafromftp'); ?></p>
-			<?php $mediafromftp_settings_tabs_3 = get_option('mediafromftp_settings'); ?>
-			<textarea id="mediafromftp_exclude" name="mediafromftp_exclude" rows="4" style="width: 250px;"><?php echo $mediafromftp_settings_tabs_3['exclude']; ?></textarea>
-			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="3" />
-				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
-			</div>
-		</form>
-		</div>
-		</div>
-
-		<div id="mediafromftp-tabs-4">
-		<div class="wrap">
-		<form method="post" action="<?php echo $scriptname; ?>">
-			<h3><?php _e('Schedule', 'mediafromftp'); ?></h3>
-			<div style="display:block;padding:5px 0">
-			<?php _e('Set the schedule.', 'mediafromftp'); ?>
-			<?php _e('Will take some time until the [Next Schedule] is reflected.', 'mediafromftp'); ?>
-			</div>
-			<?php
-			$mediafromftp_settings_tabs_4 = get_option('mediafromftp_settings');
-			if ( wp_next_scheduled( 'MediaFromFtpCronHook' ) ) {
-				$next_schedule = ' '.get_date_from_gmt(date("Y-m-d H:i:s", wp_next_scheduled( 'MediaFromFtpCronHook' )));
-			} else {
-				$next_schedule = ' '.__('None');
-			}
-			?>
-			<div style="display:block;padding:5px 0">
-			<?php echo __('Next Schedule:', 'mediafromftp').$next_schedule; ?>
-			</div>
-			<div style="display:block;padding:5px 0">
-			<input type="checkbox" name="mediafromftp_cron_apply" value="1" <?php checked('1', $mediafromftp_settings_tabs_4['cron']['apply']); ?> />
-			<?php _e('Apply Schedule', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:5px 10px">
-			<input type="radio" name="mediafromftp_cron_schedule" value="hourly" <?php checked('hourly', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
-			<?php _e('hourly', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:5px 10px">
-			<input type="radio" name="mediafromftp_cron_schedule" value="twicedaily" <?php checked('twicedaily', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
-			<?php _e('twice daily', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:5px 10px">
-			<input type="radio" name="mediafromftp_cron_schedule" value="daily" <?php checked('daily', $mediafromftp_settings_tabs_4['cron']['schedule']); ?>>
-			<?php _e('daily', 'mediafromftp'); ?>
-			</div>
-
-			<div class="submit">
-				<input type="hidden" name="mediafromftp-tabs" value="4" />
-				<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
-			</div>
-		</form>
-		</div>
-		</div>
-
-		<div id="mediafromftp-tabs-5">
-		<div class="wrap">
-			<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
-			<div style="display:block;padding:5px 10px">
-			1. <?php _e('Change directoy to media-from-ftp.', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:5px 10px">
-			2. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)', 'mediafromftp'); ?>
-			</div>
-			<div style="display:block;padding:5px 20px">
-<pre>
-$_SERVER = array(
-    "HTTP_HOST" => "<?php echo $_SERVER['HTTP_HOST']; ?>",
-    "SERVER_NAME" => "<?php echo $_SERVER['SERVER_NAME']; ?>",
-    "REQUEST_URI" => "/",
-    "REQUEST_METHOD" => "GET",
-    "HTTP_USER_AGENT" => "mediafromftp"
-                );
-require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
-</pre>
-			</div>
-			<div style="display:block;padding:5px 10px">
-			3. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
-			<code>$ php mediafromftpcmd.php</code>
-				<div style="display:block;padding:5px 20px">
-				<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-s</code> <?php _e('Search directory', 'mediafromftp'); ?></div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-s wp-content/uploads</code></div>
-						</div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-d</code> <?php _e('Date time settings', 'mediafromftp'); ?> (new, server, exif)</div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-d exif</code></div>
-						</div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-e</code> <?php _e('Exclude file', 'mediafromftp'); ?> (<?php _e('Regular expression is possible.', 'mediafromftp'); ?>)</div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"</code></div>
-						</div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-t</code> <?php _e('File type:'); ?> (all, image, audio, video, document, spreadsheet, interactive, text, archive, code)</div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-t image</code></div>
-						</div>
-					<div style="display:block;padding:5px 40px">
-					<div><code>-x</code> <?php _e('File extension' , 'mediafromftp'); ?></div>
-					</div>
-						<div style="display:block;padding:5px 60px">
-						<div><?php _e('Example:', 'mediafromftp'); ?> <code>-x jpg</code></div>
-						</div>
-				<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
-				</div>
-				<div><?php _e('Command-line works the at plug-in deactivate.', 'mediafromftp'); ?></div>
-			</div>
-		</div>
-		</div>
-
-		<div id="mediafromftp-tabs-6">
-		<div class="wrap">
-			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
-			<div align="right">Katsushi Kawamori</div>
-			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
-<a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
-		</div>
-		</div>
-
-		</div>
-		</div>
 		<?php
-
 	}
 
 	/* ==================================================
@@ -730,10 +768,47 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 	 */
 	function options_updated($tabs){
 
+		include_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
+		$mediafromftpcron = new MediaFromFtpCron();
+
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		switch ($tabs) {
 			case 1:
+				if ( !empty($_POST['mediafromftp_dateset']) ) {
+					if ( !empty($_POST['mediafromftp_cron_apply']) ) {
+						$mediafromftp_cron_apply = $_POST['mediafromftp_cron_apply'];
+					} else {
+						$mediafromftp_cron_apply = FALSE;
+					}
+					$mediafromftp_tbl = array(
+										'pagemax' => $mediafromftp_settings['pagemax'],
+										'searchdir' => $mediafromftp_settings['searchdir'],
+										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+										'extfilter' => $mediafromftp_settings['extfilter'],
+										'dateset' => $_POST['mediafromftp_dateset'],
+										'max_execution_time' => intval($_POST['mediafromftp_max_execution_time']),
+										'exclude' => $_POST['mediafromftp_exclude'],
+										'cron' => array(
+													'apply' => $mediafromftp_cron_apply,
+													'schedule' => $_POST['mediafromftp_cron_schedule']
+													)
+										);
+					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+					if ( !empty($_POST['move_yearmonth_folders']) ) {
+						update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
+					} else {
+						update_option( 'uploads_use_yearmonth_folders', '0' );
+					}
+					if ( !$mediafromftp_cron_apply ) {
+						$mediafromftpcron->CronStop();
+					} else {
+						$mediafromftpcron->CronStart();
+					}
+					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
+				}
+				break;
+			case 2:
 				if (!empty($_POST['ShowToPage'])){
 					$pagemax = intval($_POST['mediafromftp_pagemax']);
 				} else {
@@ -766,81 +841,6 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 									);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 				break;
-			case 2:
-				if ( !empty($_POST['mediafromftp_dateset']) ) {
-					$mediafromftp_tbl = array(
-										'pagemax' => $mediafromftp_settings['pagemax'],
-										'searchdir' => $mediafromftp_settings['searchdir'],
-										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
-										'extfilter' => $mediafromftp_settings['extfilter'],
-										'dateset' => $_POST['mediafromftp_dateset'],
-										'max_execution_time' => intval($_POST['mediafromftp_max_execution_time']),
-										'exclude' => $mediafromftp_settings['exclude'],
-										'cron' => array(
-													'apply' => $mediafromftp_settings['cron']['apply'],
-													'schedule' => $mediafromftp_settings['cron']['schedule']
-													)
-										);
-					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-					if ( !empty($_POST['move_yearmonth_folders']) ) {
-						update_option( 'uploads_use_yearmonth_folders', $_POST['move_yearmonth_folders'] );
-					} else {
-						update_option( 'uploads_use_yearmonth_folders', '0' );
-					}
-					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
-				}
-				break;
-			case 3:
-				if ( !empty($_POST['mediafromftp_exclude']) ) {
-					$mediafromftp_tbl = array(
-										'pagemax' => $mediafromftp_settings['pagemax'],
-										'searchdir' => $mediafromftp_settings['searchdir'],
-										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
-										'extfilter' => $mediafromftp_settings['extfilter'],
-										'dateset' => $mediafromftp_settings['dateset'],
-										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
-										'exclude' => $_POST['mediafromftp_exclude'],
-										'cron' => array(
-													'apply' => $mediafromftp_settings['cron']['apply'],
-													'schedule' => $mediafromftp_settings['cron']['schedule']
-													)
-										);
-					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-					echo '<div class="updated"><ul><li>'.__('Exclude file', 'mediafromftp').' --> '.__('Changes saved.').'</li></ul></div>';
-				}
-				break;
-			case 4:
-				require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
-				$mediafromftpcron = new MediaFromFtpCron();
-				if ( !empty($_POST['mediafromftp_cron_schedule']) ) {
-					if ( !empty($_POST['mediafromftp_cron_apply']) ) {
-						$mediafromftp_cron_apply = $_POST['mediafromftp_cron_apply'];
-					} else {
-						$mediafromftp_cron_apply = FALSE;
-					}
-					$mediafromftp_tbl = array(
-										'pagemax' => $mediafromftp_settings['pagemax'],
-										'searchdir' => $mediafromftp_settings['searchdir'],
-										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
-										'extfilter' => $mediafromftp_settings['extfilter'],
-										'dateset' => $mediafromftp_settings['dateset'],
-										'max_execution_time' => $mediafromftp_settings['max_execution_time'],
-										'exclude' => $mediafromftp_settings['exclude'],
-										'cron' => array(
-													'apply' => $mediafromftp_cron_apply,
-													'schedule' => $_POST['mediafromftp_cron_schedule']
-													)
-										);
-					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-					echo '<div class="updated"><ul><li>'.__('Schedule', 'mediafromftp').' --> '.__('Changes saved.').'</li></ul></div>';
-					if ( !$mediafromftp_cron_apply ) {
-						$mediafromftpcron->CronStop();
-					} else {
-						$mediafromftpcron->CronStart();
-					}
-				}
-				unset($mediafromftpcron);
-				break;
 		}
 
 	}
@@ -855,11 +855,6 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 $mediafromftp_add_js = <<<MEDIAFROMFTP1
 
 <!-- BEGIN: Media from FTP -->
-<script type="text/javascript">
-jQuery('#mediafromftp-tabs').responsiveTabs({
-  startCollapsed: 'accordion'
-});
-</script>
 <script type="text/javascript">
 jQuery(function(){
   jQuery('.mediafromftp-checkAll').on('change', function() {

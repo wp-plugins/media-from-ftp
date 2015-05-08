@@ -147,3 +147,6 @@ msgid ""
 "line 42)"
 msgstr ""
 "【mediafromftpcmd.php]を、以下のように書き換えてください。（42行から49行）"
+
+msgid "Execution time"
+msgstr "実行時間"
