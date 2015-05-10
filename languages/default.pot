@@ -19,14 +19,14 @@ msgstr ""
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr ""
 
-msgid "The following files was registered to the media library."
+msgid "These files was registered to the media library."
 msgstr ""
 
 msgid "There is no file that is not registered in the media library."
 msgstr ""
 
 msgid ""
-"The following files is a file that is not registered in the media library. "
+"These files is a file that is not registered in the media library. "
 "And can be registered."
 msgstr ""
 
@@ -90,9 +90,6 @@ msgstr ""
 msgid "The max_execution_time value defined in the php.ini."
 msgstr ""
 
-msgid "Number of titles to show to this page"
-msgstr ""
-
 msgid "The execution of the command line."
 msgstr ""
 
@@ -133,4 +130,7 @@ msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 fr
 msgstr ""
 
 msgid "Execution time"
+msgstr ""
+
+msgid "Reviews"
 msgstr ""

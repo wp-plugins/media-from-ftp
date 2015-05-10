@@ -33,7 +33,9 @@ class MediaFromFtpAdmin {
 			$this_plugin = MEDIAFROMFTP_PLUGIN_BASE_FILE;
 		}
 		if ( $file == $this_plugin ) {
-			$links[] = '<a href="'.admin_url('admin.php?page=mediafromftp').'">'.__( 'Settings').'</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=mediafromftp').'">Media from FTP</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=mediafromftp-settings').'">'.__( 'Settings').'</a>';
+			$links[] = '<a href="'.admin_url('admin.php?page=mediafromftp-search-register').'">'.__('Search & Register', 'mediafromftp').'</a>';
 		}
 			return $links;
 	}
@@ -97,27 +99,39 @@ class MediaFromFtpAdmin {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 
-		$scriptname_settings = admin_url('admin.php?page=mediafromftp-settings');
-		$scriptname_search_register = admin_url('admin.php?page=mediafromftp-search-register');
-		$mediafromftp_settings = get_option('mediafromftp_settings');
-		$searchdir = $mediafromftp_settings['searchdir'];
-		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
-		$extfilter = $mediafromftp_settings['extfilter'];
+		$plugin_datas = get_file_data( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/mediafromftp.php', array('version' => 'Version') );
+		$plugin_version = __('Version:').' '.$plugin_datas['version'];
 
 		?>
+
 		<div class="wrap">
 
-		<h2>Media from FTP</h2>
+		<div>
+		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
+		<div style="display: block; padding: 10px 10px;">
+			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo admin_url('admin.php?page=mediafromftp-settings'); ?>">
+				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
+			</form>
+			<form method="post" action="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
+			</form>
+		</div>
+		</div>
+		<div style="clear: both;"></div>
 
 		<h3><?php _e('Register to media library from files that have been uploaded by FTP.', 'mediafromftp'); ?></h3>
+		<h4 style="margin: 5px; padding: 5px;">
+		<?php echo $plugin_version; ?> |
+		<a style="text-decoration: none;" href="https://wordpress.org/support/plugin/media-from-ftp" target="_blank"><?php _e('Support Forums') ?></a> |
+		<a style="text-decoration: none;" href="https://wordpress.org/support/view/plugin-reviews/media-from-ftp" target="_blank"><?php _e('Reviews', 'mediafromftp') ?></a>
+		</h4>
 
 		<div class="wrap">
-			<div class="item-mediafromftp-settings">
-			<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
-			<div align="right">Katsushi Kawamori</div>
-			<h3 style="float: left;"><?php _e('Donate to this plugin &#187;'); ?></h3>
-<a href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
-			</div>
+		<div style="width: 250px; height: 170px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
+		<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
+		<div style="text-align: right; margin: 5px; padding: 5px;"><span style="padding: 3px; color: #ffffff; background-color: #008000">Plugin Author</span> <span style="font-weight: bold;">Katsushi Kawamori</span></div>
+<a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
+		</div>
 		</div>
 
 		</div>
@@ -141,8 +155,22 @@ class MediaFromFtpAdmin {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		?>
+
 		<div class="wrap">
-		<h2>Media from FTP <?php _e('Settings'); ?></h2>
+
+		<div>
+		<a style="color: #444444;" href="<?php echo admin_url('admin.php?page=mediafromftp'); ?>">
+		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
+		</a>
+		<div style="display: block; padding: 10px 10px;">
+			<input type="submit" style="float: left; margin-right: 1em;" class="button active" value="<?php _e('Settings'); ?>" />
+			<form method="post" action="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
+			</form>
+		</div>
+		</div>
+		<div style="clear: both;"></div>
+
 		<div style="display: block; padding: 5px 15px">
 		<form method="post" action="<?php echo $scriptname; ?>">
 
@@ -238,20 +266,30 @@ class MediaFromFtpAdmin {
 			2. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)', 'mediafromftp'); ?>
 			</div>
 			<div style="display:block;padding:5px 20px">
-<pre>
-$_SERVER = array(
-    "HTTP_HOST" => "<?php echo $_SERVER['HTTP_HOST']; ?>",
-    "SERVER_NAME" => "<?php echo $_SERVER['SERVER_NAME']; ?>",
+			<?php
+			$commandline_host = $_SERVER['HTTP_HOST'];
+			$commandline_server = $_SERVER['SERVER_NAME'];
+			$commandline_wpload = ABSPATH.'wp-load.php';
+$commandline_set = <<<COMMANDLINESET
+
+&#x24_SERVER = array(
+    "HTTP_HOST" => "$commandline_host",
+    "SERVER_NAME" => "$commandline_server",
     "REQUEST_URI" => "/",
     "REQUEST_METHOD" => "GET",
     "HTTP_USER_AGENT" => "mediafromftp"
                 );
-require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
-</pre>
+require_once('$commandline_wpload');
+
+COMMANDLINESET;
+?>
+			<textarea readonly rows="10" style="font-size: 12px; width: 250px;">
+			<?php echo $commandline_set; ?>
+			</textarea>
 			</div>
 			<div style="display:block;padding:5px 10px">
 			3. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
-			<code>$ php mediafromftpcmd.php</code>
+			<div><code>$ php mediafromftpcmd.php</code></div>
 				<div style="display:block;padding:5px 20px">
 				<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
 					<div style="display:block;padding:5px 40px">
@@ -349,13 +387,24 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 		}
 
 		?>
+
 		<div class="wrap">
 
-		<h2>Media from FTP <?php _e('Search & Register', 'mediafromftp'); ?></h2>
+		<div>
+		<a style="color: #444444;" href="<?php echo admin_url('admin.php?page=mediafromftp'); ?>">
+		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
+		</a>
+		<div style="display: block; padding: 10px 10px;">
+			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo admin_url('admin.php?page=mediafromftp-settings'); ?>">
+				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
+			</form>
+			<input type="submit" class="button active" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
+		</div>
+		</div>
+		<div style="clear: both;"></div>
 
 		<div id="mediafromftp-loading"><img src="<?php echo MEDIAFROMFTP_PLUGIN_URL.'/css/loading.gif'; ?>"></div>
 		<div id="mediafromftp-loading-container">
-
 		<?php
 		if ( $adddb <> 'TRUE' ) { // Search mode
 			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
@@ -377,9 +426,9 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 			$linkselectbox = $linkselectbox.$linkdirs;
 			?>
 			<form method="post" action="<?php echo $scriptname; ?>">
-				<div style="float:left;"><?php _e('Number of titles to show to this page', 'mediafromftp'); ?>:<input type="text" name="mediafromftp_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
+				<div style="float:left;"><?php _e('Number of items per page:'); ?><input type="text" name="mediafromftp_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
 				<input type="submit" name="ShowToPage" class="button" value="<?php _e('Save') ?>" />
-				<div style="clear:both"></div>
+				<div style="clear: both;"></div>
 				<div>
 					<select name="searchdir" style="width: 250px">
 					<?php echo $linkselectbox; ?>
@@ -496,7 +545,7 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 			<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
 			<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
 			</div>
-			<div style="clear:both"></div>
+			<div style="clear: both;"></div>
 			<?php
 			}
 
@@ -559,29 +608,29 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 			if ( $this->postcount == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
 				echo '<div class="updated"><ul><li>'.__('There is no file that is not registered in the media library.', 'mediafromftp').'</li></ul></div>';
 			} else {
-				if ( $this->postcount > 0 ) {
-					echo '<div class="updated"><ul><li>'.__('The following files is a file that is not registered in the media library. And can be registered.', 'mediafromftp').'</li></ul></div>';
+				?>
+				<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
+				<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
+				</div>
+				<div style="padding-top: 5px; padding-bottom: 5px;">
+				<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
+				</div>
+				<div class="submit" style="padding-top: 5px; padding-bottom: 5px;">
+					<input type="hidden" name="mediafromftp-tabs" value="2" />
+					<input type="hidden" name="adddb" value="TRUE">
+					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+					<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
+					<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
+				</div>
+				</form>
+				<?php
+				if ( $pagelast > 1 ) {
+					$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter, $extfilter);
 				}
-					?>
-					<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">
-					<?php _e('Select'); ?> & <?php _e('Thumbnail'); ?> & <?php _e('Metadata'); ?>
-					</div>
-					<div style="padding-top: 5px; padding-bottom: 5px;">
-					<input type="checkbox" id="group_media-from-ftp" class="mediafromftp-checkAll"><?php _e('Select all'); ?>
-					</div>
-					<div class="submit" style="padding-top: 5px; padding-bottom: 5px;">
-						<input type="hidden" name="mediafromftp-tabs" value="2" />
-						<input type="hidden" name="adddb" value="TRUE">
-						<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-						<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
-						<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-						<input type="submit" class="button-primary button-large" value="<?php _e('Update Media'); ?>" />
-					</div>
-					</form>
-					<?php
-					if ( $pagelast > 1 ) {
-						$this->pagenation($page, $pagebegin, $pageend, $pagelast, $scriptname, $ext2typefilter, $extfilter);
-					}
+				if ( $this->postcount > 0 ) {
+					echo '<div class="updated"><ul><li>'.__('These files is a file that is not registered in the media library. And can be registered.', 'mediafromftp').'</li></ul></div>';
+				}
 				if ( !empty($unregisters_unwritable) ) {
 					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
 						echo '<div class="error"><ul><li>'.$unregister_unwritable_url.' --> '.__('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp').'</li></ul></div>';
@@ -609,7 +658,7 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 				</form>
 				</div>
-				<div style="clear:both"></div>
+				<div style="clear: both;"></div>
 				<?php
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
@@ -691,7 +740,7 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 						}
 					}
 				}
-				echo '<div class="updated"><ul><li>'.__('The following files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
+				echo '<div class="updated"><ul><li>'.__('These files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
 			}
 			unset($new_url_attaches);
 
@@ -708,7 +757,7 @@ require_once(<?php echo "'".ABSPATH.'wp-load.php'."'"; ?>);
 				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
 			</form>
 			</div>
-			<div style="clear:both"></div>
+			<div style="clear: both;"></div>
 			<?php
 		}
 		?>

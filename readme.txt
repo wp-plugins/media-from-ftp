@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 7.0
+Stable tag: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,14 +39,16 @@ none
 
 == Screenshots ==
 
-1. Search file display
-2. Registration file selection
-3. File registration result
-4. Settings
-5. Search exclude file
-6. Schedule
+1. Settings
+2. Search file display
+3. Registration file selection
+4. File registration result
 
 == Changelog ==
+
+= 7.1 =
+Fixed display.
+Change /languages.
 
 = 7.0 =
 Separate the Search and Register page and Settings page. 
@@ -284,6 +286,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 7.1 =
 = 7.0 =
 = 6.3 =
 = 6.2 =

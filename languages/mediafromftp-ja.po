@@ -20,18 +20,18 @@ msgstr "除外ファイル"
 msgid "Register to media library from files that have been uploaded by FTP."
 msgstr "FTPでアップロードされたファイルからメディアライブラリに登録します。"
 
-msgid "The following files was registered to the media library."
-msgstr "以下のファイルは、メディアライブラリに登録されました。"
+msgid "These files was registered to the media library."
+msgstr "これらのファイルは、メディアライブラリに登録されました。"
 
 msgid "There is no file that is not registered in the media library."
 msgstr "メディアライブラリに登録されていないファイルはありません。"
 
 msgid ""
-"The following files is a file that is not registered in the media library. "
-"And can be registered."
+"These files is a file that is not registered in the media library. And can "
+"be registered."
 msgstr ""
-"以下のファイルは、メディアライブラリに登録されていないファイルです。そして登"
-"録が可能です。"
+"これらのファイルは、メディアライブラリに登録されていないファイルです。そして"
+"登録が可能です。"
 
 msgid ""
 "Can not register to directory for unwritable, because generating a thumbnail "
@@ -103,9 +103,6 @@ msgstr "スクリプトが実行可能な秒数。"
 msgid "The max_execution_time value defined in the php.ini."
 msgstr "php.iniで定義されたmax_execution_timeの値。"
 
-msgid "Number of titles to show to this page"
-msgstr "このページへ表示数するタイトルの数"
-
 msgid "The execution of the command line."
 msgstr "コマンドラインでの実行"
 
@@ -150,3 +147,6 @@ msgstr ""
 
 msgid "Execution time"
 msgstr "実行時間"
+
+msgid "Reviews"
+msgstr "レビュー"
