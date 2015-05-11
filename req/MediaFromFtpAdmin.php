@@ -106,8 +106,7 @@ class MediaFromFtpAdmin {
 
 		<div class="wrap">
 
-		<div>
-		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
+		<h2 style="float: left;">Media from FTP</h2>
 		<div style="display: block; padding: 10px 10px;">
 			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo admin_url('admin.php?page=mediafromftp-settings'); ?>">
 				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
@@ -115,7 +114,6 @@ class MediaFromFtpAdmin {
 			<form method="post" action="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>" />
 				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
 			</form>
-		</div>
 		</div>
 		<div style="clear: both;"></div>
 
@@ -126,12 +124,10 @@ class MediaFromFtpAdmin {
 		<a style="text-decoration: none;" href="https://wordpress.org/support/view/plugin-reviews/media-from-ftp" target="_blank"><?php _e('Reviews', 'mediafromftp') ?></a>
 		</h4>
 
-		<div class="wrap">
 		<div style="width: 250px; height: 170px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
 		<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
 		<div style="text-align: right; margin: 5px; padding: 5px;"><span style="padding: 3px; color: #ffffff; background-color: #008000">Plugin Author</span> <span style="font-weight: bold;">Katsushi Kawamori</span></div>
 <a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
-		</div>
 		</div>
 
 		</div>
@@ -158,17 +154,11 @@ class MediaFromFtpAdmin {
 
 		<div class="wrap">
 
-		<div>
-		<a style="color: #444444;" href="<?php echo admin_url('admin.php?page=mediafromftp'); ?>">
-		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
-		</a>
-		<div style="display: block; padding: 10px 10px;">
-			<input type="submit" style="float: left; margin-right: 1em;" class="button active" value="<?php _e('Settings'); ?>" />
-			<form method="post" action="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>" />
+		<h2>Media from FTP <?php _e('Settings'); ?>
+			<form method="post" style="float: right;" action="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>" />
 				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
 			</form>
-		</div>
-		</div>
+		</h2>
 		<div style="clear: both;"></div>
 
 		<div style="display: block; padding: 5px 15px">
@@ -283,7 +273,7 @@ require_once('$commandline_wpload');
 
 COMMANDLINESET;
 ?>
-			<textarea readonly rows="10" style="font-size: 12px; width: 250px;">
+			<textarea readonly rows="11" style="font-size: 12px; width: 250px;">
 			<?php echo $commandline_set; ?>
 			</textarea>
 			</div>
@@ -390,17 +380,11 @@ COMMANDLINESET;
 
 		<div class="wrap">
 
-		<div>
-		<a style="color: #444444;" href="<?php echo admin_url('admin.php?page=mediafromftp'); ?>">
-		<h1 style="float: left; margin-right: 1em;">Media from FTP</h1>
-		</a>
-		<div style="display: block; padding: 10px 10px;">
-			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo admin_url('admin.php?page=mediafromftp-settings'); ?>">
+		<h2>Media from FTP <?php _e('Search & Register', 'mediafromftp'); ?>
+			<form method="post" style="float: right;" action="<?php echo admin_url('admin.php?page=mediafromftp-settings'); ?>">
 				<input type="submit" class="button" value="<?php _e('Settings'); ?>" />
 			</form>
-			<input type="submit" class="button active" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
-		</div>
-		</div>
+		</h2>
 		<div style="clear: both;"></div>
 
 		<div id="mediafromftp-loading"><img src="<?php echo MEDIAFROMFTP_PLUGIN_URL.'/css/loading.gif'; ?>"></div>
@@ -652,7 +636,7 @@ COMMANDLINESET;
 					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 					<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-					<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
+					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 				</form>
 				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
@@ -751,7 +735,7 @@ COMMANDLINESET;
 				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
 				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
 				<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-				<input type="submit" class="button" value="<?php _e('Search & Register', 'mediafromftp'); ?>" />
+				<input type="submit" class="button" value="<?php _e('Search'); ?>" />
 			</form>
 			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
 				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
