@@ -136,9 +136,6 @@ msgstr "全ての拡張子"
 msgid "File extension"
 msgstr "ファイル拡張子"
 
-msgid "Change directoy to media-from-ftp."
-msgstr "カレントディレクトリをmedia-from-ftpにします。"
-
 msgid ""
 "Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from "
 "line 42)"
@@ -150,3 +147,12 @@ msgstr "実行時間"
 
 msgid "Reviews"
 msgstr "レビュー"
+
+msgid "Please check with the server administrator."
+msgstr "サーバー管理者に確認してください。"
+
+msgid "Register the command-line to the server cron."
+msgstr "サーバのcronへコマンドラインを登録"
+
+msgid "Run every 10 minutes."
+msgstr "10分毎に実行します。"

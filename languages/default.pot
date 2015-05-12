@@ -123,9 +123,6 @@ msgstr ""
 msgid "File extension"
 msgstr ""
 
-msgid "Change directoy to media-from-ftp."
-msgstr ""
-
 msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)"
 msgstr ""
 
@@ -133,4 +130,13 @@ msgid "Execution time"
 msgstr ""
 
 msgid "Reviews"
+msgstr ""
+
+msgid "Please check with the server administrator."
+msgstr ""
+
+msgid "Register the command-line to the server cron."
+msgstr ""
+
+msgid "Run every 10 minutes."
 msgstr ""
