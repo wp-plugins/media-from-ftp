@@ -65,21 +65,24 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:");
+		$cmdoptions = getopt("s:d:e:t:x:h");
 
 		$cmdlinedebugs = debug_backtrace();
-		if ( basename($cmdlinedebugs['0']['file']) <> 'mediafromftpcmd.php' ) {
+		if ( basename($cmdlinedebugs['0']['file']) === 'mediafromftpcmd.php' ) {
+			$cmdline = TRUE;
+		} else {
+			$cmdline = FALSE;
 			$max_execution_time = $mediafromftp_settings['max_execution_time'];
 			set_time_limit($max_execution_time);
 		}
 
-		if ( !empty($cmdoptions['s']) ) {
+		if ( isset($cmdoptions['s']) ) {
 			$searchdir = $cmdoptions['s'];
 		} else {
 			$searchdir = $mediafromftp_settings['searchdir'];
 		}
 
-		if ( !empty($cmdoptions['d']) ) {
+		if ( isset($cmdoptions['d']) ) {
 			if ( $cmdoptions['d'] === 'new' || $cmdoptions['d'] === 'server' || $cmdoptions['d'] === 'exif' ) {
 				$dateset = $cmdoptions['d'];
 			} else {
@@ -89,10 +92,15 @@ class MediaFromFtpCron {
 			$dateset = $mediafromftp_settings['dateset'];
 		}
 
-		if ( !empty($cmdoptions['x']) ) {
+		if ( isset($cmdoptions['x']) ) {
 			$extfilter = $cmdoptions['x'];
 		} else {
 			$extfilter = $mediafromftp_settings['extfilter'];
+		}
+
+		$hide = FALSE;
+		if ( isset($cmdoptions['h']) ) {
+			$hide = TRUE;
 		}
 
 		unset($cmdoptions);
@@ -123,6 +131,9 @@ class MediaFromFtpCron {
 		$extpattern = $mediafromftp->extpattern($extfilter);
 		$files = $mediafromftp->scan_file($document_root, $extpattern);
 
+		$count = 0;
+		$output_mail = NULL;
+		$mail_apply = $mediafromftp_settings['cron']['mail_apply'];
 		foreach ( $files as $file ){
 			// Input URL
 			list($new_file, $ext, $new_url) = $mediafromftp->input_url($file, $attachments);
@@ -134,9 +145,47 @@ class MediaFromFtpCron {
 				} else {
 					$date = $mediafromftp->get_date_check($file, $dateset);
 					// Regist
-					list($attach_id, $new_attach_title, $new_url_attach) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
+					list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
+
+					if ( ($mail_apply && !$cmdline) || (!$hide && $cmdline) ) {
+						// OutputMetaData
+						list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
+						$new_url_attachs = explode('/', $new_url_attach);
+						++$count;
+
+						$output_text = NULL;
+						$output_text .= __('Count').': '.$count."\n";
+						$output_text .= __('Title').': '.$new_attach_title."\n";
+						$output_text .= __('Permalink:').' '.get_attachment_link($attach_id)."\n";
+						$output_text .= 'URL: '.$new_url_attach."\n";
+						$output_text .= __('File name:').' '.end($new_url_attachs)."\n";
+						$output_text .= __('Date/Time').': '.$stamptime."\n";
+						if ( wp_ext2type($ext) === 'image' ) {
+							foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
+								$output_text .= $thumbsize.': '.$imagethumburl."\n";
+							}
+						} else {
+							$output_text .= __('File type:').' '.$mimetype."\n";
+							$output_text .= __('File size:').' '.size_format($file_size)."\n";
+							if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
+								$output_text .= __('Length:').' '.$length."\n";
+							}
+						}
+						$output_text .= "\n";
+
+						if ( $cmdline ) {
+							echo $output_text;
+						} else {
+							$output_mail .= $output_text;
+						}
+					}
 				}
 			}
+		}
+		if ( !empty($output_mail) ) {
+			$to = $mediafromftp_settings['cron']['mail'];
+			$subject = 'Media from FTP Schedule';
+			wp_mail( $to, $subject, $output_mail );
 		}
 
 	}

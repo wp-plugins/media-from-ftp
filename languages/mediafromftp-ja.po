@@ -137,10 +137,10 @@ msgid "File extension"
 msgstr "ファイル拡張子"
 
 msgid ""
-"Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from "
-"line 42)"
+"Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from "
+"line 48)"
 msgstr ""
-"【mediafromftpcmd.php]を、以下のように書き換えてください。（42行から49行）"
+"【mediafromftpcmd.php]を、以下のように書き換えてください。（48行から55行）"
 
 msgid "Execution time"
 msgstr "実行時間"
@@ -156,3 +156,9 @@ msgstr "サーバのcronへコマンドラインを登録"
 
 msgid "Run every 10 minutes."
 msgstr "10分毎に実行します。"
+
+msgid "command line switch"
+msgstr "コマンドラインスイッチ"
+
+msgid "Hides the display of the log."
+msgstr "ログを表示しない。"

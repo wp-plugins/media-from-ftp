@@ -39,11 +39,11 @@ class MediaFromFtp {
 		}
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:");
+		$cmdoptions = getopt("s:d:e:t:x:h");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file
-		if ( !empty($cmdoptions['e']) ) {
+		if ( isset($cmdoptions['e']) ) {
 				$excludefile .= '|'.$cmdoptions['e'];
 		} else {
 			if( get_option('mediafromftp_settings') ){
@@ -52,7 +52,7 @@ class MediaFromFtp {
 		}
 
 		$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
-		if ( !empty($cmdoptions['t']) ) {
+		if ( isset($cmdoptions['t']) ) {
 			$ext2typefilter = $cmdoptions['t'];
 		} else {
 			if (!empty($_POST['ext2type'])){
@@ -293,7 +293,7 @@ class MediaFromFtp {
 	 * @param	string	$new_url_datetime
 	 * @param	string	$dateset
 	 * @param	bool	$yearmonth_folders
-	 * @return	array	$attach_id(int), $new_attach_title(string), $new_url_attach(string)
+	 * @return	array	$attach_id(int), $new_attach_title(string), $new_url_attach(string), $metadata(array)
 	 * @since	2.36
 	 */
 	function regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders){
@@ -405,7 +405,48 @@ class MediaFromFtp {
 			$metadata = NULL;
 		}
 
-		return array($attach_id, $new_attach_title, $new_url_attach);
+		return array($attach_id, $new_attach_title, $new_url_attach, $metadata);
+
+	}
+
+	/* ==================================================
+	 * @param	string	$ext
+	 * @param	string	$attach_id
+	 * @param	array	$metadata
+	 * @return	array	$imagethumburls(string), $mimetype(string), $length(string), $stamptime(string), $file_size(string)
+	 * @since	7.4
+	 */
+	function output_metadata($ext, $attach_id, $metadata){
+
+		$imagethumburls = array();
+		$mimetype = NULL;
+		$length = NULL;
+		if ( wp_ext2type($ext) === 'image' ){
+			$imagethumburl_base = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.rtrim($metadata['file'], wp_basename($metadata['file']));
+			foreach ( $metadata as $key1 => $key2 ){
+				if ( $key1 === 'sizes' ) {
+					foreach ( $metadata[$key1] as $key2 => $key3 ){
+						$imagethumburls[$key2] = $imagethumburl_base.$metadata['sizes'][$key2]['file'];
+					}
+				}
+			}
+		}else if ( wp_ext2type($ext) === 'video'||  wp_ext2type($ext) === 'audio' ){
+			$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
+			$length = $metadata['length_formatted'];
+		} else {
+			$metadata = NULL;
+			$filetype = wp_check_filetype( get_attached_file($attach_id) );
+			$mimetype =  $filetype['ext'].'('.$filetype['type'].')';
+		}
+
+		$stamptime = get_the_time( 'Y-n-j ', $attach_id ).get_the_time( 'G:i', $attach_id );
+		if ( isset( $metadata['filesize'] ) ) {
+			$file_size = $metadata['filesize'];
+		} else {
+			$file_size = filesize( get_attached_file($attach_id) );
+		}
+
+		return array($imagethumburls, $mimetype, $length, $stamptime, $file_size);
 
 	}
 

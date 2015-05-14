@@ -31,6 +31,8 @@ class MediaFromFtpRegist {
 		$plugin_version = floatval($plugin_datas['version']);
 
 		$exclude_settings = '(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js';
+		$user = wp_get_current_user();
+		$cron_mail = $user->get('user_email');
 
 		// << version 2.35
 		if ( get_option('mediafromftp_exclude_file') ) {
@@ -49,7 +51,9 @@ class MediaFromFtpRegist {
 								'exclude' => $exclude_settings,
 								'cron' => array(
 											'apply' => FALSE,
-											'schedule' => 'hourly'
+											'schedule' => 'hourly',
+											'mail_apply' => TRUE,
+											'mail' => $cron_mail
 											)
 							);
 			update_option( 'mediafromftp_settings', $mediafromftp_tbl );
@@ -127,7 +131,7 @@ class MediaFromFtpRegist {
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-			} else if ( $plugin_version >= 6.3 ) {
+			} else if ( $plugin_version >= 6.3  && $plugin_version < 7.3 ) {
 				if ( array_key_exists( "extfilter", $mediafromftp_settings ) ) {
 					$extfilter = $mediafromftp_settings['extfilter'];
 				} else {
@@ -144,6 +148,36 @@ class MediaFromFtpRegist {
 									'cron' => array(
 												'apply' => $mediafromftp_settings['cron']['apply'],
 												'schedule' => $mediafromftp_settings['cron']['schedule']
+												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			} else if ( $plugin_version >= 7.4 ) {
+				if ( array_key_exists( "cron", $mediafromftp_settings ) ) {
+					$cron_apply = $mediafromftp_settings['cron']['apply'];
+					$cron_schedule = $mediafromftp_settings['cron']['schedule'];
+					if ( array_key_exists( "mail_apply", $mediafromftp_settings['cron'] ) ) {
+						$cron_mail_apply = $mediafromftp_settings['cron']['mail_apply'];
+					} else {
+						$cron_mail_apply = TRUE;
+					}
+				} else {
+					$cron_apply = FALSE;
+					$cron_schedule = 'hourly';
+					$cron_mail_apply = TRUE;
+				}
+				$mediafromftp_tbl = array(
+									'pagemax' => $mediafromftp_settings['pagemax'],
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+									'extfilter' => $mediafromftp_settings['extfilter'],
+									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $mediafromftp_settings['cron']['apply'],
+												'schedule' => $mediafromftp_settings['cron']['schedule'],
+												'mail_apply' => $cron_mail_apply,
+												'mail' => $cron_mail
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );

@@ -37,6 +37,12 @@
  * 	  example -x jpg
  *
  * If the argument is empty, use the set value of the management screen.
+ *
+ * command line switch
+ *
+ * -h Hides the display of the log.
+ * 	  example -h
+ *
 */
 // For your environment, please rewrite.
 	$_SERVER = array(

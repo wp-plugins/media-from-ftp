@@ -123,7 +123,7 @@ msgstr ""
 msgid "File extension"
 msgstr ""
 
-msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)"
+msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from line 48)"
 msgstr ""
 
 msgid "Execution time"
@@ -139,4 +139,10 @@ msgid "Register the command-line to the server cron."
 msgstr ""
 
 msgid "Run every 10 minutes."
+msgstr ""
+
+msgid "command line switch"
+msgstr ""
+
+msgid "Hides the display of the log."
 msgstr ""

@@ -248,6 +248,13 @@ class MediaFromFtpAdmin {
 					<input type="radio" name="mediafromftp_cron_schedule" value="daily" <?php checked('daily', $mediafromftp_settings['cron']['schedule']); ?>>
 					<?php _e('daily', 'mediafromftp'); ?>
 					</div>
+					<div style="display:block;padding:5px 10px">
+					<input type="checkbox" name="mediafromftp_cron_mail_apply" value="1" <?php checked('1', $mediafromftp_settings['cron']['mail_apply']); ?> />
+					<?php _e('E-mail me whenever'); ?>
+					</div>
+					<div style="display:block;padding:5px 20px">
+						<?php echo __('Your E-mail').': '.$mediafromftp_settings['cron']['mail']; ?>
+					</div>
 				</div>
 
 				<div style="clear: both;"></div>
@@ -260,8 +267,8 @@ class MediaFromFtpAdmin {
 
 			<div id="mediafromftp-settings-tabs-2">
 				<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
-				<div style="display:block;padding:5px 10px">
-				1. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 49 from line 42)', 'mediafromftp'); ?>
+				<div style="display:block; padding:5px 10px; font-weight: bold;">
+				1. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from line 48)', 'mediafromftp'); ?>
 				</div>
 				<div style="display:block;padding:5px 20px">
 				<?php
@@ -285,12 +292,14 @@ COMMANDLINESET;
 				<?php echo $commandline_set; ?>
 				</textarea>
 				</div>
-				<div style="display:block;padding:5px 10px">
+				<div style="display:block; padding:5px 10px; font-weight: bold;">
 				2. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
-				<div>$ <code>/usr/bin/php <?php echo MEDIAFROMFTP_PLUGIN_BASE_DIR; ?>/mediafromftpcmd.php</code></div>
+				</div>
+				<div style="display:block; padding:5px 10px;">
+				<div>% <code>/usr/bin/php <?php echo MEDIAFROMFTP_PLUGIN_BASE_DIR; ?>/mediafromftpcmd.php</code></div>
 				<div style="display:block; padding:5px 15px; color:red;"><code>/usr/bin/php</code> >> <?php _e('Please check with the server administrator.', 'mediafromftp'); ?></div>
 					<div style="display:block;padding:5px 20px">
-					<div><?php _e('command line argument list', 'mediafromftp'); ?></div>
+					<li style="font-weight: bold;"><?php _e('command line argument list', 'mediafromftp'); ?></li>
 						<div style="display:block;padding:5px 40px">
 						<div><code>-s</code> <?php _e('Search directory', 'mediafromftp'); ?></div>
 						</div>
@@ -323,10 +332,21 @@ COMMANDLINESET;
 							</div>
 					<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
 					</div>
-					<div><?php _e('Command-line works the at plug-in deactivate.', 'mediafromftp'); ?></div>
+					<div style="display:block;padding:5px 20px">
+					<li style="font-weight: bold;"><?php _e('command line switch', 'mediafromftp'); ?></li>
+						<div style="display:block;padding:5px 40px">
+						<div><code>-h</code> <?php _e('Hides the display of the log.', 'mediafromftp'); ?></div>
+						</div>
+							<div style="display:block;padding:5px 60px">
+							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-h</code></div>
+							</div>
+					</div>
+					<div style="color:red;"><?php _e('Command-line works the at plug-in deactivate.', 'mediafromftp'); ?></div>
 				</div>
-				<div style="display:block;padding:5px 10px">
+				<div style="display:block; padding:5px 10px; font-weight: bold;">
 				3. <?php _e('Register the command-line to the server cron.', 'mediafromftp'); ?> (<?php _e('Example:', 'mediafromftp'); ?> <?php _e('Run every 10 minutes.', 'mediafromftp'); ?>)
+				</div>
+				<div style="display:block; padding:5px 10px;">
 				<div><code>0,10,20,30,40,50 * * * * /usr/bin/php <?php echo MEDIAFROMFTP_PLUGIN_BASE_DIR; ?>/mediafromftpcmd.php</code></div>
 				<div style="display:block; padding:5px 15px; color:red;"><code>/usr/bin/php</code> >> <?php _e('Please check with the server administrator.', 'mediafromftp'); ?></div>
 				</div>
@@ -669,39 +689,12 @@ COMMANDLINESET;
 							$mediafromftp->delete_cash($ext, $new_url_attach);
 
 							// Regist
-							list($attach_id, $new_attach_title, $new_url_attach) = $mediafromftp->regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders);
+							list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders);
 
-							if ( wp_ext2type($ext) === 'image' ){
-								$metadata = wp_get_attachment_metadata( $attach_id );
-								$imagethumburl_base = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.rtrim($metadata['file'], wp_basename($metadata['file']));
-								foreach ( $metadata as $key1 => $key2 ){
-									if ( $key1 === 'sizes' ) {
-										foreach ( $metadata[$key1] as $key2 => $key3 ){
-											$imagethumburls[$key2] = $imagethumburl_base.$metadata['sizes'][$key2]['file'];
-										}
-									}
-								}
-							}else if ( wp_ext2type($ext) === 'video' ){
-								$metadata = wp_read_video_metadata( get_attached_file($attach_id) );
-								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
-								$length = $metadata['length_formatted'];
-							}else if ( wp_ext2type($ext) === 'audio' ){
-								$metadata = wp_read_audio_metadata( get_attached_file($attach_id) );
-								$mimetype = $metadata['fileformat'].'('.$metadata['mime_type'].')';
-								$length = $metadata['length_formatted'];
-							} else {
-								$metadata = NULL;
-							}
+							// Outputdata
+							list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
 
 							$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
-
-							$stamptime = get_the_time( 'Y-n-j ', $attach_id ).get_the_time( 'G:i', $attach_id );
-							if ( isset( $metadata['filesize'] ) ) {
-								$file_size = $metadata['filesize'];
-							} else {
-								$file_size = filesize( get_attached_file($attach_id) );
-							}
-							$filetype = strtoupper($ext);
 
 							$output_html = NULL;
 							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
@@ -721,7 +714,7 @@ COMMANDLINESET;
 								}
 								$output_html .= '</div>';
 							} else {
-								$output_html .= '<div>'.__('File type:').' '.$filetype.'</div>';
+								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
 								if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
 									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
@@ -823,6 +816,11 @@ COMMANDLINESET;
 					} else {
 						$mediafromftp_cron_apply = FALSE;
 					}
+					if ( !empty($_POST['mediafromftp_cron_mail_apply']) ) {
+						$mediafromftp_cron_mail_apply = $_POST['mediafromftp_cron_mail_apply'];
+					} else {
+						$mediafromftp_cron_mail_apply = FALSE;
+					}
 					$mediafromftp_tbl = array(
 										'pagemax' => $mediafromftp_settings['pagemax'],
 										'searchdir' => $mediafromftp_settings['searchdir'],
@@ -833,7 +831,9 @@ COMMANDLINESET;
 										'exclude' => $_POST['mediafromftp_exclude'],
 										'cron' => array(
 													'apply' => $mediafromftp_cron_apply,
-													'schedule' => $_POST['mediafromftp_cron_schedule']
+													'schedule' => $_POST['mediafromftp_cron_schedule'],
+													'mail_apply' => $mediafromftp_cron_mail_apply,
+													'mail' => $mediafromftp_settings['cron']['mail']
 													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
