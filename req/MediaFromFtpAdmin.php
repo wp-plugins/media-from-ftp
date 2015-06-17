@@ -257,11 +257,27 @@ class MediaFromFtpAdmin {
 					</div>
 				</div>
 
+				<div class="item-mediafromftp-settings">
+					<h3><?php _e('Remove Thumbnails Cache', 'mediafromftp'); ?></h3>
+					<div style="display:block;padding:5px 0">
+						<?php _e('Remove the cache of thumbnail used in the search screen.', 'mediafromftp'); ?>
+					</div>
+				</div>
+
 				<div style="clear: both;"></div>
-				<div class="submit">
-					<input type="submit" class="button" value="<?php _e('Save Changes'); ?>" />
+				<p>
+				<div>
+					<input type="submit" class="button" style="float: left; margin-right: 1em;" value="<?php _e('Save Changes'); ?>" />
 				</div>
 			</form>
+
+			<form method="post" action="<?php echo $scriptname; ?>" />
+				<input type="hidden" name="mediafromftp_clear_cash" value="1" />
+				<div>
+				<input type="submit" class="button" value="<?php _e('Remove Thumbnails Cache', 'mediafromftp'); ?>" />
+				</div>
+			</form>
+
 			</div>
 			</div>
 
@@ -803,8 +819,11 @@ COMMANDLINESET;
 	 */
 	function options_updated($submenu){
 
-		include_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
+		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php';
 		$mediafromftpcron = new MediaFromFtpCron();
+
+		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
+		$mediafromftp = new MediaFromFtp();
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
@@ -848,6 +867,14 @@ COMMANDLINESET;
 						$mediafromftpcron->CronStart();
 					}
 					echo '<div class="updated"><ul><li>'.__('Settings').' --> '.__('Changes saved.').'</li></ul></div>';
+				}
+				if ( !empty($_POST['mediafromftp_clear_cash']) ) {
+					$del_cash_count = $mediafromftp->delete_all_cash();
+					if ( $del_cash_count > 0 ) {
+						echo '<div class="updated"><ul><li>'.$del_cash_count.__('Thumbnails Cache', 'mediafromftp').' --> '.__('Delete').'</li></ul></div>';
+					} else {
+						echo '<div class="error"><ul><li>'.__('No Thumbnails Cache', 'mediafromftp').'</li></ul></div>';
+					}
 				}
 				break;
 			case 2:

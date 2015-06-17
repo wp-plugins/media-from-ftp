@@ -213,12 +213,46 @@ class MediaFromFtp {
 			$del_cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$del_cash_thumb_key.'.'.$ext;
 			$value_del_cash = get_transient( $del_cash_thumb_key );
 			if ( $value_del_cash <> FALSE ) {
+				delete_transient( $del_cash_thumb_key );
 				if ( file_exists( $del_cash_thumb_filename )) {
-					delete_transient( $del_cash_thumb_key );
-					unlink( MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$del_cash_thumb_key.'.'.$ext );
+					unlink( $del_cash_thumb_filename );
 				}
 			}
 		}
+
+	}
+
+	/* ==================================================
+	 * @param	none
+	 * @return	int		$del_cash_count(int)
+	 * @since	7.5
+	 */
+	function delete_all_cash(){
+
+		global $wpdb;
+		$search_transients = MEDIAFROMFTP_PLUGIN_TMP_URL;
+		$del_transients = $wpdb->get_results("
+						SELECT	option_value
+						FROM	$wpdb->options
+						WHERE	option_value LIKE '%%$search_transients%%'
+						");
+
+		$del_cash_count = 0;
+		foreach ( $del_transients as $del_transient ) {
+			$delfile = pathinfo($del_transient->option_value);
+			$del_cash_thumb_key = $delfile['filename'];
+			$del_cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$delfile['basename'];
+			$value_del_cash = get_transient( $del_cash_thumb_key );
+			if ( $value_del_cash <> FALSE ) {
+				delete_transient( $del_cash_thumb_key );
+				++$del_cash_count;
+				if ( file_exists( $del_cash_thumb_filename )) {
+					unlink( $del_cash_thumb_filename );
+				}
+			}
+		}
+
+		return $del_cash_count;
 
 	}
 

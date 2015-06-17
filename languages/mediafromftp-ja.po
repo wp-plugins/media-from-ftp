@@ -162,3 +162,15 @@ msgstr "コマンドラインスイッチ"
 
 msgid "Hides the display of the log."
 msgstr "ログを表示しない。"
+
+msgid "Thumbnails Cache"
+msgstr "サムネイルのキャッシュ"
+
+msgid "No Thumbnails Cache"
+msgstr "サムネイルのキャッシュはありません"
+
+msgid "Remove Thumbnails Cache"
+msgstr "サムネイルのキャッシュを削除"
+
+msgid "Remove the cache of thumbnail used in the search screen."
+msgstr "検索画面で使用されるサムネイルのキャッシュを削除します。"

@@ -146,3 +146,15 @@ msgstr ""
 
 msgid "Hides the display of the log."
 msgstr ""
+
+msgid "Thumbnails Cache"
+msgstr ""
+
+msgid "No Thumbnails Cache"
+msgstr ""
+
+msgid "Remove Thumbnails Cache"
+msgstr ""
+
+msgid "Remove the cache of thumbnail used in the search screen."
+msgstr ""
