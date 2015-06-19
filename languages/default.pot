@@ -156,5 +156,5 @@ msgstr ""
 msgid "Remove Thumbnails Cache"
 msgstr ""
 
-msgid "Remove the cache of thumbnail used in the search screen."
+msgid "Remove the cache of thumbnail used in the search screen. Please try out if trouble occurs in the search screen. It might become normal."
 msgstr ""

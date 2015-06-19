@@ -241,15 +241,17 @@ class MediaFromFtp {
 		foreach ( $del_transients as $del_transient ) {
 			$delfile = pathinfo($del_transient->option_value);
 			$del_cash_thumb_key = $delfile['filename'];
-			$del_cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/'.$delfile['basename'];
 			$value_del_cash = get_transient( $del_cash_thumb_key );
 			if ( $value_del_cash <> FALSE ) {
 				delete_transient( $del_cash_thumb_key );
 				++$del_cash_count;
-				if ( file_exists( $del_cash_thumb_filename )) {
-					unlink( $del_cash_thumb_filename );
-				}
 			}
+		}
+
+		$del_cash_thumb_filename = MEDIAFROMFTP_PLUGIN_TMP_DIR.'/*.*';
+		foreach ( glob($del_cash_thumb_filename) as $val ) {
+			unlink($val);
+			++$del_cash_count;
 		}
 
 		return $del_cash_count;

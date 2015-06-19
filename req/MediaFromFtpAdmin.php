@@ -260,7 +260,7 @@ class MediaFromFtpAdmin {
 				<div class="item-mediafromftp-settings">
 					<h3><?php _e('Remove Thumbnails Cache', 'mediafromftp'); ?></h3>
 					<div style="display:block;padding:5px 0">
-						<?php _e('Remove the cache of thumbnail used in the search screen.', 'mediafromftp'); ?>
+						<?php _e('Remove the cache of thumbnail used in the search screen. Please try out if trouble occurs in the search screen. It might become normal.', 'mediafromftp'); ?>
 					</div>
 				</div>
 
@@ -871,7 +871,7 @@ COMMANDLINESET;
 				if ( !empty($_POST['mediafromftp_clear_cash']) ) {
 					$del_cash_count = $mediafromftp->delete_all_cash();
 					if ( $del_cash_count > 0 ) {
-						echo '<div class="updated"><ul><li>'.$del_cash_count.__('Thumbnails Cache', 'mediafromftp').' --> '.__('Delete').'</li></ul></div>';
+						echo '<div class="updated"><ul><li>'.__('Thumbnails Cache', 'mediafromftp').' --> '.__('Delete').'</li></ul></div>';
 					} else {
 						echo '<div class="error"><ul><li>'.__('No Thumbnails Cache', 'mediafromftp').'</li></ul></div>';
 					}
