@@ -66,12 +66,26 @@
 	if ( !$mediafromftp_active ) {
 		define("MEDIAFROMFTP_PLUGIN_BASE_DIR", dirname(__FILE__));
 		$wp_uploads = wp_upload_dir();
-		if(is_ssl()){
-			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $wp_uploads['baseurl']));
+		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
+		$mediafromftp = new MediaFromFtp();
+		$wp_uploads = wp_upload_dir();
+		$relation_path_true = strpos($wp_uploads['baseurl'], '../');
+		if ( $relation_path_true > 0 ) {
+			$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
+			$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
+			$upload_url = $mediafromftp->realurl($basepath, $relationalpath);
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", realpath($wp_uploads['basedir']));
 		} else {
-			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+			$upload_url = $wp_uploads['baseurl'];
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
 		}
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
+		unset($mediafromftp);
+
+		if(is_ssl()){
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $upload_url));
+		} else {
+			define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
+		}
 	}
 
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );

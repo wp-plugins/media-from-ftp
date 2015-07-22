@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.2
-Stable tag: 7.6
+Stable tag: 7.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,9 @@ none
 4. File registration result
 
 == Changelog ==
+
+= 7.7 =
+Supported moving uploads folder. Please edit the [wp-config.php](http://codex.wordpress.org/Editing_wp-config.php#Moving_uploads_folder). Please do not use other methods.
 
 = 7.6 =
 Add thumbnails cache remove to uninstall script.
@@ -308,6 +311,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 7.7 =
 = 7.6 =
 = 7.5 =
 = 7.4 =

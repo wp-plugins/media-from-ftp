@@ -406,13 +406,11 @@ COMMANDLINESET;
 		if ( !empty($_POST['ShowToPage']) ) {
 			echo '<div class="updated"><ul><li>'.__('Settings saved.').'</li></ul></div>';
 		}
-		if (!empty($_POST['searchdir'])){
-			$searchdir = urldecode($_POST['searchdir']);
-		}
 
 		$scriptname = admin_url('admin.php?page=mediafromftp-search-register');
 
-		$document_root = ABSPATH.$searchdir;
+		$document_root = realpath(ABSPATH.$searchdir);
+
 		if( get_option('WPLANG') === 'ja' ) {
 			mb_language('Japanese');
 		} else if( get_option('WPLANG') === 'en' ) {
@@ -443,8 +441,13 @@ COMMANDLINESET;
 		if ( $adddb <> 'TRUE' ) { // Search mode
 			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
 			$linkselectbox = NULL;
+			$wordpress_path = str_replace("\\", "/", ABSPATH);
 			foreach ($dirs as $linkdir) {
-				$linkdirenc = mb_convert_encoding(str_replace(ABSPATH, "", $linkdir), "UTF-8", "auto");
+				if ( strstr($linkdir, $wordpress_path ) ) {
+					$linkdirenc = mb_convert_encoding(str_replace($wordpress_path, '', $linkdir), "UTF-8", "auto");
+				} else {
+					$linkdirenc = MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.mb_convert_encoding(str_replace(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR, "", $linkdir), "UTF-8", "auto");
+				}
 				if( $searchdir === $linkdirenc ){
 					$linkdirs = '<option value="'.urlencode($linkdirenc).'" selected>'.$linkdirenc.'</option>';
 				}else{
@@ -887,6 +890,9 @@ COMMANDLINESET;
 					$searchdir = urldecode($_POST['searchdir']);
 				} else {
 					$searchdir = $mediafromftp_settings['searchdir'];
+					if ( !strstr(realpath(ABSPATH.$searchdir),realpath(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR)) ) {
+						$searchdir = MEDIAFROMFTP_PLUGIN_UPLOAD_PATH;
+					}
 				}
 				if (!empty($_POST['ext2type'])){
 					$ext2typefilter = $_POST['ext2type'];

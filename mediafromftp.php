@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 7.6
+Version: 7.7
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
@@ -30,14 +30,33 @@ Domain Path: /languages
 	define("MEDIAFROMFTP_PLUGIN_BASE_FILE", plugin_basename(__FILE__));
 	define("MEDIAFROMFTP_PLUGIN_BASE_DIR", dirname(__FILE__));
 	define("MEDIAFROMFTP_PLUGIN_URL", plugins_url($path='',$scheme=null).'/media-from-ftp');
+
+	include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
+	$mediafromftp = new MediaFromFtp();
 	$wp_uploads = wp_upload_dir();
-	if(is_ssl()){
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $wp_uploads['baseurl']));
+
+	$relation_path_true = strpos($wp_uploads['baseurl'], '../');
+	if ( $relation_path_true > 0 ) {
+		$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
+		$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
+		$upload_url = $mediafromftp->realurl($basepath, $relationalpath);
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", realpath($wp_uploads['basedir']));
 	} else {
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $wp_uploads['baseurl']);
+		$upload_url = $wp_uploads['baseurl'];
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
 	}
-	define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
-	define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL));
+	unset($mediafromftp);
+
+	if(is_ssl()){
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $upload_url));
+	} else {
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
+	}
+	if ( $relation_path_true > 0 ) {
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", $relationalpath);
+	} else {
+		define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL));
+	}
 	define("MEDIAFROMFTP_PLUGIN_TMP_URL", MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/media-from-ftp-tmp');
 	define("MEDIAFROMFTP_PLUGIN_TMP_DIR", MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/media-from-ftp-tmp');
 

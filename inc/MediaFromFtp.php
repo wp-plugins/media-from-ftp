@@ -304,7 +304,14 @@ class MediaFromFtp {
 			$exts = explode('.', wp_basename($file));
 			$ext = end($exts);
 			$suffix_file = '.'.$ext;
-			$new_url = site_url('/').str_replace(ABSPATH, '', $file);
+			$file = str_replace('\\', '/', $file);
+			$wordpress_path = str_replace('\\', '/', ABSPATH);
+			$upload_path = str_replace('\\', '/', MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
+			if ( strstr($file, $wordpress_path) ) {
+				$new_url = site_url('/').str_replace($wordpress_path, '', $file);
+			} else {
+				$new_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.str_replace($upload_path, '', $file);
+			}
 			$new_titles = explode('/', $new_url);
 			$new_title = str_replace($suffix_file, '', end($new_titles));
 			$new_title_md5 = md5($new_title);
@@ -483,6 +490,54 @@ class MediaFromFtp {
 		}
 
 		return array($imagethumburls, $mimetype, $length, $stamptime, $file_size);
+
+	}
+
+	/* ==================================================
+	 * @param	string	$base
+	 * @param	string	$relationalpath
+	 * @return	string	realurl
+	 * @since	7.7
+	 */
+	function realurl( $base, $relationalpath ){
+	     $parse = array(
+	          "scheme" => null,
+	          "user" => null,
+	          "pass" => null,
+	          "host" => null,
+	          "port" => null,
+	          "query" => null,
+	          "fragment" => null
+	     );
+	     $parse = parse_url( $base );
+
+	     if( strpos($parse["path"], "/", (strlen($parse["path"])-1)) !== false ){
+	          $parse["path"] .= ".";
+	     }
+
+	     if( preg_match("#^https?://#", $relationalpath) ){
+	          return $relationalpath;
+	     }else if( preg_match("#^/.*$#", $relationalpath) ){
+	          return $parse["scheme"] . "://" . $parse["host"] . $relationalpath;
+	     }else{
+	          $basePath = explode("/", dirname($parse["path"]));
+	          $relPath = explode("/", $relationalpath);
+	          foreach( $relPath as $relDirName ){
+	               if( $relDirName == "." ){
+	                    array_shift( $basePath );
+	                    array_unshift( $basePath, "" );
+	               }else if( $relDirName == ".." ){
+	                    array_pop( $basePath );
+	                    if( count($basePath) == 0 ){
+	                         $basePath = array("");
+	                    }
+	               }else{
+	                    array_push($basePath, $relDirName);
+	               }
+	          }
+	          $path = implode("/", $basePath);
+	          return $parse["scheme"] . "://" . $parse["host"] . $path;
+	     }
 
 	}
 

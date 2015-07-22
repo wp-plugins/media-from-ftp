@@ -106,7 +106,7 @@ class MediaFromFtpCron {
 		unset($cmdoptions);
 
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
-		$document_root = ABSPATH.$searchdir;
+		$document_root = realpath(ABSPATH.$searchdir);
 
 		if( get_option('WPLANG') === 'ja' ) {
 			mb_language('Japanese');
