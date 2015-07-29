@@ -541,6 +541,45 @@ class MediaFromFtp {
 
 	}
 
+	/* ==================================================
+	 * @param	none
+	 * @return	array	$upload_dir, $upload_url, $upload_path
+	 * @since	7.8
+	 */
+	function upload_dir_url_path(){
+
+		$wp_uploads = wp_upload_dir();
+
+		$relation_path_true = strpos($wp_uploads['baseurl'], '../');
+		if ( $relation_path_true > 0 ) {
+			$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
+			$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
+			$upload_url = $this->realurl($basepath, $relationalpath);
+			$upload_dir = wp_normalize_path(realpath($wp_uploads['basedir']));
+		} else {
+			$upload_url = $wp_uploads['baseurl'];
+			$upload_dir = wp_normalize_path($wp_uploads['basedir']);
+		}
+
+
+		if(is_ssl()){
+			$upload_url = str_replace('http:', 'https:', $upload_url);
+		}
+
+		if ( $relation_path_true > 0 ) {
+			$upload_path = $relationalpath;
+		} else {
+			$upload_path = str_replace(site_url('/'), '', $upload_url);
+		}
+
+		$upload_dir = untrailingslashit($upload_dir);
+		$upload_url = untrailingslashit($upload_url);
+		$upload_path = untrailingslashit($upload_path);
+
+		return array($upload_dir, $upload_url, $upload_path);
+
+	}
+
 }
 
 ?>

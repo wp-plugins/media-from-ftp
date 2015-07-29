@@ -106,7 +106,8 @@ class MediaFromFtpCron {
 		unset($cmdoptions);
 
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
-		$document_root = realpath(ABSPATH.$searchdir);
+
+		$document_root = ABSPATH.$searchdir;
 
 		if( get_option('WPLANG') === 'ja' ) {
 			mb_language('Japanese');
@@ -119,6 +120,9 @@ class MediaFromFtpCron {
 			$document_root = mb_convert_encoding($document_root, "sjis-win", "auto");
 		} else {
 			$document_root = mb_convert_encoding($document_root, "UTF-8", "auto");
+		}
+		if ( strstr($searchdir, '../') ) {
+			$document_root = realpath($document_root);
 		}
 
 		global $wpdb;

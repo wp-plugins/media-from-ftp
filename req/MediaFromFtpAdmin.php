@@ -290,7 +290,7 @@ class MediaFromFtpAdmin {
 				<?php
 				$commandline_host = $_SERVER['HTTP_HOST'];
 				$commandline_server = $_SERVER['SERVER_NAME'];
-				$commandline_wpload = ABSPATH.'wp-load.php';
+				$commandline_wpload = wp_normalize_path(ABSPATH).'wp-load.php';
 $commandline_set = <<<COMMANDLINESET
 
 &#x24_SERVER = array(
@@ -403,13 +403,10 @@ COMMANDLINESET;
 		if (!empty($_POST['adddb'])){
 			$adddb = $_POST['adddb'];
 		}
-		if ( !empty($_POST['ShowToPage']) ) {
-			echo '<div class="updated"><ul><li>'.__('Settings saved.').'</li></ul></div>';
-		}
 
 		$scriptname = admin_url('admin.php?page=mediafromftp-search-register');
 
-		$document_root = realpath(ABSPATH.$searchdir);
+		$document_root = ABSPATH.$searchdir;
 
 		if( get_option('WPLANG') === 'ja' ) {
 			mb_language('Japanese');
@@ -422,6 +419,9 @@ COMMANDLINESET;
 			$document_root = mb_convert_encoding($document_root, "sjis-win", "auto");
 		} else {
 			$document_root = mb_convert_encoding($document_root, "UTF-8", "auto");
+		}
+		if ( strstr($searchdir, '../') ) {
+			$document_root = realpath($document_root);
 		}
 
 		?>
@@ -441,7 +441,7 @@ COMMANDLINESET;
 		if ( $adddb <> 'TRUE' ) { // Search mode
 			$dirs = $mediafromftp->scan_dir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
 			$linkselectbox = NULL;
-			$wordpress_path = str_replace("\\", "/", ABSPATH);
+			$wordpress_path = wp_normalize_path(ABSPATH);
 			foreach ($dirs as $linkdir) {
 				if ( strstr($linkdir, $wordpress_path ) ) {
 					$linkdirenc = mb_convert_encoding(str_replace($wordpress_path, '', $linkdir), "UTF-8", "auto");
@@ -466,6 +466,7 @@ COMMANDLINESET;
 				<div style="float:left;"><?php _e('Number of items per page:'); ?><input type="text" name="mediafromftp_pagemax" value="<?php echo $pagemax; ?>" size="3" /></div>
 				<input type="submit" name="ShowToPage" class="button" value="<?php _e('Save') ?>" />
 				<div style="clear: both;"></div>
+				<div style="font-size: small; font-weight: bold;"><code><?php echo $wordpress_path; ?></code></div>
 				<div>
 					<select name="searchdir" style="width: 250px">
 					<?php echo $linkselectbox; ?>
@@ -845,6 +846,7 @@ COMMANDLINESET;
 					}
 					$mediafromftp_tbl = array(
 										'pagemax' => $mediafromftp_settings['pagemax'],
+										'basedir' => $mediafromftp_settings['basedir'],
 										'searchdir' => $mediafromftp_settings['searchdir'],
 										'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
 										'extfilter' => $mediafromftp_settings['extfilter'],
@@ -883,15 +885,23 @@ COMMANDLINESET;
 			case 2:
 				if (!empty($_POST['ShowToPage'])){
 					$pagemax = intval($_POST['mediafromftp_pagemax']);
+					if ( $pagemax <= 0 ) {
+						echo '<div class="error"><ul><li>'.__('Number of items per page:').' --> '.__('Incorrect value.', 'mediafromftp').' '.__('Save failed.').'</li></ul></div>';
+						$pagemax = $mediafromftp_settings['pagemax'];
+					} else {
+						echo '<div class="updated"><ul><li>'.__('Number of items per page:').' --> '.__('Settings saved.').'</li></ul></div>';
+					}
 				} else {
 					$pagemax = $mediafromftp_settings['pagemax'];
 				}
+				$basedir = $mediafromftp_settings['basedir'];
 				if (!empty($_POST['searchdir'])){
 					$searchdir = urldecode($_POST['searchdir']);
 				} else {
 					$searchdir = $mediafromftp_settings['searchdir'];
-					if ( !strstr(realpath(ABSPATH.$searchdir),realpath(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR)) ) {
+					if ( MEDIAFROMFTP_PLUGIN_UPLOAD_PATH <> $basedir ) {
 						$searchdir = MEDIAFROMFTP_PLUGIN_UPLOAD_PATH;
+						$basedir = MEDIAFROMFTP_PLUGIN_UPLOAD_PATH;
 					}
 				}
 				if (!empty($_POST['ext2type'])){
@@ -903,6 +913,7 @@ COMMANDLINESET;
 				}
 				$mediafromftp_tbl = array(
 									'pagemax' => $pagemax,
+									'basedir' => $basedir,
 									'searchdir' => $searchdir,
 									'ext2typefilter' => $ext2typefilter,
 									'extfilter' => $extfilter,
@@ -911,7 +922,9 @@ COMMANDLINESET;
 									'exclude' => $mediafromftp_settings['exclude'],
 									'cron' => array(
 												'apply' => $mediafromftp_settings['cron']['apply'],
-												'schedule' => $mediafromftp_settings['cron']['schedule']
+												'schedule' => $mediafromftp_settings['cron']['schedule'],
+												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
+												'mail' => $mediafromftp_settings['cron']['mail']
 												)
 									);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );

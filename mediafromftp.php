@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 7.7
+Version: 7.8
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
@@ -33,30 +33,12 @@ Domain Path: /languages
 
 	include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 	$mediafromftp = new MediaFromFtp();
-	$wp_uploads = wp_upload_dir();
+	list($upload_dir, $upload_url, $upload_path) = $mediafromftp->upload_dir_url_path();
+	define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $upload_dir);
+	define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
+	define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", $upload_path);
+	unset($mediafromftp, $upload_dir, $upload_url, $upload_path);
 
-	$relation_path_true = strpos($wp_uploads['baseurl'], '../');
-	if ( $relation_path_true > 0 ) {
-		$relationalpath = substr($wp_uploads['baseurl'], $relation_path_true);
-		$basepath = substr($wp_uploads['baseurl'], 0, $relation_path_true);
-		$upload_url = $mediafromftp->realurl($basepath, $relationalpath);
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", realpath($wp_uploads['basedir']));
-	} else {
-		$upload_url = $wp_uploads['baseurl'];
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $wp_uploads['basedir']);
-	}
-	unset($mediafromftp);
-
-	if(is_ssl()){
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", str_replace('http:', 'https:', $upload_url));
-	} else {
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
-	}
-	if ( $relation_path_true > 0 ) {
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", $relationalpath);
-	} else {
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", str_replace(site_url('/'), '', MEDIAFROMFTP_PLUGIN_UPLOAD_URL));
-	}
 	define("MEDIAFROMFTP_PLUGIN_TMP_URL", MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/media-from-ftp-tmp');
 	define("MEDIAFROMFTP_PLUGIN_TMP_DIR", MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/media-from-ftp-tmp');
 
