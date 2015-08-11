@@ -123,7 +123,7 @@ msgstr ""
 msgid "File extension"
 msgstr ""
 
-msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from line 48)"
+msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from line 50)"
 msgstr ""
 
 msgid "Execution time"
@@ -160,4 +160,10 @@ msgid "Remove the cache of thumbnail used in the search screen. Please try out i
 msgstr ""
 
 msgid "Incorrect value."
+msgstr ""
+
+msgid "Limit number of update files"
+msgstr ""
+
+msgid "Apply limit number of update files."
 msgstr ""

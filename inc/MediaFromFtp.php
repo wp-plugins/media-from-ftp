@@ -39,7 +39,7 @@ class MediaFromFtp {
 		}
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:h");
+		$cmdoptions = getopt("s:d:e:t:x:p:h");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file

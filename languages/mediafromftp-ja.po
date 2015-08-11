@@ -8,7 +8,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.3\n"
+"X-Generator: Poedit 1.8.4\n"
 "Language: ja\n"
 
 msgid "Search & Register"
@@ -137,10 +137,10 @@ msgid "File extension"
 msgstr "ファイル拡張子"
 
 msgid ""
-"Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from "
-"line 48)"
+"Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from "
+"line 50)"
 msgstr ""
-"【mediafromftpcmd.php]を、以下のように書き換えてください。（48行から55行）"
+"【mediafromftpcmd.php]を、以下のように書き換えてください。（50行から57行）"
 
 msgid "Execution time"
 msgstr "実行時間"
@@ -181,3 +181,9 @@ msgstr ""
 
 msgid "Incorrect value."
 msgstr "値が正しくありません。"
+
+msgid "Limit number of update files"
+msgstr "更新ファイルの制限数"
+
+msgid "Apply limit number of update files."
+msgstr "更新ファイルの制限数を適用。"

@@ -35,6 +35,8 @@
  * 	  example -t image
  * -x File extension
  * 	  example -x jpg
+ * -p Limit number of update files
+ * 	  example -p 10
  *
  * If the argument is empty, use the set value of the management screen.
  *

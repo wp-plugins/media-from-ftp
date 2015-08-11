@@ -53,6 +53,7 @@ class MediaFromFtpRegist {
 								'cron' => array(
 											'apply' => FALSE,
 											'schedule' => 'hourly',
+											'limit_number' => FALSE,
 											'mail_apply' => TRUE,
 											'mail' => $cron_mail
 											)
@@ -182,7 +183,7 @@ class MediaFromFtpRegist {
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-			} else if ( $plugin_version >= 7.8 ) {
+			} else if ( $plugin_version >= 7.8  && $plugin_version < 7.9 ) {
 				if ( array_key_exists( "basedir", $mediafromftp_settings ) ) {
 					$basedir = $mediafromftp_settings['basedir'];
 				} else {
@@ -201,6 +202,40 @@ class MediaFromFtpRegist {
 												'apply' => $mediafromftp_settings['cron']['apply'],
 												'schedule' => $mediafromftp_settings['cron']['schedule'],
 												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
+												'mail' => $cron_mail
+												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			} else if ( $plugin_version >= 7.9 ) {
+				if ( array_key_exists( "cron", $mediafromftp_settings ) ) {
+					$cron_apply = $mediafromftp_settings['cron']['apply'];
+					$cron_schedule = $mediafromftp_settings['cron']['schedule'];
+					$cron_mail_apply = $mediafromftp_settings['cron']['mail_apply'];
+					if ( array_key_exists( "limit_number", $mediafromftp_settings['cron'] ) ) {
+						$cron_limit_number = $mediafromftp_settings['cron']['limit_number'];
+					} else {
+						$cron_limit_number = FALSE;
+					}
+				} else {
+					$cron_apply = FALSE;
+					$cron_schedule = 'hourly';
+					$cron_limit_number = FALSE;
+					$cron_mail_apply = TRUE;
+				}
+				$mediafromftp_tbl = array(
+									'pagemax' => $mediafromftp_settings['pagemax'],
+									'basedir' => $mediafromftp_settings['basedir'],
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+									'extfilter' => $mediafromftp_settings['extfilter'],
+									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $cron_apply,
+												'schedule' => $cron_schedule,
+												'limit_number' => $cron_limit_number,
+												'mail_apply' => $cron_mail_apply,
 												'mail' => $cron_mail
 												)
 								);

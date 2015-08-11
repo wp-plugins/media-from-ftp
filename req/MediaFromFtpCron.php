@@ -65,7 +65,7 @@ class MediaFromFtpCron {
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:h");
+		$cmdoptions = getopt("s:d:e:t:x:p:h");
 
 		$cmdlinedebugs = debug_backtrace();
 		if ( basename($cmdlinedebugs['0']['file']) === 'mediafromftpcmd.php' ) {
@@ -96,6 +96,14 @@ class MediaFromFtpCron {
 			$extfilter = $cmdoptions['x'];
 		} else {
 			$extfilter = $mediafromftp_settings['extfilter'];
+		}
+
+		if ( isset($cmdoptions['p']) ) {
+			$pagemax = $cmdoptions['p'];
+			$limit_number = TRUE;
+		} else {
+			$pagemax = $mediafromftp_settings['pagemax'];
+			$limit_number = $mediafromftp_settings['cron']['limit_number'];
 		}
 
 		$hide = FALSE;
@@ -147,6 +155,7 @@ class MediaFromFtpCron {
 				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
 					// skip
 				} else {
+					++$count;
 					$date = $mediafromftp->get_date_check($file, $dateset);
 					// Regist
 					list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
@@ -155,7 +164,6 @@ class MediaFromFtpCron {
 						// OutputMetaData
 						list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
 						$new_url_attachs = explode('/', $new_url_attach);
-						++$count;
 
 						$output_text = NULL;
 						$output_text .= __('Count').': '.$count."\n";
@@ -182,6 +190,9 @@ class MediaFromFtpCron {
 						} else {
 							$output_mail .= $output_text;
 						}
+					}
+					if ( $count == $pagemax && $limit_number ) {
+						break;
 					}
 				}
 			}

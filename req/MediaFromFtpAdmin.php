@@ -249,6 +249,14 @@ class MediaFromFtpAdmin {
 					<?php _e('daily', 'mediafromftp'); ?>
 					</div>
 					<div style="display:block;padding:5px 10px">
+					<input type="checkbox" name="mediafromftp_cron_limit_number" value="1" <?php checked('1', $mediafromftp_settings['cron']['limit_number']); ?> />
+					<?php _e('Apply limit number of update files.', 'mediafromftp'); ?>
+					</div>
+					<div style="display:block;padding:5px 20px">
+						<?php echo __('Limit number of update files', 'mediafromftp').': '.$mediafromftp_settings['pagemax']; ?>
+						= <a href="<?php echo admin_url('admin.php?page=mediafromftp-search-register'); ?>"><?php _e('Number of items per page:'); ?></a>
+					</div>
+					<div style="display:block;padding:5px 10px">
 					<input type="checkbox" name="mediafromftp_cron_mail_apply" value="1" <?php checked('1', $mediafromftp_settings['cron']['mail_apply']); ?> />
 					<?php _e('E-mail me whenever'); ?>
 					</div>
@@ -284,13 +292,14 @@ class MediaFromFtpAdmin {
 			<div id="mediafromftp-settings-tabs-2">
 				<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
 				<div style="display:block; padding:5px 10px; font-weight: bold;">
-				1. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 55 from line 48)', 'mediafromftp'); ?>
+				1. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from line 50)', 'mediafromftp'); ?>
 				</div>
 				<div style="display:block;padding:5px 20px">
 				<?php
 				$commandline_host = $_SERVER['HTTP_HOST'];
 				$commandline_server = $_SERVER['SERVER_NAME'];
 				$commandline_wpload = wp_normalize_path(ABSPATH).'wp-load.php';
+				$commandline_pg = wp_normalize_path(MEDIAFROMFTP_PLUGIN_BASE_DIR.'/mediafromftpcmd.php');
 $commandline_set = <<<COMMANDLINESET
 
 &#x24_SERVER = array(
@@ -312,7 +321,7 @@ COMMANDLINESET;
 				2. <?php _e('The execution of the command line.', 'mediafromftp'); ?>
 				</div>
 				<div style="display:block; padding:5px 10px;">
-				<div>% <code>/usr/bin/php <?php echo MEDIAFROMFTP_PLUGIN_BASE_DIR; ?>/mediafromftpcmd.php</code></div>
+				<div>% <code>/usr/bin/php <?php echo $commandline_pg; ?></code></div>
 				<div style="display:block; padding:5px 15px; color:red;"><code>/usr/bin/php</code> >> <?php _e('Please check with the server administrator.', 'mediafromftp'); ?></div>
 					<div style="display:block;padding:5px 20px">
 					<li style="font-weight: bold;"><?php _e('command line argument list', 'mediafromftp'); ?></li>
@@ -346,6 +355,12 @@ COMMANDLINESET;
 							<div style="display:block;padding:5px 60px">
 							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-x jpg</code></div>
 							</div>
+						<div style="display:block;padding:5px 40px">
+						<div><code>-p</code> <?php _e('Limit number of update files' , 'mediafromftp'); ?></div>
+						</div>
+							<div style="display:block;padding:5px 60px">
+							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-p 10</code></div>
+							</div>
 					<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
 					</div>
 					<div style="display:block;padding:5px 20px">
@@ -363,7 +378,7 @@ COMMANDLINESET;
 				3. <?php _e('Register the command-line to the server cron.', 'mediafromftp'); ?> (<?php _e('Example:', 'mediafromftp'); ?> <?php _e('Run every 10 minutes.', 'mediafromftp'); ?>)
 				</div>
 				<div style="display:block; padding:5px 10px;">
-				<div><code>0,10,20,30,40,50 * * * * /usr/bin/php <?php echo MEDIAFROMFTP_PLUGIN_BASE_DIR; ?>/mediafromftpcmd.php</code></div>
+				<div><code>0,10,20,30,40,50 * * * * /usr/bin/php <?php echo $commandline_pg; ?></code></div>
 				<div style="display:block; padding:5px 15px; color:red;"><code>/usr/bin/php</code> >> <?php _e('Please check with the server administrator.', 'mediafromftp'); ?></div>
 				</div>
 			</div>
@@ -839,6 +854,11 @@ COMMANDLINESET;
 					} else {
 						$mediafromftp_cron_apply = FALSE;
 					}
+					if ( !empty($_POST['mediafromftp_cron_limit_number']) ) {
+						$mediafromftp_cron_limit_number = $_POST['mediafromftp_cron_limit_number'];
+					} else {
+						$mediafromftp_cron_limit_number = FALSE;
+					}
 					if ( !empty($_POST['mediafromftp_cron_mail_apply']) ) {
 						$mediafromftp_cron_mail_apply = $_POST['mediafromftp_cron_mail_apply'];
 					} else {
@@ -856,6 +876,7 @@ COMMANDLINESET;
 										'cron' => array(
 													'apply' => $mediafromftp_cron_apply,
 													'schedule' => $_POST['mediafromftp_cron_schedule'],
+													'limit_number' => $mediafromftp_cron_limit_number,
 													'mail_apply' => $mediafromftp_cron_mail_apply,
 													'mail' => $mediafromftp_settings['cron']['mail']
 													)
@@ -923,6 +944,7 @@ COMMANDLINESET;
 									'cron' => array(
 												'apply' => $mediafromftp_settings['cron']['apply'],
 												'schedule' => $mediafromftp_settings['cron']['schedule'],
+												'limit_number' => $mediafromftp_settings['cron']['limit_number'],
 												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
 												'mail' => $mediafromftp_settings['cron']['mail']
 												)
