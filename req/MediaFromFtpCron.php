@@ -62,10 +62,11 @@ class MediaFromFtpCron {
 		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 		$mediafromftp = new MediaFromFtp();
 
-		$mediafromftp_settings = get_option('mediafromftp_settings');
-
 		// for mediafromftpcmd.php
 		$cmdoptions = getopt("s:d:e:t:x:p:h");
+
+		$mediafromftp_settings = get_option('mediafromftp_settings');
+		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
 		$cmdlinedebugs = debug_backtrace();
 		if ( basename($cmdlinedebugs['0']['file']) === 'mediafromftpcmd.php' ) {
@@ -112,8 +113,6 @@ class MediaFromFtpCron {
 		}
 
 		unset($cmdoptions);
-
-		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
 
 		$document_root = ABSPATH.$searchdir;
 

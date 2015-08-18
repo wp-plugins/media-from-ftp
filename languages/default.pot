@@ -111,7 +111,7 @@ msgstr ""
 msgid "Example:"
 msgstr ""
 
-msgid "Command-line works the at plug-in deactivate."
+msgid "Command-line, please use by activate sure the plug-in."
 msgstr ""
 
 msgid "All types"

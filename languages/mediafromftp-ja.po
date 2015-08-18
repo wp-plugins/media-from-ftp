@@ -124,8 +124,8 @@ msgstr "引数が空の場合は、管理画面の設定値が使用されます
 msgid "Example:"
 msgstr "例:"
 
-msgid "Command-line works the at plug-in deactivate."
-msgstr "コマンドラインは、プラグインが停止している場合でも動作します。"
+msgid "Command-line, please use by activate sure the plug-in."
+msgstr "コマンドラインは、必ずプラグインを有効化して使用してください。"
 
 msgid "All types"
 msgstr "全てのタイプ"

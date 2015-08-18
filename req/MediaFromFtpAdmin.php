@@ -298,6 +298,7 @@ class MediaFromFtpAdmin {
 				<?php
 				$commandline_host = $_SERVER['HTTP_HOST'];
 				$commandline_server = $_SERVER['SERVER_NAME'];
+				$commandline_uri = wp_make_link_relative(site_url());
 				$commandline_wpload = wp_normalize_path(ABSPATH).'wp-load.php';
 				$commandline_pg = wp_normalize_path(MEDIAFROMFTP_PLUGIN_BASE_DIR.'/mediafromftpcmd.php');
 $commandline_set = <<<COMMANDLINESET
@@ -305,7 +306,7 @@ $commandline_set = <<<COMMANDLINESET
 &#x24_SERVER = array(
 "HTTP_HOST" => "$commandline_host",
 "SERVER_NAME" => "$commandline_server",
-"REQUEST_URI" => "/",
+"REQUEST_URI" => "$commandline_uri",
 "REQUEST_METHOD" => "GET",
 "HTTP_USER_AGENT" => "mediafromftp"
             );
@@ -372,7 +373,7 @@ COMMANDLINESET;
 							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-h</code></div>
 							</div>
 					</div>
-					<div style="color:red;"><?php _e('Command-line works the at plug-in deactivate.', 'mediafromftp'); ?></div>
+					<div style="color:red;"><?php _e('Command-line, please use by activate sure the plug-in.', 'mediafromftp'); ?></div>
 				</div>
 				<div style="display:block; padding:5px 10px; font-weight: bold;">
 				3. <?php _e('Register the command-line to the server cron.', 'mediafromftp'); ?> (<?php _e('Example:', 'mediafromftp'); ?> <?php _e('Run every 10 minutes.', 'mediafromftp'); ?>)

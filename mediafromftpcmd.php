@@ -50,31 +50,12 @@
 	$_SERVER = array(
 		"HTTP_HOST" => "localhost",
 		"SERVER_NAME" => "localhost",
-		"REQUEST_URI" => "/",
+		"REQUEST_URI" => "/wordpress",
 		"REQUEST_METHOD" => "GET",
 		"HTTP_USER_AGENT" => "mediafromftp"
 					);
 	require_once(dirname(__FILE__).'/../../../wp-load.php');
 // For your environment, please rewrite.
-
-	$activeplugins = get_option('active_plugins');
-	$mediafromftp_active = FALSE;
-	foreach ( $activeplugins as $plugin_number => $plugin_name ) {
-		if ( $plugin_name === 'media-from-ftp/mediafromftp.php' ) {
-			$mediafromftp_active = TRUE;
-		}
-	}
-
-	if ( !$mediafromftp_active ) {
-		define("MEDIAFROMFTP_PLUGIN_BASE_DIR", dirname(__FILE__));
-		include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
-		$mediafromftp = new MediaFromFtp();
-		list($upload_dir, $upload_url, $upload_path) = $mediafromftp->upload_dir_url_path();
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $upload_dir);
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
-		define("MEDIAFROMFTP_PLUGIN_UPLOAD_PATH", $upload_path);
-		unset($mediafromftp, $upload_dir, $upload_url, $upload_path);
-	}
 
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );
 	$mediafromftpcron = new MediaFromFtpCron();

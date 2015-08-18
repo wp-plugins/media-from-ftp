@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 7.9
+Stable tag: 8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,11 @@ none
 4. File registration result
 
 == Changelog ==
+
+= 8.0 =
+Supported Multisite.
+Specification Change of command line.
+Change /languages.
 
 = 7.9 =
 Add limit number of update files with cron.
@@ -323,6 +328,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 8.0 =
 = 7.9 =
 = 7.8 =
 = 7.7 =
