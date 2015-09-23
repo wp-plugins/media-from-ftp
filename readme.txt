@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 8.0
+Stable tag: 8.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,6 +45,29 @@ none
 4. File registration result
 
 == Changelog ==
+
+= 8.7 =
+Fixed problem of search in the file in a multi-domain.
+Add the author data at the time of registration in the schedule or mediafromftpcmd.php.
+
+= 8.6 =
+Fixed problem of Fatal error: Call to undefined function get_blog_details(). 
+
+= 8.5 =
+Fixed problem of multisite.
+
+= 8.4 =
+Add error handling for file copy.
+
+= 8.3 =
+Fixed problem of exclude file.
+
+= 8.2 =
+Fixed problem of types and extensions filter.
+
+= 8.1 =
+Fixed problem of filter of the thumbnail.
+Fixed problem of search for path.
 
 = 8.0 =
 Supported Multisite.
@@ -328,6 +351,13 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 8.7 =
+= 8.6 =
+= 8.5 =
+= 8.4 =
+= 8.3 =
+= 8.2 =
+= 8.1 =
 = 8.0 =
 = 7.9 =
 = 7.8 =

@@ -47,14 +47,14 @@
  *
 */
 // For your environment, please rewrite.
-	$_SERVER = array(
-		"HTTP_HOST" => "localhost",
-		"SERVER_NAME" => "localhost",
-		"REQUEST_URI" => "/wordpress",
-		"REQUEST_METHOD" => "GET",
-		"HTTP_USER_AGENT" => "mediafromftp"
-					);
-	require_once(dirname(__FILE__).'/../../../wp-load.php');
+$_SERVER = array(
+"HTTP_HOST" => "localhost.localdomain",
+"SERVER_NAME" => "localhost.localdomain",
+"REQUEST_URI" => "",
+"REQUEST_METHOD" => "GET",
+"HTTP_USER_AGENT" => "mediafromftp"
+            );
+require_once('D:/SkyDrive/www/top/wordpress/wp-load.php');
 // For your environment, please rewrite.
 
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpCron.php' );

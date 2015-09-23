@@ -30,19 +30,6 @@ msgid ""
 "And can be registered."
 msgstr ""
 
-msgid ""
-"Can not register to directory for unwritable, because generating a thumbnail "
-"in the case of image files. Must be writable(757 or 777) of attributes of "
-"the directory that contains the files required for registration."
-msgstr ""
-
-msgid ""
-"Can not register to directory for unwritable, because to delete the previous "
-"file by converting in MD5 format from multi-byte file names. Must be "
-"writable(757 or 777) of attributes of the directory that contains the files "
-"required for registration."
-msgstr ""
-
 msgid "Regular expression is possible."
 msgstr ""
 
@@ -166,4 +153,10 @@ msgid "Limit number of update files"
 msgstr ""
 
 msgid "Apply limit number of update files."
+msgstr ""
+
+msgid "Directory name:"
+msgstr ""
+
+msgid "You need to make this directory writable before you can register this file. See <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">the Codex</a> for more information. Or, filename must be changed of illegal."
 msgstr ""

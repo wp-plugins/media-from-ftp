@@ -42,14 +42,15 @@ class MediaFromFtp {
 		$cmdoptions = getopt("s:d:e:t:x:p:h");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
-		$excludefile = '-[0-9]*x[0-9]*|media-from-ftp-tmp';	// thumbnail & tmp dir file
-		if ( is_multisite() && !strstr(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH, '/sites/') ) {
+		$excludefile = '-[0-9]+x[0-9]+\.|media-from-ftp-tmp';	// thumbnail & tmp dir file
+		global $blog_id;
+		if ( is_multisite() && is_main_site($blog_id) ) {
 			$excludefile .= '|\/sites\/';
 		}
 		if ( isset($cmdoptions['e']) ) {
 				$excludefile .= '|'.$cmdoptions['e'];
 		} else {
-			if( get_option('mediafromftp_settings') ){
+			if( !empty($mediafromftp_settings['exclude']) ){
 				$excludefile .= '|'.$mediafromftp_settings['exclude'];
 			}
 		}
@@ -94,8 +95,9 @@ class MediaFromFtp {
 	function scan_dir($dir) {
 
 		$excludedir = 'media-from-ftp-tmp';	// tmp dir
-		if ( is_multisite() && !strstr(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH, '/sites/') ) {
-			$excludedir .= '|\/sites';
+		global $blog_id;
+		if ( is_multisite() && is_main_site($blog_id) ) {
+			$excludedir .= '|\/sites\/';
 		}
 
 		$dirlist = $tmp = array();
@@ -189,13 +191,13 @@ class MediaFromFtp {
 					$cash_thumb->save( $cash_thumb_filename );
 					$view_thumb_url = MEDIAFROMFTP_PLUGIN_TMP_URL.'/'.$cash_thumb_key.'.'.$ext;
 				} else {
-					$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+					$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/default.png';
 				}
 			} else {
 				if ( file_exists( $cash_thumb_filename )) {
 					$view_thumb_url = MEDIAFROMFTP_PLUGIN_TMP_URL.'/'.$cash_thumb_key.'.'.$ext;
 				} else {
-					$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+					$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/default.png';
 				}
 			}
 			set_transient( $cash_thumb_key, $view_thumb_url, DAY_IN_SECONDS);
@@ -312,21 +314,16 @@ class MediaFromFtp {
 			$exts = explode('.', wp_basename($file));
 			$ext = end($exts);
 			$suffix_file = '.'.$ext;
-			$file = str_replace('\\', '/', $file);
-			$wordpress_path = str_replace('\\', '/', ABSPATH);
-			$upload_path = str_replace('\\', '/', MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
-			if ( strstr($file, $wordpress_path) ) {
-				$new_url = site_url('/').str_replace($wordpress_path, '', $file);
-			} else {
-				$new_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.str_replace($upload_path, '', $file);
-			}
+			$file = wp_normalize_path($file);
+			$upload_path = wp_normalize_path(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR);
+			$new_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.str_replace($upload_path, '', $file);
 			$new_titles = explode('/', $new_url);
 			$new_title = str_replace($suffix_file, '', end($new_titles));
 			$new_title_md5 = md5($new_title);
 			$new_url_md5 = str_replace($new_title.$suffix_file, '', $new_url).$new_title_md5.$suffix_file;
 			$new_file = TRUE;
 			foreach ( $attachments as $attachment ){
-				$attach_url = $attachment->guid;
+				$attach_url = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.get_post_meta( $attachment->ID, '_wp_attached_file', true );
 				if ( $attach_url === $new_url || $attach_url === $new_url_md5 ) {
 					$new_file = FALSE;
 				}
@@ -359,9 +356,29 @@ class MediaFromFtp {
 		$suffix_attach_file = '.'.$ext;
 		$new_attach_titlenames = explode('/', $new_url_attach);
 		$new_attach_title = str_replace($suffix_attach_file, '', end($new_attach_titlenames));
-		$filename = str_replace(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH.'/', '', strstr(wp_make_link_relative($new_url_attach), MEDIAFROMFTP_PLUGIN_UPLOAD_PATH));
 
-		$copy_file_new = NULL;
+		$path_parts = pathinfo($new_url_attach);
+		$urlpath_dir = wp_make_link_relative($path_parts['dirname']);
+
+		$relation_path_true = strstr(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH, '../');
+		if ( !$relation_path_true ) {
+			$plus_path = ltrim(str_replace(MEDIAFROMFTP_PLUGIN_UPLOAD_PATH, '', strstr($urlpath_dir, MEDIAFROMFTP_PLUGIN_UPLOAD_PATH)), '/');
+		} else {
+			$plus_path_tmp = str_replace($urlpath_dir, '', str_replace('../', '', MEDIAFROMFTP_PLUGIN_UPLOAD_PATH).'/');
+			$plus_path =  ltrim(str_replace($plus_path_tmp, '', $urlpath_dir), '/');
+		}
+		if ( !empty($plus_path) ) {
+			$plus_path = trailingslashit($plus_path);
+		}
+		$filename = $plus_path.wp_basename( $new_url_attach );
+
+		$err_copy = TRUE;
+		$copy_file_org1 = NULL;
+		$copy_file_org2 = NULL;
+		$copy_file_org3 = NULL;
+		$copy_file_new1 = NULL;
+		$copy_file_new2 = NULL;
+		$copy_file_new3 = NULL;
 		$postdategmt = date_i18n( "Y-m-d H:i:s", FALSE, TRUE );
 		if ( $dateset === 'server' || $dateset === 'exif' ) {
 			$postdategmt = get_gmt_from_date($new_url_datetime.':00');
@@ -370,12 +387,14 @@ class MediaFromFtp {
 			$oldfilename = $filename;
 			$filename = str_replace(' ', '-', $oldfilename);
 			$new_url_attach = str_replace(' ', '-', $new_url_attach);
-			$copy_file_org = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename;
-			$copy_file_new = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
-			copy( $copy_file_org, $copy_file_new);
-			unlink( $copy_file_org );
+			$copy_file_org1 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename;
+			$copy_file_new1 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
+			$err_copy = @copy( $copy_file_org1, $copy_file_new1 );
+			if ( !$err_copy ) {
+				return array(-1, $copy_file_org1, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$plus_path, NULL);
+			}
 		}
-		if (strlen($new_url_attach) <> mb_strlen($new_url_attach, $char_code)) {
+		if ( !mb_check_encoding($new_url_attach, 'ASCII') ) {
 			$filename = mb_convert_encoding($filename, $char_code, "auto");
 			if ( strpos( $filename ,'/' ) === FALSE ) {
 				$currentdir = '';
@@ -392,10 +411,16 @@ class MediaFromFtp {
 			$oldfilename = $currentdir.$currentfile.$suffix_attach_file;
 			$filename = $currentdir.md5($currentfile).$suffix_attach_file;
 			$new_url_attach = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.$filename;
-			$copy_file_org = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename;
-			$copy_file_new = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
-			copy( $copy_file_org, $copy_file_new);
-			unlink( $copy_file_org );
+			$copy_file_org2 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename;
+			$copy_file_new2 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
+			$err_copy = @copy( $copy_file_org2, $copy_file_new2 );
+			if ( !$err_copy ) {
+				if (!empty($copy_file_new1)) {
+					$copy_file_org2 = $copy_file_org1;
+					unlink( $copy_file_new1 );
+				}
+				return array(-1, $copy_file_org2, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$plus_path, NULL);
+			}
 		}
 
 		// Move YearMonth Folders
@@ -406,27 +431,42 @@ class MediaFromFtp {
 			$filename_base = wp_basename($filename);
 			if ( MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename <> MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base ) {
 				if ( !file_exists(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir) ) {
-					mkdir(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir, 0757, true);
+					wp_mkdir_p(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir);
 				}
 				if ( file_exists(MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base) ) {
 					$filename_base = wp_basename($filename, $suffix_attach_file).date_i18n( "dHis", FALSE, FALSE ).$suffix_attach_file;
 				}
-				$copy_file_org = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
-				$copy_file_new = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base;
-				copy( $copy_file_org, $copy_file_new);
-				unlink( $copy_file_org );
+				$copy_file_org3 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
+				$copy_file_new3 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir.'/'.$filename_base;
+				$err_copy = copy( $copy_file_org3, $copy_file_new3 );
+				if ( !$err_copy ) {
+					if (!empty($copy_file_new1)) {
+						$copy_file_org3 = $copy_file_org1;
+						unlink( $copy_file_new1 );
+					} else if (!empty($copy_file_new2)) {
+						$copy_file_org3 = $copy_file_org2;
+						unlink( $copy_file_new2 );
+					}
+					return array(-1, $copy_file_org3, MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.$subdir, NULL);
+				}
 				$filename = ltrim($subdir, '/').'/'.$filename_base;
 				$new_url_attach = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.$filename;
 			}
 		}
+		if (!empty($copy_file_org1)) { unlink( $copy_file_org1 ); }
+		if (!empty($copy_file_org2)) { unlink( $copy_file_org2 ); }
+		if (!empty($copy_file_org3)) { unlink( $copy_file_org3 ); }
 
 		$filename = mb_convert_encoding($filename, "UTF-8", "auto");
 		$new_url_attach = mb_convert_encoding($new_url_attach, "UTF-8", "auto");
+
+		$mediafromftp_settings = get_option('mediafromftp_settings');
 
 		// File Regist
 		$newfile_post = array(
 			'post_title' => $new_attach_title,
 			'post_content' => '',
+			'post_author' => $mediafromftp_settings['cron']['user'],
 			'guid' => $new_url_attach,
 			'post_status' => 'inherit', 
 			'post_type' => 'attachment',
@@ -586,7 +626,8 @@ class MediaFromFtp {
 		if ( $relation_path_true > 0 ) {
 			$upload_path = $relationalpath;
 		} else {
-			$upload_path = str_replace(site_url('/'), '', $upload_url);
+			$wordpress_path = wp_normalize_path(ABSPATH);
+			$upload_path = str_replace($wordpress_path, '', $upload_dir);
 		}
 
 		$upload_dir = untrailingslashit($upload_dir);
@@ -594,6 +635,51 @@ class MediaFromFtp {
 		$upload_path = untrailingslashit($upload_path);
 
 		return array($upload_dir, $upload_url, $upload_path);
+
+	}
+
+	/* ==================================================
+	 * @param	none
+	 * @return	$siteurl
+	 * @since	8.5
+	 */
+	function siteurl(){
+		if ( is_multisite() ) {
+			global $blog_id;
+			$siteurl = trailingslashit(get_blog_details($blog_id)->siteurl);
+		} else {
+			$siteurl = site_url('/');
+		}
+		return $siteurl;
+	}
+
+	/* ==================================================
+	 * @param	string	$ext2typefilter
+	 * @return	array	$extensions
+	 * @since	8.2
+	 */
+	function scan_extensions($ext2typefilter){
+
+		$extensions = array();
+		$mimes = wp_get_mime_types();
+
+		foreach ($mimes as $extselect => $mime) {
+			if( strpos( $extselect, '|' ) ){
+				$extselects = explode('|',$extselect);
+				foreach ( $extselects as $extselect2 ) {
+					if ( $ext2typefilter === 'all' || $ext2typefilter === wp_ext2type($extselect2) ) {
+						$extensions[] = $extselect2;
+					}
+				}
+			} else {
+				if ( $ext2typefilter === 'all' || $ext2typefilter === wp_ext2type($extselect) ) {
+					$extensions[] = $extselect;
+				}
+			}
+		}
+
+		asort($extensions);
+		return $extensions;
 
 	}
 

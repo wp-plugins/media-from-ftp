@@ -298,7 +298,7 @@ class MediaFromFtpAdmin {
 				<?php
 				$commandline_host = $_SERVER['HTTP_HOST'];
 				$commandline_server = $_SERVER['SERVER_NAME'];
-				$commandline_uri = wp_make_link_relative(site_url());
+				$commandline_uri = untrailingslashit(wp_make_link_relative(MEDIAFROMFTP_PLUGIN_SITE_URL));
 				$commandline_wpload = wp_normalize_path(ABSPATH).'wp-load.php';
 				$commandline_pg = wp_normalize_path(MEDIAFROMFTP_PLUGIN_BASE_DIR.'/mediafromftpcmd.php');
 $commandline_set = <<<COMMANDLINESET
@@ -505,20 +505,11 @@ COMMANDLINESET;
 					<select name="extension" style="width: 120px;">
 					<option value="all" <?php if ($extfilter === 'all') echo 'selected';?>><?php echo esc_attr( __('All extensions', 'mediafromftp') ); ?></option>
 					<?php
-					$mimes = wp_get_mime_types();
-					foreach ($mimes as $extselect => $mime) {
-						if( strpos( $extselect, '|' ) ){
-							$extselects = explode('|',$extselect);
-							foreach ( $extselects as $extselect2 ) {
-								?>
-								<option value="<?php echo $extselect2; ?>" <?php if ($extfilter === $extselect2) echo 'selected';?>><?php echo $extselect2; ?></option>
-								<?php
-							}
-						} else {
-							?>
-							<option value="<?php echo $extselect; ?>" <?php if ($extfilter === $extselect) echo 'selected';?>><?php echo $extselect; ?></option>
-							<?php
-						}
+					$extensions = $mediafromftp->scan_extensions($ext2typefilter);
+					foreach ($extensions as $extselect) {
+						?>
+						<option value="<?php echo $extselect; ?>" <?php if ($extfilter === $extselect) echo 'selected';?>><?php echo $extselect; ?></option>
+						<?php
 					}
 					?>
 					</select>
@@ -528,7 +519,7 @@ COMMANDLINESET;
 			<?php
 			global $wpdb;
 			$attachments = $wpdb->get_results("
-							SELECT guid
+							SELECT ID
 							FROM $wpdb->posts
 							WHERE post_type = 'attachment'
 							");
@@ -536,8 +527,6 @@ COMMANDLINESET;
 			$extpattern = $mediafromftp->extpattern($extfilter);
 			$files = $mediafromftp->scan_file($document_root, $extpattern);
 
-			$unregister_unwritable_count = 0;
-			$unregister_multibyte_file_count = 0;
 			$searchfiles = array();
 			$search_ext = array();
 			$search_new_url = array();
@@ -546,18 +535,10 @@ COMMANDLINESET;
 				// Input URL
 				list($new_file, $ext, $new_url) = $mediafromftp->input_url($file, $attachments);
 				if ($new_file) {
-					if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
-						$unregisters_unwritable[$unregister_unwritable_count] = $new_url;
-						++$unregister_unwritable_count;
-					} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
-						$unregisters_multibyte_file[$unregister_multibyte_file_count] = $new_url;
-						++$unregister_multibyte_file_count;
-					} else {
-						$searchfiles[$pageallcount] = $file;
-						$search_ext[$pageallcount] = $ext;
-						$search_new_url[$pageallcount] = $new_url;
-						++$pageallcount;
-					}
+					$searchfiles[$pageallcount] = $file;
+					$search_ext[$pageallcount] = $ext;
+					$search_new_url[$pageallcount] = $new_url;
+					++$pageallcount;
 				}
 			}
 			unset($files);
@@ -616,21 +597,21 @@ COMMANDLINESET;
 							if ( wp_ext2type($ext) === 'image' ){
 								$view_thumb_url = $mediafromftp->create_cash($ext, $file, $new_url);
 							} else if ( wp_ext2type($ext) === 'audio' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/audio.png';
+								$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/audio.png';
 								$metadata_audio = wp_read_audio_metadata( $file );
 								$file_size = size_format($metadata_audio['filesize']);
 								$mimetype = $metadata_audio['fileformat'].'('.$metadata_audio['mime_type'].')';
 								$length = $metadata_audio['length_formatted'];
 							} else if ( wp_ext2type($ext) === 'video' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/video.png';
+								$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/video.png';
 								$metadata_video = wp_read_video_metadata( $file );
 								$file_size = size_format($metadata_video['filesize']);
 								$mimetype = $metadata_video['fileformat'].'('.$metadata_video['mime_type'].')';
 								$length = $metadata_video['length_formatted'];
 							} else if ( wp_ext2type($ext) === 'NULL' ) {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/default.png';
+								$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/default.png';
 							} else {
-								$view_thumb_url = site_url('/'). WPINC . '/images/media/'.wp_ext2type($ext).'.png';
+								$view_thumb_url = MEDIAFROMFTP_PLUGIN_SITE_URL. WPINC . '/images/media/'.wp_ext2type($ext).'.png';
 							}
 							$input_html .= '<img width="40" height="40" src="'.$view_thumb_url.'" style="float: left; margin: 5px;">';
 							$input_html .= '<div style="overflow: hidden;">';
@@ -657,7 +638,7 @@ COMMANDLINESET;
 			}
 			unset($searchfiles, $search_ext, $search_new_url, $attachments);
 
-			if ( $this->postcount == 0 && $unregister_unwritable_count == 0 && $unregister_multibyte_file_count == 0) {
+			if ( $this->postcount == 0 ) {
 				echo '<div class="updated"><ul><li>'.__('There is no file that is not registered in the media library.', 'mediafromftp').'</li></ul></div>';
 			} else {
 				?>
@@ -682,16 +663,6 @@ COMMANDLINESET;
 				if ( $this->postcount > 0 ) {
 					echo '<div class="updated"><ul><li>'.__('These files is a file that is not registered in the media library. And can be registered.', 'mediafromftp').'</li></ul></div>';
 				}
-				if ( !empty($unregisters_unwritable) ) {
-					foreach ( $unregisters_unwritable as $unregister_unwritable_url ) {
-						echo '<div class="error"><ul><li>'.$unregister_unwritable_url.' --> '.__('Can not register to directory for unwritable, because generating a thumbnail in the case of image files. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp').'</li></ul></div>';
-					}
-				}
-				if ( !empty($unregisters_multibyte_file) ) {
-					foreach ( $unregisters_multibyte_file as $unregister_multibyte_file_url ) {
-						echo '<div class="error"><ul><li>'.$unregister_multibyte_file_url.' --> '.__('Can not register to directory for unwritable, because to delete the previous file by converting in MD5 format from multi-byte file names. Must be writable(757 or 777) of attributes of the directory that contains the files required for registration.', 'mediafromftp').'</li></ul></div>';
-					}
-				}
 			}
 		} else { // Register mode ($adddb === 'TRUE')
 			$new_url_attaches = $_POST["new_url_attaches"];
@@ -712,7 +683,7 @@ COMMANDLINESET;
 				<?php
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
-
+				$regist_count = 0;
 				foreach ( $new_url_attaches as $postkey1 => $postval1 ){
 					foreach ( $postval1 as $postkey2 => $postval2 ){
 						if ( $postkey2 === 'url' ) {
@@ -726,61 +697,67 @@ COMMANDLINESET;
 
 							// Regist
 							list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url_attach, $new_url_datetime, $dateset, $yearmonth_folders);
-
-							// Outputdata
-							list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
-
-							$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
-
-							$output_html = NULL;
-							$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
-							$output_html .= '<img width="40" height="40" src="'.$image_attr_thumbnail[0].'" style="float: left; margin: 5px;">';
-							$output_html .= '<div style="overflow: hidden;">';
-							$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
-							$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
-							$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
-							$new_url_attachs = explode('/', $new_url_attach);
-							$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
-
-							$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
-							if ( wp_ext2type($ext) === 'image' ) {
-								$output_html .= '<div>'.__('Images').': ';
-								foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
-									$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
-								}
-								$output_html .= '</div>';
+							if ( $attach_id == -1 ) { // error
+								echo '<div class="error"><ul><li>'.'<div>'.__('File name:').mb_convert_encoding($new_attach_title, "UTF-8", "auto").'</div>'.'<div>'.__('Directory name:', 'mediafromftp').mb_convert_encoding($new_url_attach, "UTF-8", "auto").'</div>'.__("You need to make this directory writable before you can register this file. See <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">the Codex</a> for more information. Or, filename must be changed of illegal.", 'mediafromftp').'</li></div>';
 							} else {
-								$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
-								$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
-								if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
-									$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+								// Outputdata
+								list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
+
+								$image_attr_thumbnail = wp_get_attachment_image_src($attach_id, 'thumbnail', true);
+
+								$output_html = NULL;
+								$output_html .= '<div style="border-bottom: 1px solid; padding-top: 5px; padding-bottom: 5px;">';
+								$output_html .= '<img width="40" height="40" src="'.$image_attr_thumbnail[0].'" style="float: left; margin: 5px;">';
+								$output_html .= '<div style="overflow: hidden;">';
+								$output_html .= '<div>'.__('Title').': '.$new_attach_title.'</div>';
+								$output_html .= '<div>'.__('Permalink:').' <a href="'.get_attachment_link($attach_id).'" target="_blank" style="text-decoration: none; word-break: break-all;">'.get_attachment_link($attach_id).'</a></div>';
+								$output_html .= '<div>URL: <a href="'.$new_url_attach.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$new_url_attach.'</a></div>';
+								$new_url_attachs = explode('/', $new_url_attach);
+								$output_html .= '<div>'.__('File name:').' '.end($new_url_attachs).'</div>';
+
+								$output_html .= '<div>'.__('Date/Time').': '.$stamptime.'</div>';
+								if ( wp_ext2type($ext) === 'image' ) {
+									$output_html .= '<div>'.__('Images').': ';
+									foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
+										$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
+									}
+									$output_html .= '</div>';
+								} else {
+									$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
+									$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
+									if ( wp_ext2type($ext) === 'video' || wp_ext2type($ext) === 'audio' ) {
+										$output_html .= '<div>'.__('Length:').' '.$length.'</div>';
+									}
 								}
+								$output_html .= '</div></div>';
+								echo $output_html;
+								++$regist_count;
 							}
-							$output_html .= '</div></div>';
-
-							echo $output_html;
-
 						}
 					}
 				}
-				echo '<div class="updated"><ul><li>'.__('These files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
+				if ( $regist_count > 0 ) {
+					echo '<div class="updated"><ul><li>'.__('These files was registered to the media library.', 'mediafromftp').'</li></ul></div>';
+				}
 			}
 			unset($new_url_attaches);
 
-			?>
-			<div class="submit">
-			<form method="post" style="float: left; margin-right: 1em;" action="<?php echo $scriptname; ?>">
-				<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
-				<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
-				<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
-				<input type="submit" class="button" value="<?php _e('Search'); ?>" />
-			</form>
-			<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
-				<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
-			</form>
-			</div>
-			<div style="clear: both;"></div>
-			<?php
+			if ( $regist_count > 0 ) {
+				?>
+				<div class="submit">
+				<form method="post" style="float: left; margin-right: 1em;" action="<?php echo $scriptname; ?>">
+					<input type="hidden" name="searchdir" value="<?php echo $searchdir; ?>">
+					<input type="hidden" name="ext2type" value="<?php echo $ext2typefilter; ?>">
+					<input type="hidden" name="extension" value="<?php echo $extfilter; ?>">
+					<input type="submit" class="button" value="<?php _e('Search'); ?>" />
+				</form>
+				<form method="post" action="<?php echo admin_url( 'upload.php'); ?>">
+					<input type="submit" class="button" value="<?php _e('Media Library'); ?>" />
+				</form>
+				</div>
+				<div style="clear: both;"></div>
+				<?php
+			}
 		}
 		?>
 		</div>
@@ -873,13 +850,14 @@ COMMANDLINESET;
 										'extfilter' => $mediafromftp_settings['extfilter'],
 										'dateset' => $_POST['mediafromftp_dateset'],
 										'max_execution_time' => intval($_POST['mediafromftp_max_execution_time']),
-										'exclude' => $_POST['mediafromftp_exclude'],
+										'exclude' => stripslashes($_POST['mediafromftp_exclude']),
 										'cron' => array(
 													'apply' => $mediafromftp_cron_apply,
 													'schedule' => $_POST['mediafromftp_cron_schedule'],
 													'limit_number' => $mediafromftp_cron_limit_number,
 													'mail_apply' => $mediafromftp_cron_mail_apply,
-													'mail' => $mediafromftp_settings['cron']['mail']
+													'mail' => $mediafromftp_settings['cron']['mail'],
+													'user' => $mediafromftp_settings['cron']['user']
 													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
@@ -928,9 +906,20 @@ COMMANDLINESET;
 				}
 				if (!empty($_POST['ext2type'])){
 					$ext2typefilter = $_POST['ext2type'];
-					$extfilter = $_POST['extension'];
 				} else {
 					$ext2typefilter = $mediafromftp_settings['ext2typefilter'];
+				}
+				if (!empty($_POST['extension'])){
+					if ( $_POST['extension'] === 'all') {
+						$extfilter = 'all';
+					} else {
+						if ( $ext2typefilter === 'all' || $ext2typefilter === wp_ext2type($_POST['extension']) ) {
+							$extfilter = $_POST['extension'];
+						} else {
+							$extfilter = 'all';
+						}
+					}
+				} else {
 					$extfilter = $mediafromftp_settings['extfilter'];
 				}
 				$mediafromftp_tbl = array(
@@ -947,7 +936,8 @@ COMMANDLINESET;
 												'schedule' => $mediafromftp_settings['cron']['schedule'],
 												'limit_number' => $mediafromftp_settings['cron']['limit_number'],
 												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
-												'mail' => $mediafromftp_settings['cron']['mail']
+												'mail' => $mediafromftp_settings['cron']['mail'],
+												'user' => $mediafromftp_settings['cron']['user']
 												)
 									);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );

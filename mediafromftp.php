@@ -2,7 +2,7 @@
 /*
 Plugin Name: Media from FTP
 Plugin URI: http://wordpress.org/plugins/media-from-ftp/
-Version: 8.0
+Version: 8.7
 Description: Register to media library from files that have been uploaded by FTP.
 Author: Katsushi Kawamori
 Author URI: http://riverforest-wp.info/
@@ -33,6 +33,7 @@ Domain Path: /languages
 
 	include_once MEDIAFROMFTP_PLUGIN_BASE_DIR.'/inc/MediaFromFtp.php';
 	$mediafromftp = new MediaFromFtp();
+	define("MEDIAFROMFTP_PLUGIN_SITE_URL", $mediafromftp->siteurl());
 	list($upload_dir, $upload_url, $upload_path) = $mediafromftp->upload_dir_url_path();
 	define("MEDIAFROMFTP_PLUGIN_UPLOAD_DIR", $upload_dir);
 	define("MEDIAFROMFTP_PLUGIN_UPLOAD_URL", $upload_url);
@@ -44,7 +45,7 @@ Domain Path: /languages
 
 	// Make tmp dir
 	if ( !is_dir( MEDIAFROMFTP_PLUGIN_TMP_DIR ) ) {
-		mkdir( MEDIAFROMFTP_PLUGIN_TMP_DIR, 0755 );
+		wp_mkdir_p( MEDIAFROMFTP_PLUGIN_TMP_DIR );
 	}
 
 	require_once( MEDIAFROMFTP_PLUGIN_BASE_DIR.'/req/MediaFromFtpRegist.php' );

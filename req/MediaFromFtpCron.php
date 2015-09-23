@@ -134,7 +134,7 @@ class MediaFromFtpCron {
 
 		global $wpdb;
 		$attachments = $wpdb->get_results("
-						SELECT guid
+						SELECT ID
 						FROM $wpdb->posts
 						WHERE post_type = 'attachment'
 						");
@@ -149,17 +149,19 @@ class MediaFromFtpCron {
 			// Input URL
 			list($new_file, $ext, $new_url) = $mediafromftp->input_url($file, $attachments);
 			if ($new_file) {
-				if ( !is_writable(dirname($file)) && wp_ext2type($ext) === 'image' ) {
-					// skip
-				} else if ( !is_writable(dirname($file)) && strlen($file) <> mb_strlen($file) ) {
-					// skip
-				} else {
-					++$count;
-					$date = $mediafromftp->get_date_check($file, $dateset);
-					// Regist
-					list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
+				++$count;
+				$date = $mediafromftp->get_date_check($file, $dateset);
+				// Regist
+				list($attach_id, $new_attach_title, $new_url_attach, $metadata) = $mediafromftp->regist($ext, $new_url, $date, $dateset, $yearmonth_folders);
 
-					if ( ($mail_apply && !$cmdline) || (!$hide && $cmdline) ) {
+				if ( ($mail_apply && !$cmdline) || (!$hide && $cmdline) ) {
+					if ( $attach_id == -1 ) { // error
+						$output_text = NULL;
+						$output_text .= __('File name:').mb_convert_encoding($new_attach_title, "UTF-8", "auto")."\n";
+						$output_text .= __('Directory name:', 'mediafromftp').mb_convert_encoding($new_url_attach, "UTF-8", "auto")."\n";
+						$output_text .= __("You need to make this directory writable before you can register this file. See <a href=\"http://codex.wordpress.org/Changing_File_Permissions\">the Codex</a> for more information. Or, filename must be changed of illegal.", 'mediafromftp')."\n";
+						$output_text .= "\n";
+					} else {
 						// OutputMetaData
 						list($imagethumburls, $mimetype, $length, $stamptime, $file_size) = $mediafromftp->output_metadata($ext, $attach_id, $metadata);
 						$new_url_attachs = explode('/', $new_url_attach);
@@ -183,16 +185,16 @@ class MediaFromFtpCron {
 							}
 						}
 						$output_text .= "\n";
+					}
 
-						if ( $cmdline ) {
-							echo $output_text;
-						} else {
-							$output_mail .= $output_text;
-						}
+					if ( $cmdline ) {
+						echo $output_text;
+					} else {
+						$output_mail .= $output_text;
 					}
-					if ( $count == $pagemax && $limit_number ) {
-						break;
-					}
+				}
+				if ( $count == $pagemax && $limit_number ) {
+					break;
 				}
 			}
 		}
