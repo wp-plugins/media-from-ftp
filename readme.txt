@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 8.7
+Stable tag: 8.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -35,7 +35,58 @@ Translators
 
 == Frequently Asked Questions ==
 
-none
+= Where is it better to upload files? =
+* Upload directory is any of the following locations.
+* Single-site wp-content/uploads
+* Multisite wp-content/uploads/sites/*
+
+= File at the time of registration is moved to another directory. =
+* If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check.
+
+= 'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message. =
+* Media from FTP Settings -> Settings -> Execution time
+* Please increasing the number of seconds.
+
+= I want to change the date at the time of registration. =
+* Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.
+* Please put the check.
+
+= I want to register at the date of the Exif information. =
+* Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information. 
+* Please put the check.
+
+= I would like to hide the files do not need to search & registration screen. =
+* Media from FTP Settings -> Settings -> Exclude file
+* Please enter the exclusion file. It can be a regular expression.
+
+= Periodically, I would like to register. =
+* There is a schedule function.
+* Media from FTP Settings -> Settings -> Schedule
+
+= I want to limit the number of registered every once in a schedule. =
+* Media from FTP Search & Register -> Number of items per page:
+* Enter a numeric value.
+* Media from FTP Settings -> Settings -> Schedule -> Apply Schedule
+* Please put the check.
+* Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.
+* Please put the check.
+
+= I would like to apply a more finely schedule. =
+* Use the mediafromftpcmd.php, please register on the server cron.
+
+= File is located in a large amount. I would like to register without having to worry about the running time. =
+* If you can use the command line, please use the mediafromftpcmd.php.
+
+= mediafromftpcmd.php does not run. =
+* Rewriting is need.
+* Media from FTP Settings -> Command-line
+* Please look at.
+
+= I want to turn off the creation of additional images such as thumbnail. =
+* It conforms to the WordPress settings.
+* Settings-> Media
+* Please change the six values to all zeros. 
+* Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php.
 
 == Screenshots ==
 
@@ -45,6 +96,10 @@ none
 4. File registration result
 
 == Changelog ==
+
+= 8.8 =
+Add FAQ.
+Change /languages.
 
 = 8.7 =
 Fixed problem of search in the file in a multi-domain.
@@ -351,6 +406,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 8.8 =
 = 8.7 =
 = 8.6 =
 = 8.5 =

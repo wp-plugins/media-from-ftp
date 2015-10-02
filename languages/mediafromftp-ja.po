@@ -157,3 +157,117 @@ msgstr "ディレクトリ名:"
 
 msgid "You need to make this directory writable before you can register this file. See <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">the Codex</a> for more information. Or, filename must be changed of illegal."
 msgstr "このファイルを登録するには事前にこのディレクトリを書き込み可能にする必要があります。詳しい情報は <a href=\"http://wpdocs.osdn.jp/%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%83%91%E3%83%BC%E3%83%9F%E3%83%83%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E5%A4%89%E6%9B%B4\" target=\"_blank\">Codex</a> を参照してください。 あるいは、ファイル名が不正で変更する必要があるかもしれません。"
+
+msgid "Where is it better to upload files?"
+msgstr "ファイルのアップロード場所はどこですか？"
+
+msgid "Upload directory is any of the following locations."
+msgstr "アップロードディレクトリは、次のいずれかの場所です。"
+
+msgid "Single-site wp-content/uploads"
+msgstr "シングルサイト wp-content/uploads"
+
+msgid "Multisite wp-content/uploads/sites/*"
+msgstr "マルチサイト wp-content/uploads/sites/*"
+
+msgid "File at the time of registration is moved to another directory."
+msgstr "登録時にファイルが別のディレクトリに移動されます。"
+
+msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+msgstr "'アップロードしたファイルを年月ベースのフォルダに整理' の項目にチェックが入っていると、登録時にファイルを年月ベースのフォルダに移動します。同一ディレクトリで登録したい場合は、チェックをはずしてください。"
+
+msgid "'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message."
+msgstr "Fatal error: Maximum execution time of ** seconds exceeded というエラーが出ます。"
+
+msgid "Media from FTP Settings -> Settings -> Execution time"
+msgstr "Media from FTP 設定ｰ>設定ｰ>実行時間"
+
+msgid "Please increasing the number of seconds."
+msgstr "秒数を増やしてください。"
+
+msgid "I want to change the date at the time of registration."
+msgstr "登録時に日付を変更したいです。"
+
+msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary."
+msgstr "Media from FTP 設定ｰ>設定ｰ>ファイルの日時を取得し、それに基づいて更新。必要に応じて変更。"
+
+msgid "Please put the check."
+msgstr "チェックを入れてください。"
+
+msgid "I want to register at the date of the Exif information."
+msgstr "Exif情報の日付で登録したいです。"
+
+msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information."
+msgstr "Media from FTP 設定ｰ>設定ｰ>ファイルの日時を取得し、それに基づいて更新。必要に応じて変更。Exif情報の日時がある場合に優先的に取得する。"
+
+msgid "I would like to hide the files do not need to search & registration screen."
+msgstr "検索＆登録画面に必要のないファイルを非表示にしたいです。"
+
+msgid "Media from FTP Settings -> Settings -> Exclude file"
+msgstr "Media from FTP 設定ｰ>設定ｰ>除外ファイル"
+
+msgid "Please enter the exclusion file. It can be a regular expression."
+msgstr "除外ファイルを入力してください。正規表現を使用できます。"
+
+msgid "Periodically, I would like to register."
+msgstr "定期的に登録したいです。"
+
+msgid "There is a schedule function."
+msgstr "スケジュール機能があります。"
+
+msgid "Media from FTP Settings -> Settings -> Schedule"
+msgstr "Media from FTP 設定ｰ>設定ｰ>スケジュール"
+
+msgid "I want to limit the number of registered every once in a schedule."
+msgstr "スケジュールで１回毎の登録数を制限したいです。"
+
+msgid "Media from FTP Search & Register -> Number of items per page:"
+msgstr "Media from FTP 検索＆登録ｰ>ページごとに表示する項目数:"
+
+msgid "Enter a numeric value."
+msgstr "数値を入力します。"
+
+msgid "Media from FTP Settings -> Settings -> Schedule -> Apply Schedule"
+msgstr "Media from FTP 設定ｰ>設定ｰ>スケジュールｰ>スケジュールを適用"
+
+msgid "Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files."
+msgstr "Media from FTP 設定ｰ>設定ｰ>スケジュールｰ>更新ファイルの制限数を適用"
+
+msgid "I would like to apply a more finely schedule."
+msgstr "より細かくスケジュールを適用したいです。"
+
+msgid "Use the mediafromftpcmd.php, please register on the server cron."
+msgstr "mediafromftpcmd.phpを、サーバーのcronに登録してください。"
+
+msgid "File is located in a large amount. I would like to register without having to worry about the running time."
+msgstr "ファイルが大量にあります。実行時間を気にせずに登録したいです。"
+
+msgid "If you can use the command line, please use the mediafromftpcmd.php."
+msgstr "コマンドラインを利用できれば、mediafromftpcmd.phpを使用してください。"
+
+msgid "mediafromftpcmd.php does not run."
+msgstr "mediafromftpcmd.phpが動きません。"
+
+msgid "Rewriting is need."
+msgstr "書き換えが必要になります。"
+
+msgid "Media from FTP Settings -> Command-line"
+msgstr "Media from FTP 設定ｰ>設定ｰ>コマンドライン"
+
+msgid "Please look at."
+msgstr "ご覧ください。"
+
+msgid "I want to turn off the creation of additional images such as thumbnail."
+msgstr "サムネイルなどの追加画像を作成したくないです。"
+
+msgid "It conforms to the WordPress settings."
+msgstr "それについてはワードプレスの設定に準拠しています。"
+
+msgid "Settings-> Media"
+msgstr "設定ｰ>メディア"
+
+msgid "Please change the six values to all zeros."
+msgstr "６つの値を全て0に変更してください。"
+
+msgid "Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php."
+msgstr "テーマのfunctions.phpの'set_post_thumbnail_size'や'add_image_size'をコメントアウトしてください。"

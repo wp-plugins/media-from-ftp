@@ -133,6 +133,87 @@ class MediaFromFtpAdmin {
 <a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
 		</div>
 
+		<hr style="border: #CCC 2px solid;">
+
+		<h3>FAQ</h3>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('Where is it better to upload files?', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Upload directory is any of the following locations.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Single-site wp-content/uploads', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Multisite wp-content/uploads/sites/*', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('File at the time of registration is moved to another directory.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e("If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check.", 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e("'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message.", 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Execution time', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please increasing the number of seconds.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to change the date at the time of registration.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to register at the date of the Exif information.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I would like to hide the files do not need to search & registration screen.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Exclude file', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please enter the exclusion file. It can be a regular expression.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('Periodically, I would like to register.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('There is a schedule function.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to limit the number of registered every once in a schedule.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Search & Register -> Number of items per page:', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Enter a numeric value.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply Schedule', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I would like to apply a more finely schedule.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Use the mediafromftpcmd.php, please register on the server cron.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('File is located in a large amount. I would like to register without having to worry about the running time.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('If you can use the command line, please use the mediafromftpcmd.php.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('mediafromftpcmd.php does not run.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Rewriting is need.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Command-line', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please look at.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to turn off the creation of additional images such as thumbnail.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('It conforms to the WordPress settings.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Settings-> Media', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please change the six values to all zeros.', 'mediafromftp'); ?> </h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e("Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php.", 'mediafromftp'); ?></h3>
+		</div>
+
 		</div>
 		<?php
 	}

@@ -160,3 +160,117 @@ msgstr ""
 
 msgid "You need to make this directory writable before you can register this file. See <a href=\"http://codex.wordpress.org/Changing_File_Permissions\" target=\"_blank\">the Codex</a> for more information. Or, filename must be changed of illegal."
 msgstr ""
+
+msgid "Where is it better to upload files?"
+msgstr ""
+
+msgid "Upload directory is any of the following locations."
+msgstr ""
+
+msgid "Single-site wp-content/uploads"
+msgstr ""
+
+msgid "Multisite wp-content/uploads/sites/*"
+msgstr ""
+
+msgid "File at the time of registration is moved to another directory."
+msgstr ""
+
+msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+msgstr ""
+
+msgid "'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Execution time"
+msgstr ""
+
+msgid "Please increasing the number of seconds."
+msgstr ""
+
+msgid "I want to change the date at the time of registration."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary."
+msgstr ""
+
+msgid "Please put the check."
+msgstr ""
+
+msgid "I want to register at the date of the Exif information."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information."
+msgstr ""
+
+msgid "I would like to hide the files do not need to search & registration screen."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Exclude file"
+msgstr ""
+
+msgid "Please enter the exclusion file. It can be a regular expression."
+msgstr ""
+
+msgid "Periodically, I would like to register."
+msgstr ""
+
+msgid "There is a schedule function."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Schedule"
+msgstr ""
+
+msgid "I want to limit the number of registered every once in a schedule."
+msgstr ""
+
+msgid "Media from FTP Search & Register -> Number of items per page:"
+msgstr ""
+
+msgid "Enter a numeric value."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Schedule -> Apply Schedule"
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files."
+msgstr ""
+
+msgid "I would like to apply a more finely schedule."
+msgstr ""
+
+msgid "Use the mediafromftpcmd.php, please register on the server cron."
+msgstr ""
+
+msgid "File is located in a large amount. I would like to register without having to worry about the running time."
+msgstr ""
+
+msgid "If you can use the command line, please use the mediafromftpcmd.php."
+msgstr ""
+
+msgid "mediafromftpcmd.php does not run."
+msgstr ""
+
+msgid "Rewriting is need."
+msgstr ""
+
+msgid "Media from FTP Settings -> Command-line"
+msgstr ""
+
+msgid "Please look at."
+msgstr ""
+
+msgid "I want to turn off the creation of additional images such as thumbnail."
+msgstr ""
+
+msgid "It conforms to the WordPress settings."
+msgstr ""
+
+msgid "Settings-> Media"
+msgstr ""
+
+msgid "Please change the six values to all zeros."
+msgstr ""
+
+msgid "Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php."
+msgstr ""
