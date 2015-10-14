@@ -107,8 +107,8 @@ msgstr "全ての拡張子"
 msgid "File extension"
 msgstr "ファイル拡張子"
 
-msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from line 50)"
-msgstr "【mediafromftpcmd.php]を、以下のように書き換えてください。（50行から57行）"
+msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line %2$d from line %1$d)"
+msgstr "[mediafromftpcmd.php]を、以下のように書き換えてください。（%1$d行から%2$d行）"
 
 msgid "Execution time"
 msgstr "実行時間"
@@ -174,7 +174,34 @@ msgid "File at the time of registration is moved to another directory."
 msgstr "登録時にファイルが別のディレクトリに移動されます。"
 
 msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
-msgstr "'アップロードしたファイルを年月ベースのフォルダに整理' の項目にチェックが入っていると、登録時にファイルを年月ベースのフォルダに移動します。同一ディレクトリで登録したい場合は、チェックをはずしてください。"
+msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」の項目にチェックが入っていると、登録時にファイルを年月ベースのフォルダに移動します。同一ディレクトリで登録したい場合は、チェックをはずしてください。"
+
+msgid "The original file is deleted."
+msgstr "オリジナルファイルが削除されます。"
+
+msgid "The case of the following of this plugin to delete the file."
+msgstr "このプラグインは以下の場合にファイルを削除します。"
+
+msgid "If it contains spaces in the file name. Convert to '-'. And remove original file."
+msgstr "ファイル名にスペースが含まれている場合。スペースを「-」に変換してオリジナルファイルを削除します。"
+
+msgid "If the file name is a multi-byte. It makes the MD5 conversion. And remove original file."
+msgstr "ファイル名にマルチバイト文字が含まれている場合。MD5変換を行いオリジナルファイルを削除します。"
+
+msgid "If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file."
+msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」の項目にチェックが入っている場合。年月ベースのフォルダにファイルをコピーしてオリジナルファイルを削除します。"
+
+msgid "Thumbnail creation, database registration, do in file after copy."
+msgstr "サムネイルの作成とデータベースへの登録は、ファイルのコピー後に行います。"
+
+msgid "The original file is deleted, it will be the one that has been added to eight characters to the end of the file."
+msgstr "オリジナルファイルが削除され、末尾に8文字追加されたファイル名になります。"
+
+msgid "When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end."
+msgstr "メディアライブラリ内に同じファイル名を見つけたときに、ファイル名の重複を避けるために、登録された時の日付と時刻、分、および秒を付加します。"
+
+msgid "Meaning 03193845 -> 3rd 19h38m45s"
+msgstr "意味 -> 3日19時38分45秒"
 
 msgid "'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message."
 msgstr "Fatal error: Maximum execution time of ** seconds exceeded というエラーが出ます。"
@@ -184,6 +211,12 @@ msgstr "Media from FTP 設定ｰ>設定ｰ>実行時間"
 
 msgid "Please increasing the number of seconds."
 msgstr "秒数を増やしてください。"
+
+msgid "'Fatal error: Call to undefined function getopt()' get an error message in Windows Server."
+msgstr "Fatal error: Call to undefined function getopt() というエラーがWindows Serverで出ます。"
+
+msgid "Media from FTP uses the <a href=\"http://php.net/manual/en/function.getopt.php\" target=\"_blank\">getopt</a>. In the case of Windows, please use the PHP5.3.0 higher versions."
+msgstr "Media from FTPは、<a href=\"http://php.net/manual/ja/function.getopt.php\" target=\"_blank\">getopt</a>を使用しています。Windowsの場合には、PHP5.3.0以降のバージョンを使用してください。"
 
 msgid "I want to change the date at the time of registration."
 msgstr "登録時に日付を変更したいです。"

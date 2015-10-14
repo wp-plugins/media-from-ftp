@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 8.8
+Stable tag: 8.81
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -41,11 +41,27 @@ Translators
 * Multisite wp-content/uploads/sites/*
 
 = File at the time of registration is moved to another directory. =
-* If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check.
+* If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+
+= The original file is deleted. =
+* The case of the following of this plugin to delete the file.
+1. If it contains spaces in the file name. Convert to "-". And remove original file. image example.jpg -> image-example.jpg
+2. If the file name is a multi-byte. It makes the MD5 conversion. And remove original file. image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg
+3. If "Organize my uploads into month- and year-based folders" is checked, copy the file to the month- and year-based folder, and then delete the original file. wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg
+
+* Thumbnail creation, database registration, do in file after copy.
+
+= The original file is deleted, it will be the one that has been added to eight characters to the end of the file. =
+* When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end.
+* image-example.jpg -> image-example03193845.jpg
+* Meaning 03193845 -> 3rd 19h38m45s
 
 = 'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message. =
 * Media from FTP Settings -> Settings -> Execution time
 * Please increasing the number of seconds.
+
+= 'Fatal error: Call to undefined function getopt()' get an error message in Windows Server. =
+* Media from FTP uses the [getopt](http://php.net/manual/en/function.getopt.php). In the case of Windows, please use the PHP5.3.0 higher versions.
 
 = I want to change the date at the time of registration. =
 * Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.
@@ -96,6 +112,10 @@ Translators
 4. File registration result
 
 == Changelog ==
+
+= 8.81 =
+Change FAQ.
+Change /languages.
 
 = 8.8 =
 Add FAQ.
@@ -406,6 +426,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 8.81 =
 = 8.8 =
 = 8.7 =
 = 8.6 =

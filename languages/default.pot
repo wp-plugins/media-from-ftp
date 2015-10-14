@@ -110,7 +110,7 @@ msgstr ""
 msgid "File extension"
 msgstr ""
 
-msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from line 50)"
+msgid "Please [mediafromftpcmd.php] rewrite the following manner.(the line %2$d from line %1$d)"
 msgstr ""
 
 msgid "Execution time"
@@ -179,6 +179,33 @@ msgstr ""
 msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
 msgstr ""
 
+msgid "The original file is deleted."
+msgstr ""
+
+msgid "The case of the following of this plugin to delete the file."
+msgstr ""
+
+msgid "If it contains spaces in the file name. Convert to '-'. And remove original file."
+msgstr ""
+
+msgid "If the file name is a multi-byte. It makes the MD5 conversion. And remove original file."
+msgstr ""
+
+msgid "If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file."
+msgstr ""
+
+msgid "Thumbnail creation, database registration, do in file after copy."
+msgstr ""
+
+msgid "The original file is deleted, it will be the one that has been added to eight characters to the end of the file."
+msgstr ""
+
+msgid "When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end."
+msgstr ""
+
+msgid "Meaning 03193845 -> 3rd 19h38m45s"
+msgstr ""
+
 msgid "'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message."
 msgstr ""
 
@@ -186,6 +213,12 @@ msgid "Media from FTP Settings -> Settings -> Execution time"
 msgstr ""
 
 msgid "Please increasing the number of seconds."
+msgstr ""
+
+msgid "'Fatal error: Call to undefined function getopt()' get an error message in Windows Server."
+msgstr ""
+
+msgid "Media from FTP uses the <a href=\"http://php.net/manual/en/function.getopt.php\" target=\"_blank\">getopt</a>. In the case of Windows, please use the PHP5.3.0 higher versions."
 msgstr ""
 
 msgid "I want to change the date at the time of registration."

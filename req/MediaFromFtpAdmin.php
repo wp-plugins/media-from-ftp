@@ -150,9 +150,34 @@ class MediaFromFtpAdmin {
 		</div>
 
 		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('The original file is deleted.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('The case of the following of this plugin to delete the file.', 'mediafromftp'); ?></h3>
+
+		<h3 style="margin: 10px; padding: 0px 20px;">1. <?php _e("If it contains spaces in the file name. Convert to '-'. And remove original file.", "mediafromftp"); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 40px;">image example.jpg -> image-example.jpg</h3>
+		<h3 style="margin: 10px; padding: 0px 20px;">2. <?php _e('If the file name is a multi-byte. It makes the MD5 conversion. And remove original file.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 40px;">image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg</h3>
+		<h3 style="margin: 10px; padding: 0px 20px;">3. <?php _e("If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file.", "mediafromftp"); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 40px;">wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Thumbnail creation, database registration, do in file after copy.', 'mediafromftp'); ?>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('The original file is deleted, it will be the one that has been added to eight characters to the end of the file.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* image-example.jpg -> image-example03193845.jpg</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Meaning 03193845 -> 3rd 19h38m45s', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
 		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e("'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message.", 'mediafromftp'); ?> =</h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Execution time', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please increasing the number of seconds.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e("'Fatal error: Call to undefined function getopt()' get an error message in Windows Server.", 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP uses the <a href="http://php.net/manual/en/function.getopt.php" target="_blank">getopt</a>. In the case of Windows, please use the PHP5.3.0 higher versions.', 'mediafromftp'); ?></h3>
 		</div>
 
 		<div style="padding: 5px 0px;">
@@ -373,7 +398,7 @@ class MediaFromFtpAdmin {
 			<div id="mediafromftp-settings-tabs-2">
 				<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
 				<div style="display:block; padding:5px 10px; font-weight: bold;">
-				1. <?php _e('Please [mediafromftpcmd.php] rewrite the following manner.(the line 57 from line 50)', 'mediafromftp'); ?>
+				1. <?php echo sprintf(__('Please [mediafromftpcmd.php] rewrite the following manner.(the line %2$d from line %1$d)', 'mediafromftp'), 50, 57); ?>
 				</div>
 				<div style="display:block;padding:5px 20px">
 				<?php
@@ -423,7 +448,7 @@ COMMANDLINESET;
 						<div><code>-e</code> <?php _e('Exclude file', 'mediafromftp'); ?> (<?php _e('Regular expression is possible.', 'mediafromftp'); ?>)</div>
 						</div>
 							<div style="display:block;padding:5px 60px">
-							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|.php|.js"</code></div>
+							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-e "(.ktai.)|(.backwpup_log.)|(.ps_auto_sitemap.)|\.php|\.js"</code></div>
 							</div>
 						<div style="display:block;padding:5px 40px">
 						<div><code>-t</code> <?php _e('File type:'); ?> (all, image, audio, video, document, spreadsheet, interactive, text, archive, code)</div>
