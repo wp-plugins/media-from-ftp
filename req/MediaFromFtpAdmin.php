@@ -75,14 +75,15 @@ class MediaFromFtpAdmin {
 	 * @since	2.23
 	 */
 	function load_custom_wp_admin_style() {
-		wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
-		wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
-		wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
-		wp_enqueue_style( 'mediafromftp',  MEDIAFROMFTP_PLUGIN_URL.'/css/mediafromftp.css' );
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
-		wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
-
+		if ($this->is_my_plugin_screen()) {
+			wp_enqueue_style( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/css/jquery.datetimepicker.css' );
+			wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
+			wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
+			wp_enqueue_style( 'mediafromftp',  MEDIAFROMFTP_PLUGIN_URL.'/css/mediafromftp.css' );
+			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
+			wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
+		}
 	}
 
 	/* ==================================================
@@ -90,7 +91,24 @@ class MediaFromFtpAdmin {
 	 * @since	2.24
 	 */
 	function load_custom_wp_admin_style2() {
-		echo $this->add_js();
+		if ($this->is_my_plugin_screen()) {
+			echo $this->add_js();
+		}
+	}
+
+	/* ==================================================
+	 * For only admin style
+	 * @since	8.82
+	 */
+	function is_my_plugin_screen() {
+		$screen = get_current_screen();
+		if (is_object($screen) && $screen->id == 'media-from-ftp_page_mediafromftp-settings') {
+			return TRUE;
+		} else if (is_object($screen) && $screen->id == 'media-from-ftp_page_mediafromftp-search-register') {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
 	}
 
 	/* ==================================================

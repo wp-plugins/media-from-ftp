@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 8.81
+Stable tag: 8.82
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -112,6 +112,9 @@ Translators
 4. File registration result
 
 == Changelog ==
+
+= 8.82 =
+The reading of Javascript and css, on only display of this plugin.
 
 = 8.81 =
 Change FAQ.
@@ -426,6 +429,7 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 8.82 =
 = 8.81 =
 = 8.8 =
 = 8.7 =
