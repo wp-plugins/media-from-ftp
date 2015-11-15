@@ -173,7 +173,7 @@ msgstr "マルチサイト wp-content/uploads/sites/*"
 msgid "File at the time of registration is moved to another directory."
 msgstr "登録時にファイルが別のディレクトリに移動されます。"
 
-msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+msgid "If checked \"Organize my uploads into month- and year-based folders\", it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, Please uncheck."
 msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」の項目にチェックが入っていると、登録時にファイルを年月ベースのフォルダに移動します。同一ディレクトリで登録したい場合は、チェックをはずしてください。"
 
 msgid "The original file is deleted."
@@ -188,8 +188,8 @@ msgstr "ファイル名にスペースが含まれている場合。スペース
 msgid "If the file name is a multi-byte. It makes the MD5 conversion. And remove original file."
 msgstr "ファイル名にマルチバイト文字が含まれている場合。MD5変換を行いオリジナルファイルを削除します。"
 
-msgid "If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file."
-msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」の項目にチェックが入っている場合。年月ベースのフォルダにファイルをコピーしてオリジナルファイルを削除します。"
+msgid "If checked \"Organize my uploads into month- and year-based folders\", it copy the file to the \"month- and year-based folder\" and then delete the original file."
+msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」の項目にチェックが入っていると、ファイルを年月ベースのフォルダにコピーし、オリジナルファイルを削除します。"
 
 msgid "Thumbnail creation, database registration, do in file after copy."
 msgstr "サムネイルの作成とデータベースへの登録は、ファイルのコピー後に行います。"
@@ -224,7 +224,7 @@ msgstr "登録時に日付を変更したいです。"
 msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary."
 msgstr "Media from FTP 設定ｰ>設定ｰ>ファイルの日時を取得し、それに基づいて更新。必要に応じて変更。"
 
-msgid "Please put the check."
+msgid "Please checked."
 msgstr "チェックを入れてください。"
 
 msgid "I want to register at the date of the Exif information."
@@ -304,3 +304,21 @@ msgstr "６つの値を全て0に変更してください。"
 
 msgid "Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php."
 msgstr "テーマのfunctions.phpの'set_post_thumbnail_size'や'add_image_size'をコメントアウトしてください。"
+
+msgid "I will not find a file with name like this: a-b-0x0.jpg."
+msgstr "a-b-0x0.jpgの様な名前のファイルを検索できません。"
+
+msgid "WordPress thumbnails, adds the suffix -80x80 like this: filename-80x80.jpg. Media from FTP, exclude the search of the thumbnail. Please change the file name."
+msgstr "ワードプレスは-80x80の様な接尾辞を付加して、filename-80x80.jpgという様なサムネイルをつくります。Media from FTPはサムネイルの検索を除外します。ファイル名を変更してください。"
+
+msgid "I want to register file for any folder."
+msgstr "任意のフォルダにファイルを登録したいです。"
+
+msgid "I want to register file to \"month- and year-based folders\" without relevant to the timestamp of the file."
+msgstr "ファイルのタイムスタンプとは無関係に「年月ベースのフォルダ」にファイルを登録したいです。"
+
+msgid "Media from FTP Settings -> Settings -> Date"
+msgstr "Media from FTP 設定 -> 設定 -> 日付"
+
+msgid "Uncheck of \"Organize my uploads into month- and year-based folders\"."
+msgstr "「アップロードしたファイルを年月ベースのフォルダに整理」のチェックを外してください。"

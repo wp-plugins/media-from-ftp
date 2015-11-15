@@ -145,7 +145,7 @@ class MediaFromFtpAdmin {
 		<a style="text-decoration: none;" href="https://wordpress.org/support/view/plugin-reviews/media-from-ftp" target="_blank"><?php _e('Reviews', 'mediafromftp') ?></a>
 		</h4>
 
-		<div style="width: 250px; height: 170px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
+		<div style="width: 250px; height: 180px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
 		<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
 		<div style="text-align: right; margin: 5px; padding: 5px;"><span style="padding: 3px; color: #ffffff; background-color: #008000">Plugin Author</span> <span style="font-weight: bold;">Katsushi Kawamori</span></div>
 <a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
@@ -156,6 +156,11 @@ class MediaFromFtpAdmin {
 		<h3>FAQ</h3>
 
 		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I will not find a file with name like this: a-b-0x0.jpg.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('WordPress thumbnails, adds the suffix -80x80 like this: filename-80x80.jpg. Media from FTP, exclude the search of the thumbnail. Please change the file name.', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
 		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('Where is it better to upload files?', 'mediafromftp'); ?> =</h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Upload directory is any of the following locations.', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Single-site wp-content/uploads', 'mediafromftp'); ?></h3>
@@ -163,8 +168,20 @@ class MediaFromFtpAdmin {
 		</div>
 
 		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to register file for any folder.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Uncheck of "Organize my uploads into month- and year-based folders".', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
+		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to register file to "month- and year-based folders" without relevant to the timestamp of the file.', 'mediafromftp'); ?> =</h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Uncheck of "Organize my uploads into month- and year-based folders".', 'mediafromftp'); ?></h3>
+		</div>
+
+		<div style="padding: 5px 0px;">
 		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('File at the time of registration is moved to another directory.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e("If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check.", 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('If checked "Organize my uploads into month- and year-based folders", it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, Please uncheck.', 'mediafromftp'); ?></h3>
 		</div>
 
 		<div style="padding: 5px 0px;">
@@ -175,7 +192,7 @@ class MediaFromFtpAdmin {
 		<h3 style="margin: 10px; padding: 0px 40px;">image example.jpg -> image-example.jpg</h3>
 		<h3 style="margin: 10px; padding: 0px 20px;">2. <?php _e('If the file name is a multi-byte. It makes the MD5 conversion. And remove original file.', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 40px;">image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg</h3>
-		<h3 style="margin: 10px; padding: 0px 20px;">3. <?php _e("If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file.", "mediafromftp"); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 20px;">3. <?php _e('If checked "Organize my uploads into month- and year-based folders", it copy the file to the "month- and year-based folder" and then delete the original file.', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 40px;">wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg</h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Thumbnail creation, database registration, do in file after copy.', 'mediafromftp'); ?>
 		</div>
@@ -201,13 +218,13 @@ class MediaFromFtpAdmin {
 		<div style="padding: 5px 0px;">
 		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to change the date at the time of registration.', 'mediafromftp'); ?> =</h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please checked.', 'mediafromftp'); ?></h3>
 		</div>
 
 		<div style="padding: 5px 0px;">
 		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to register at the date of the Exif information.', 'mediafromftp'); ?> =</h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please checked.', 'mediafromftp'); ?></h3>
 		</div>
 
 		<div style="padding: 5px 0px;">
@@ -227,9 +244,9 @@ class MediaFromFtpAdmin {
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Search & Register -> Number of items per page:', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Enter a numeric value.', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply Schedule', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please checked.', 'mediafromftp'); ?></h3>
 		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please checked.', 'mediafromftp'); ?></h3>
 		</div>
 
 		<div style="padding: 5px 0px;">
@@ -1125,10 +1142,6 @@ MEDIAFROMFTP4;
 
 		return $mediafromftp_add_js;
 
-	}
-
-	function modify_attachment_link($markup) {
-	    return preg_replace('/^<a([^>]+)>(.*)$/', '<a\\1 target="_blank">\\2', $markup);
 	}
 
 }
