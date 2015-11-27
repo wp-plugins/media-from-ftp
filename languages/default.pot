@@ -4,11 +4,11 @@ msgstr ""
 "POT-Creation-Date: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Katsushi Kawamori <dodesyoswift312@gmail.com>\n"
-"Language-Team:  <dodesyoswift312@gmail.com>\n"
+"Language-Team: dodesyoswift312@gmail.com\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.6.7\n"
+"X-Generator: Poedit 1.8.4\n"
 
 msgid "Search & Register"
 msgstr ""
@@ -25,9 +25,7 @@ msgstr ""
 msgid "There is no file that is not registered in the media library."
 msgstr ""
 
-msgid ""
-"These files is a file that is not registered in the media library. "
-"And can be registered."
+msgid "These files is a file that is not registered in the media library. And can be registered."
 msgstr ""
 
 msgid "Regular expression is possible."
@@ -36,9 +34,7 @@ msgstr ""
 msgid "Update to use of the current date/time."
 msgstr ""
 
-msgid ""
-"Get the date/time of the file, and updated based on it. Change it if "
-"necessary."
+msgid "Get the date/time of the file, and updated based on it. Change it if necessary."
 msgstr ""
 
 msgid "Get by priority if there is date and time of the Exif information."
@@ -176,7 +172,7 @@ msgstr ""
 msgid "File at the time of registration is moved to another directory."
 msgstr ""
 
-msgid "If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+msgid "If checked \"Organize my uploads into month- and year-based folders\", it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, Please uncheck."
 msgstr ""
 
 msgid "The original file is deleted."
@@ -191,7 +187,7 @@ msgstr ""
 msgid "If the file name is a multi-byte. It makes the MD5 conversion. And remove original file."
 msgstr ""
 
-msgid "If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file."
+msgid "If checked \"Organize my uploads into month- and year-based folders\", it copy the file to the \"month- and year-based folder\" and then delete the original file."
 msgstr ""
 
 msgid "Thumbnail creation, database registration, do in file after copy."
@@ -227,10 +223,22 @@ msgstr ""
 msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary."
 msgstr ""
 
-msgid "Please put the check."
+msgid "Please checked."
 msgstr ""
 
 msgid "I want to register at the date of the Exif information."
+msgstr ""
+
+msgid "I want to register the Exif information in the caption of the media library."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Exif Caption"
+msgstr ""
+
+msgid "In Exif Caption, I want to change the display order of the Exif."
+msgstr ""
+
+msgid "Please swapping the order of the Exif Tags. Please save your settings."
 msgstr ""
 
 msgid "Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information."
@@ -306,4 +314,34 @@ msgid "Please change the six values to all zeros."
 msgstr ""
 
 msgid "Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php."
+msgstr ""
+
+msgid "I will not find a file with name like this: a-b-0x0.jpg."
+msgstr ""
+
+msgid "WordPress thumbnails, adds the suffix -80x80 like this: filename-80x80.jpg. Media from FTP, exclude the search of the thumbnail. Please change the file name."
+msgstr ""
+
+msgid "I want to register file for any folder."
+msgstr ""
+
+msgid "I want to register file to \"month- and year-based folders\" without relevant to the timestamp of the file."
+msgstr ""
+
+msgid "Media from FTP Settings -> Settings -> Date"
+msgstr ""
+
+msgid "Uncheck of \"Organize my uploads into month- and year-based folders\"."
+msgstr ""
+
+msgid "Register the Exif data to the caption."
+msgstr ""
+
+msgid "For Exif tags, please read here."
+msgstr ""
+
+msgid "Exif tags for registering in the caption"
+msgstr ""
+
+msgid "If you want to insert the Exif in the media that have already been registered in the media library, Please use the %1$s."
 msgstr ""

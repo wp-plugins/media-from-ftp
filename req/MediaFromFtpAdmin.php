@@ -80,7 +80,10 @@ class MediaFromFtpAdmin {
 			wp_enqueue_style( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/css/responsive-tabs.css' );
 			wp_enqueue_style( 'jquery-responsiveTabs-style', MEDIAFROMFTP_PLUGIN_URL.'/css/style.css' );
 			wp_enqueue_style( 'mediafromftp',  MEDIAFROMFTP_PLUGIN_URL.'/css/mediafromftp.css' );
+			global $wp_scripts;
+			wp_enqueue_style('jquery-ui', "http://ajax.googleapis.com/ajax/libs/jqueryui/{$wp_scripts->registered['jquery-ui-core']->ver}/themes/smoothness/jquery-ui.min.css");
 			wp_enqueue_script( 'jquery' );
+			wp_enqueue_script( 'jquery-ui-accordion' );
 			wp_enqueue_script( 'jquery-datetimepicker', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.datetimepicker.js', null, '2.3.4' );
 			wp_enqueue_script( 'jquery-responsiveTabs', MEDIAFROMFTP_PLUGIN_URL.'/js/jquery.responsiveTabs.min.js' );
 		}
@@ -102,7 +105,9 @@ class MediaFromFtpAdmin {
 	 */
 	function is_my_plugin_screen() {
 		$screen = get_current_screen();
-		if (is_object($screen) && $screen->id == 'media-from-ftp_page_mediafromftp-settings') {
+		if (is_object($screen) && $screen->id == 'toplevel_page_mediafromftp') {
+			return TRUE;
+		} else if (is_object($screen) && $screen->id == 'media-from-ftp_page_mediafromftp-settings') {
 			return TRUE;
 		} else if (is_object($screen) && $screen->id == 'media-from-ftp_page_mediafromftp-search-register') {
 			return TRUE;
@@ -145,7 +150,7 @@ class MediaFromFtpAdmin {
 		<a style="text-decoration: none;" href="https://wordpress.org/support/view/plugin-reviews/media-from-ftp" target="_blank"><?php _e('Reviews', 'mediafromftp') ?></a>
 		</h4>
 
-		<div style="width: 250px; height: 170px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
+		<div style="width: 250px; height: 180px; margin: 5px; padding: 5px; border: #CCC 2px solid;">
 		<h3><?php _e('Please make a donation if you like my work or would like to further the development of this plugin.', 'mediafromftp'); ?></h3>
 		<div style="text-align: right; margin: 5px; padding: 5px;"><span style="padding: 3px; color: #ffffff; background-color: #008000">Plugin Author</span> <span style="font-weight: bold;">Katsushi Kawamori</span></div>
 <a style="margin: 5px; padding: 5px;" href='https://pledgie.com/campaigns/28307' target="_blank"><img alt='Click here to lend your support to: Various Plugins for WordPress and make a donation at pledgie.com !' src='https://pledgie.com/campaigns/28307.png?skin_name=chrome' border='0' ></a>
@@ -155,106 +160,130 @@ class MediaFromFtpAdmin {
 
 		<h3>FAQ</h3>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('Where is it better to upload files?', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Upload directory is any of the following locations.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Single-site wp-content/uploads', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Multisite wp-content/uploads/sites/*', 'mediafromftp'); ?></h3>
+		<div id="mediafromftp-faq-accordion">
+
+		<h3><?php _e('I will not find a file with name like this: a-b-0x0.jpg.', 'mediafromftp'); ?></h3>
+		<div>* <?php _e('WordPress thumbnails, adds the suffix -80x80 like this: filename-80x80.jpg. Media from FTP, exclude the search of the thumbnail. Please change the file name.', 'mediafromftp'); ?></div>
+
+		<h3><?php _e('Where is it better to upload files?', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Upload directory is any of the following locations.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Single-site wp-content/uploads', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Multisite wp-content/uploads/sites/*', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('File at the time of registration is moved to another directory.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e("If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check.", 'mediafromftp'); ?></h3>
+		<h3><?php _e('I want to register file for any folder.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Date', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Uncheck of "Organize my uploads into month- and year-based folders".', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('The original file is deleted.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('The case of the following of this plugin to delete the file.', 'mediafromftp'); ?></h3>
-
-		<h3 style="margin: 10px; padding: 0px 20px;">1. <?php _e("If it contains spaces in the file name. Convert to '-'. And remove original file.", "mediafromftp"); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 40px;">image example.jpg -> image-example.jpg</h3>
-		<h3 style="margin: 10px; padding: 0px 20px;">2. <?php _e('If the file name is a multi-byte. It makes the MD5 conversion. And remove original file.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 40px;">image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg</h3>
-		<h3 style="margin: 10px; padding: 0px 20px;">3. <?php _e("If 'Organize my uploads into month- and year-based folders' is checked, copy the file to the month- and year-based folder, and then delete the original file.", "mediafromftp"); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 40px;">wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Thumbnail creation, database registration, do in file after copy.', 'mediafromftp'); ?>
+		<h3><?php _e('I want to register file to "month- and year-based folders" without relevant to the timestamp of the file.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Date', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Uncheck of "Organize my uploads into month- and year-based folders".', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('The original file is deleted, it will be the one that has been added to eight characters to the end of the file.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* image-example.jpg -> image-example03193845.jpg</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Meaning 03193845 -> 3rd 19h38m45s', 'mediafromftp'); ?></h3>
+		<h3><?php _e('File at the time of registration is moved to another directory.', 'mediafromftp'); ?></h3>
+		<div>* <?php _e('If checked "Organize my uploads into month- and year-based folders", it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, Please uncheck.', 'mediafromftp'); ?></div>
+
+		<h3><?php _e('The original file is deleted.', 'mediafromftp'); ?></h3>
+		<div>
+		<div style="margin: 10px; padding: 0px 10px;">* <?php _e('The case of the following of this plugin to delete the file.', 'mediafromftp'); ?></div>
+
+		<div style="margin: 10px; padding: 0px 20px;">1. <?php _e("If it contains spaces in the file name. Convert to '-'. And remove original file.", "mediafromftp"); ?></div>
+		<div style="margin: 10px; padding: 0px 40px;">image example.jpg -> image-example.jpg</div>
+		<div style="margin: 10px; padding: 0px 20px;">2. <?php _e('If the file name is a multi-byte. It makes the MD5 conversion. And remove original file.', 'mediafromftp'); ?></div>
+		<div style="margin: 10px; padding: 0px 40px;">image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg</div>
+		<div style="margin: 10px; padding: 0px 20px;">3. <?php _e('If checked "Organize my uploads into month- and year-based folders", it copy the file to the "month- and year-based folder" and then delete the original file.', 'mediafromftp'); ?></div>
+		<div style="margin: 10px; padding: 0px 40px;">wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg</div>
+		<div style="margin: 10px; padding: 0px 10px;">* <?php _e('Thumbnail creation, database registration, do in file after copy.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e("'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message.", 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Execution time', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please increasing the number of seconds.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('The original file is deleted, it will be the one that has been added to eight characters to the end of the file.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('When find the same file name in the media library in order to avoid duplication of the file, adds the date and time, minute, and second at the time it was registered in the end.', 'mediafromftp'); ?></div>
+		<div>* image-example.jpg -> image-example03193845.jpg</div>
+		<div>* <?php _e('Meaning 03193845 -> 3rd 19h38m45s', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e("'Fatal error: Call to undefined function getopt()' get an error message in Windows Server.", 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP uses the <a href="http://php.net/manual/en/function.getopt.php" target="_blank">getopt</a>. In the case of Windows, please use the PHP5.3.0 higher versions.', 'mediafromftp'); ?></h3>
+		<h3><?php _e("'Fatal error: Maximum execution time of ** seconds exceeded.' get an error message.", 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Execution time', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please increasing the number of seconds.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to change the date at the time of registration.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3><?php _e("'Fatal error: Call to undefined function getopt()' get an error message in Windows Server.", 'mediafromftp'); ?></h3>
+		<div>* <?php _e('Media from FTP uses the <a href="http://php.net/manual/en/function.getopt.php" target="_blank">getopt</a>. In the case of Windows, please use the PHP5.3.0 higher versions.', 'mediafromftp'); ?></div>
+
+		<h3><?php _e('I want to change the date at the time of registration.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please checked.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to register at the date of the Exif information.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('I want to register at the date of the Exif information.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please checked.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I would like to hide the files do not need to search & registration screen.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Exclude file', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please enter the exclusion file. It can be a regular expression.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('I want to register the Exif information in the caption of the media library.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Exif Caption', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please checked.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('Periodically, I would like to register.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('There is a schedule function.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule', 'mediafromftp'); ?></h3>
+		<h3><?php _e('In Exif Caption, I want to change the display order of the Exif.', 'mediafromftp'); ?></h3>
+		<div>* <?php _e('Please swapping the order of the Exif Tags. Please save your settings.', 'mediafromftp'); ?></div>
+
+		<h3><?php _e('I would like to hide the files do not need to search & registration screen.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Exclude file', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please enter the exclusion file. It can be a regular expression.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to limit the number of registered every once in a schedule.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Search & Register -> Number of items per page:', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Enter a numeric value.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply Schedule', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please put the check.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('Periodically, I would like to register.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('There is a schedule function.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Schedule', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I would like to apply a more finely schedule.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Use the mediafromftpcmd.php, please register on the server cron.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('I want to limit the number of registered every once in a schedule.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Media from FTP Search & Register -> Number of items per page:', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Enter a numeric value.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply Schedule', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please checked.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please checked.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('File is located in a large amount. I would like to register without having to worry about the running time.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('If you can use the command line, please use the mediafromftpcmd.php.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('I would like to apply a more finely schedule.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Use the mediafromftpcmd.php, please register on the server cron.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('mediafromftpcmd.php does not run.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Rewriting is need.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Media from FTP Settings -> Command-line', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please look at.', 'mediafromftp'); ?></h3>
+		<h3><?php _e('File is located in a large amount. I would like to register without having to worry about the running time.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('If you can use the command line, please use the mediafromftpcmd.php.', 'mediafromftp'); ?></div>
 		</div>
 
-		<div style="padding: 5px 0px;">
-		<h3 style="margin: 5px; padding: 0px 5px;">= <?php _e('I want to turn off the creation of additional images such as thumbnail.', 'mediafromftp'); ?> =</h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('It conforms to the WordPress settings.', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Settings-> Media', 'mediafromftp'); ?></h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e('Please change the six values to all zeros.', 'mediafromftp'); ?> </h3>
-		<h3 style="margin: 10px; padding: 0px 10px;">* <?php _e("Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php.", 'mediafromftp'); ?></h3>
+		<h3><?php _e('mediafromftpcmd.php does not run.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('Rewriting is need.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Media from FTP Settings -> Command-line', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please look at.', 'mediafromftp'); ?></div>
+		</div>
+
+		<h3><?php _e('I want to turn off the creation of additional images such as thumbnail.', 'mediafromftp'); ?></h3>
+		<div>
+		<div>* <?php _e('It conforms to the WordPress settings.', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Settings-> Media', 'mediafromftp'); ?></div>
+		<div>* <?php _e('Please change the six values to all zeros.', 'mediafromftp'); ?> </div>
+		<div>* <?php _e("Please comment out the 'set_post_thumbnail_size' or 'add_image_size' of theme's functions.php.", 'mediafromftp'); ?></div>
+		</div>
+
 		</div>
 
 		</div>
@@ -329,6 +358,38 @@ class MediaFromFtpAdmin {
 					<div style="display: block; padding:5px 5px">
 					<input type="checkbox" name="move_yearmonth_folders" value="1" <?php checked('1', get_option('uploads_use_yearmonth_folders')); ?> />
 					<?php _e('Organize my uploads into month- and year-based folders'); ?>
+					</div>
+				</div>
+
+				<div class="item-mediafromftp-settings">
+					<h3>Exif <?php _e('Caption'); ?></h3>
+					<div style="display:block;padding:5px 0">
+					<?php _e('Register the Exif data to the caption.', 'mediafromftp'); ?>
+					</div>
+					<div style="display:block;padding:5px 0">
+					<input type="checkbox" name="mediafromftp_caption_apply" value="1" <?php checked('1', $mediafromftp_settings['caption']['apply']); ?> />
+					<?php _e('Apply'); ?>
+					</div>
+					<div style="display: block; padding:5px 20px;">
+						Exif <?php _e('Tags'); ?>
+						<input type="submit" style="position:relative; top:-5px;" class="button" name="mediafromftp_exif_default" value="<?php _e('Default') ?>" />
+						<div style="display: block; padding:5px 20px;">
+						<textarea name="mediafromftp_exif_text" style="width: 100%;"><?php echo $mediafromftp_settings['caption']['exif_text']; ?></textarea>
+							<div>
+							<a href="https://codex.wordpress.org/Function_Reference/wp_read_image_metadata#Return%20Values" target="_blank" style="text-decoration: none; word-break: break-all;"><?php _e('For Exif tags, please read here.', 'mediafromftp'); ?></a>
+							</div>
+						</div>
+					</div>
+					<div>
+					<?php
+						if ( is_multisite() ) {
+							$exifcaption_install_url = network_admin_url('plugin-install.php?tab=plugin-information&plugin=exif-caption');
+						} else {
+							$exifcaption_install_url = admin_url('plugin-install.php?tab=plugin-information&plugin=exif-caption');
+						}
+						$exifcaption_install_html = '<a href="'.$exifcaption_install_url.'" target="_blank" style="text-decoration: none; word-break: break-all;">Exif Caption</a>';
+						echo sprintf(__('If you want to insert the Exif in the media that have already been registered in the media library, Please use the %1$s.','mediafromftp'), $exifcaption_install_html);
+					?>
 					</div>
 				</div>
 
@@ -416,7 +477,7 @@ class MediaFromFtpAdmin {
 			<div id="mediafromftp-settings-tabs-2">
 				<h3><?php _e('Command-line', 'mediafromftp'); ?></h3>
 				<div style="display:block; padding:5px 10px; font-weight: bold;">
-				1. <?php echo sprintf(__('Please [mediafromftpcmd.php] rewrite the following manner.(the line %2$d from line %1$d)', 'mediafromftp'), 50, 57); ?>
+				1. <?php echo sprintf(__('Please [mediafromftpcmd.php] rewrite the following manner.(the line %2$d from line %1$d)', 'mediafromftp'), 51, 58); ?>
 				</div>
 				<div style="display:block;padding:5px 20px">
 				<?php
@@ -485,6 +546,12 @@ COMMANDLINESET;
 						</div>
 							<div style="display:block;padding:5px 60px">
 							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-p 10</code></div>
+							</div>
+						<div style="display:block;padding:5px 40px">
+						<div><code>-c</code> <?php _e('Exif tags for registering in the caption' , 'mediafromftp'); ?></div>
+						</div>
+							<div style="display:block;padding:5px 60px">
+							<div><?php _e('Example:', 'mediafromftp'); ?> <code>-c "%title% %credit% %camera% %caption% %created_timestamp% %copyright% %aperture% %shutter_speed% %iso% %focal_length%"</code></div>
 							</div>
 					<div><?php _e('If the argument is empty, use the set value of the management screen.', 'mediafromftp'); ?></div>
 					</div>
@@ -807,6 +874,10 @@ COMMANDLINESET;
 				<?php
 				$dateset = $mediafromftp_settings['dateset'];
 				$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
+				$exif_text_tag = NULL;
+				if ( $mediafromftp_settings['caption']['apply'] ) {
+					$exif_text_tag = $mediafromftp_settings['caption']['exif_text'];
+				}
 				$regist_count = 0;
 				foreach ( $new_url_attaches as $postkey1 => $postval1 ){
 					foreach ( $postval1 as $postkey2 => $postval2 ){
@@ -846,6 +917,15 @@ COMMANDLINESET;
 										$output_html .= '[<a href="'.$imagethumburl.'" target="_blank" style="text-decoration: none; word-break: break-all;">'.$thumbsize.'</a>]';
 									}
 									$output_html .= '</div>';
+									if ( !empty($exif_text_tag) ) {
+										$mime_type = $mediafromftp->mime_type($ext);
+										if ( $mime_type === 'image/jpeg' || $mime_type === 'image/tiff' ) {
+											$exif_text = $mediafromftp->exifcaption($attach_id, $metadata, $exif_text_tag);
+											if ( !empty($exif_text) ) {
+												$output_html .= '<div>'.__('Caption').'[Exif]: '.$exif_text.'</div>';
+											}
+										}
+									}
 								} else {
 									$output_html .= '<div>'.__('File type:').' '.$mimetype.'</div>';
 									$output_html .= '<div>'.__('File size:').' '.size_format($file_size).'</div>';
@@ -966,6 +1046,20 @@ COMMANDLINESET;
 					} else {
 						$mediafromftp_cron_mail_apply = FALSE;
 					}
+					if ( !empty($_POST['mediafromftp_caption_apply']) ) {
+						$mediafromftp_caption_apply = $_POST['mediafromftp_caption_apply'];
+					} else {
+						$mediafromftp_caption_apply = FALSE;
+					}
+					if ( !empty($_POST['mediafromftp_exif_text']) ) {
+						$exif_text = $_POST['mediafromftp_exif_text'];
+					} else {
+						$exif_text = $mediafromftp_settings['caption']['exif_text'];
+					}
+					if ( !empty($_POST['mediafromftp_exif_default']) ) {
+						$exif_text = '%title% %credit% %camera% %caption% %created_timestamp% %copyright% %aperture% %shutter_speed% %iso% %focal_length%';
+					}
+
 					$mediafromftp_tbl = array(
 										'pagemax' => $mediafromftp_settings['pagemax'],
 										'basedir' => $mediafromftp_settings['basedir'],
@@ -982,6 +1076,10 @@ COMMANDLINESET;
 													'mail_apply' => $mediafromftp_cron_mail_apply,
 													'mail' => $mediafromftp_settings['cron']['mail'],
 													'user' => $mediafromftp_settings['cron']['user']
+													),
+										'caption' => array(
+													'apply' => $mediafromftp_caption_apply,
+													'exif_text' => $exif_text
 													)
 										);
 					update_option( 'mediafromftp_settings', $mediafromftp_tbl );
@@ -1062,7 +1160,11 @@ COMMANDLINESET;
 												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
 												'mail' => $mediafromftp_settings['cron']['mail'],
 												'user' => $mediafromftp_settings['cron']['user']
-												)
+												),
+									'caption' => array(
+													'apply' => $mediafromftp_settings['caption']['apply'],
+													'exif_text' => $mediafromftp_settings['caption']['exif_text']
+													)
 									);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 				break;
@@ -1080,6 +1182,13 @@ COMMANDLINESET;
 $mediafromftp_add_js = <<<MEDIAFROMFTP1
 
 <!-- BEGIN: Media from FTP -->
+<script type="text/javascript">
+jQuery(function() {
+  jQuery( "#mediafromftp-faq-accordion" ).accordion({
+	heightStyle: "content"
+	});
+});
+</script>
 <script type="text/javascript">
 jQuery(function(){
   jQuery('.mediafromftp-checkAll').on('change', function() {
@@ -1125,10 +1234,6 @@ MEDIAFROMFTP4;
 
 		return $mediafromftp_add_js;
 
-	}
-
-	function modify_attachment_link($markup) {
-	    return preg_replace('/^<a([^>]+)>(.*)$/', '<a\\1 target="_blank">\\2', $markup);
 	}
 
 }

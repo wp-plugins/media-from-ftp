@@ -34,6 +34,7 @@ class MediaFromFtpRegist {
 		$user = wp_get_current_user();
 		$cron_mail = $user->user_email;
 		$cron_user = $user->ID;
+		$exif_text = '%title% %credit% %camera% %caption% %created_timestamp% %copyright% %aperture% %shutter_speed% %iso% %focal_length%';
 
 		// << version 2.35
 		if ( get_option('mediafromftp_exclude_file') ) {
@@ -58,7 +59,11 @@ class MediaFromFtpRegist {
 											'mail_apply' => TRUE,
 											'mail' => $cron_mail,
 											'user' => $cron_user
-											)
+											),
+								'caption' => array(
+												'apply' => FALSE,
+												'exif_text' => $exif_text
+												)
 							);
 			update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 		} else {
@@ -264,7 +269,7 @@ class MediaFromFtpRegist {
 												)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
-			} else if ( $plugin_version >= 8.7 ) {
+			} else if ( $plugin_version >= 8.7 && $plugin_version < 9.00 ) {
 				$mediafromftp_tbl = array(
 									'pagemax' => $mediafromftp_settings['pagemax'],
 									'basedir' => $mediafromftp_settings['basedir'],
@@ -282,6 +287,37 @@ class MediaFromFtpRegist {
 												'mail' => $cron_mail,
 												'user' => $cron_user
 												)
+								);
+				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
+			} else if ( $plugin_version >= 9.00 ) {
+				if ( array_key_exists( "caption", $mediafromftp_settings ) ) {
+					$caption_apply = $mediafromftp_settings['caption']['apply'];
+					$caption_exif_text = $mediafromftp_settings['caption']['exif_text'];
+				} else {
+					$caption_apply = FALSE;
+					$caption_exif_text = $exif_text;
+				}
+				$mediafromftp_tbl = array(
+									'pagemax' => $mediafromftp_settings['pagemax'],
+									'basedir' => $mediafromftp_settings['basedir'],
+									'searchdir' => $mediafromftp_settings['searchdir'],
+									'ext2typefilter' => $mediafromftp_settings['ext2typefilter'],
+									'extfilter' => $mediafromftp_settings['extfilter'],
+									'dateset' => $mediafromftp_settings['dateset'],
+									'max_execution_time' => $mediafromftp_settings['max_execution_time'],
+									'exclude' => $mediafromftp_settings['exclude'],
+									'cron' => array(
+												'apply' => $mediafromftp_settings['cron']['apply'],
+												'schedule' => $mediafromftp_settings['cron']['schedule'],
+												'limit_number' => $mediafromftp_settings['cron']['limit_number'],
+												'mail_apply' => $mediafromftp_settings['cron']['mail_apply'],
+												'mail' => $cron_mail,
+												'user' => $cron_user
+												),
+									'caption' => array(
+													'apply' => $caption_apply,
+													'exif_text' => $caption_exif_text
+													)
 								);
 				update_option( 'mediafromftp_settings', $mediafromftp_tbl );
 			}

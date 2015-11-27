@@ -4,7 +4,7 @@ Donate link: http://pledgie.com/campaigns/28307
 Tags: admin, attachment, attachments, ftp, gallery, image preview, image upload, images, import, importer, media, media library, schedule, sync, synchronize, upload, uploader
 Requires at least: 3.6.0
 Tested up to: 4.3
-Stable tag: 8.82
+Stable tag: 9.01
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,6 +16,7 @@ Register to media library from files that have been uploaded by FTP.
 * This create a thumbnail of the image file.
 * This create a metadata(Images, Videos, Audios).
 * Change the date/time.
+* Register the Exif data to the caption.
 * Work with [DateTimePicker](http://xdsoft.net/jqplugins/datetimepicker/). jQuery plugin select date/time.
 * If use the Schedule options, can periodically run.
 * The execution of the command line is supported.(mediafromftpcmd.php)
@@ -35,20 +36,30 @@ Translators
 
 == Frequently Asked Questions ==
 
+= I will not find a file with name like this: a-b-0x0.jpg. =
+* WordPress thumbnails, adds the suffix -80x80 like this: filename-80x80.jpg. Media from FTP, exclude the search of the thumbnail. Please change the file name.
+
 = Where is it better to upload files? =
 * Upload directory is any of the following locations.
 * Single-site wp-content/uploads
 * Multisite wp-content/uploads/sites/*
 
+= I want to register file for any folder. =
+* Media from FTP Settings -> Settings -> Date.
+* Uncheck of "Organize my uploads into month- and year-based folders".
+
+= I want to register file to "month- and year-based folders" without relevant to the timestamp of the file. =
+* Media from FTP Settings -> Settings -> Date.
+* Uncheck of "Organize my uploads into month- and year-based folders".
+
 = File at the time of registration is moved to another directory. =
-* If the 'uploads_use_yearmonth_folders' is set to true (checkbox if checked in the administration settings panel), it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, please remove the check."
+* If checked "Organize my uploads into month- and year-based folders", it will move the file at the time of registration to year month-based folders. If you want to register in the same directory, Please uncheck.
 
 = The original file is deleted. =
 * The case of the following of this plugin to delete the file.
 1. If it contains spaces in the file name. Convert to "-". And remove original file. image example.jpg -> image-example.jpg
 2. If the file name is a multi-byte. It makes the MD5 conversion. And remove original file. image例.jpg -> 2edd9ad56212ce13a39f25b429b09012.jpg
-3. If "Organize my uploads into month- and year-based folders" is checked, copy the file to the month- and year-based folder, and then delete the original file. wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg
-
+3. If checked "Organize my uploads into month- and year-based folders", it copy the file to the "month- and year-based folder" and then delete the original file. wp-content/uploads/sites/2/image-example.jpg -> wp-content/uploads/sites/2/2015/09/image-example.jpg
 * Thumbnail creation, database registration, do in file after copy.
 
 = The original file is deleted, it will be the one that has been added to eight characters to the end of the file. =
@@ -65,11 +76,17 @@ Translators
 
 = I want to change the date at the time of registration. =
 * Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.
-* Please put the check.
+* Please checked.
 
 = I want to register at the date of the Exif information. =
 * Media from FTP Settings -> Settings -> Date -> Get the date/time of the file, and updated based on it. Change it if necessary.Get by priority if there is date and time of the Exif information. 
-* Please put the check.
+* Please checked.
+
+= I want to register the Exif information in the caption of the media library. =
+* Media from FTP Settings -> Settings -> Exif Caption
+
+= In Exif Caption, I want to change the display order of the Exif. =
+* Please swapping the order of the Exif Tags. Please save your settings.
 
 = I would like to hide the files do not need to search & registration screen. =
 * Media from FTP Settings -> Settings -> Exclude file
@@ -83,9 +100,9 @@ Translators
 * Media from FTP Search & Register -> Number of items per page:
 * Enter a numeric value.
 * Media from FTP Settings -> Settings -> Schedule -> Apply Schedule
-* Please put the check.
+* Please checked.
 * Media from FTP Settings -> Settings -> Schedule -> Apply limit number of update files.
-* Please put the check.
+* Please checked.
 
 = I would like to apply a more finely schedule. =
 * Use the mediafromftpcmd.php, please register on the server cron.
@@ -112,6 +129,24 @@ Translators
 4. File registration result
 
 == Changelog ==
+
+= 9.01 =
+Change the display of the FAQ.
+Add FAQ.
+Change /languages.
+
+= 9.00 =
+Can register the Exif data to the caption.
+Change /languages.
+Change mediafromftpcmd.php.
+
+= 8.84 =
+Fixed problems of directories of including space.
+
+= 8.83 =
+Add FAQ.
+Change /languages.
+Remove the unnecessary code.
 
 = 8.82 =
 The reading of Javascript and css, on only display of this plugin.
@@ -429,6 +464,10 @@ Specifications to exclude files that contain spaces.
 
 == Upgrade Notice ==
 
+= 9.01 =
+= 9.00 =
+= 8.84 =
+= 8.83 =
 = 8.82 =
 = 8.81 =
 = 8.8 =

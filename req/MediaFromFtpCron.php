@@ -63,7 +63,7 @@ class MediaFromFtpCron {
 		$mediafromftp = new MediaFromFtp();
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:p:h");
+		$cmdoptions = getopt("s:d:e:t:x:p:c:h");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$yearmonth_folders = get_option('uploads_use_yearmonth_folders');
@@ -105,6 +105,15 @@ class MediaFromFtpCron {
 		} else {
 			$pagemax = $mediafromftp_settings['pagemax'];
 			$limit_number = $mediafromftp_settings['cron']['limit_number'];
+		}
+
+		$exif_text_tag = NULL;
+		if ( isset($cmdoptions['c']) ) {
+			$exif_text_tag = $cmdoptions['c'];
+		} else {
+			if ( $mediafromftp_settings['caption']['apply'] ) {
+				$exif_text_tag = $mediafromftp_settings['caption']['exif_text'];
+			}
 		}
 
 		$hide = FALSE;
@@ -176,6 +185,15 @@ class MediaFromFtpCron {
 						if ( wp_ext2type($ext) === 'image' ) {
 							foreach ( $imagethumburls as $thumbsize => $imagethumburl ) {
 								$output_text .= $thumbsize.': '.$imagethumburl."\n";
+							}
+							if ( !empty($exif_text_tag) ) {
+								$mime_type = $mediafromftp->mime_type($ext);
+								if ( $mime_type === 'image/jpeg' || $mime_type === 'image/tiff' ) {
+									$exif_text = $mediafromftp->exifcaption($attach_id, $metadata, $exif_text_tag);
+									if ( !empty($exif_text) ) {
+										$output_text .= __('Caption').'[Exif]: '.$exif_text."\n";
+									}
+								}
 							}
 						} else {
 							$output_text .= __('File type:').' '.$mimetype."\n";

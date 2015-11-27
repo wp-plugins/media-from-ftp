@@ -39,7 +39,7 @@ class MediaFromFtp {
 		}
 
 		// for mediafromftpcmd.php
-		$cmdoptions = getopt("s:d:e:t:x:p:h");
+		$cmdoptions = getopt("s:d:e:t:x:p:c:h");
 
 		$mediafromftp_settings = get_option('mediafromftp_settings');
 		$excludefile = '-[0-9]+x[0-9]+\.|media-from-ftp-tmp';	// thumbnail & tmp dir file
@@ -383,10 +383,19 @@ class MediaFromFtp {
 		if ( $dateset === 'server' || $dateset === 'exif' ) {
 			$postdategmt = get_gmt_from_date($new_url_datetime.':00');
 		}
-		if ( strpos($filename, ' ' ) ) {
+		if ( strpos( $filename ,'/' ) === FALSE ) {
+			$currentdir = '';
+			$currentfile = $filename;
+		} else {
+			$currentfiles = explode('/', $filename);
+			$currentfile = end($currentfiles);
+			$currentdir = str_replace($currentfile, '', $filename);
+		}
+		if ( strpos($currentfile, ' ' ) ) {
 			$oldfilename = $filename;
-			$filename = str_replace(' ', '-', $oldfilename);
-			$new_url_attach = str_replace(' ', '-', $new_url_attach);
+			$currentfile = str_replace(' ', '-', $currentfile);
+			$filename = $currentdir.$currentfile;
+			$new_url_attach = MEDIAFROMFTP_PLUGIN_UPLOAD_URL.'/'.$filename;
 			$copy_file_org1 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$oldfilename;
 			$copy_file_new1 = MEDIAFROMFTP_PLUGIN_UPLOAD_DIR.'/'.$filename;
 			$err_copy = @copy( $copy_file_org1, $copy_file_new1 );
@@ -680,6 +689,82 @@ class MediaFromFtp {
 
 		asort($extensions);
 		return $extensions;
+
+	}
+
+	/* ==================================================
+	 * @param	int		$attach_id
+	 * @param	array	$metadata
+	 * @param	string	$exif_text_tag
+	 * @return	string	$exif_text
+	 * @since	8.9
+	 */
+	function exifcaption($attach_id, $metadata, $exif_text_tag){
+
+		$exifdatas = array();
+		if ( $metadata['image_meta']['title'] ) {
+			$exifdatas['title'] = $metadata['image_meta']['title'];
+		}
+		if ( $metadata['image_meta']['credit'] ) {
+			$exifdatas['credit'] = $metadata['image_meta']['credit'];
+		}
+		if ( $metadata['image_meta']['camera'] ) {
+			$exifdatas['camera'] = $metadata['image_meta']['camera'];
+		}
+		if ( $metadata['image_meta']['caption'] ) {
+			$exifdatas['caption'] = $metadata['image_meta']['caption'];
+		}
+		$exif_ux_time = $metadata['image_meta']['created_timestamp'];
+		if ( !empty($exif_ux_time) ) {
+			$exifdatas['created_timestamp'] = date_i18n( "Y-m-d H:i:s", $exif_ux_time, FALSE );
+		}
+		if ( $metadata['image_meta']['copyright'] ) {
+			$exifdatas['copyright'] = $metadata['image_meta']['copyright'];
+		}
+		if ( $metadata['image_meta']['aperture'] ) {
+			$exifdatas['aperture'] = 'f/'.$metadata['image_meta']['aperture'];
+		}
+		if ( $metadata['image_meta']['shutter_speed'] ) {
+			if ( $metadata['image_meta']['shutter_speed'] < 1 ) {
+				$shutter = round( 1 / $metadata['image_meta']['shutter_speed'] );
+				$exifdatas['shutter_speed'] = '1/'.$shutter.'sec';
+			} else {
+				$exifdatas['shutter_speed'] = $metadata['image_meta']['shutter_speed'].'sec';
+			}
+		}
+		if ( $metadata['image_meta']['iso'] ) {
+			$exifdatas['iso'] = 'ISO-'.$metadata['image_meta']['iso'];
+		}
+		if ( $metadata['image_meta']['focal_length'] ) {
+			$exifdatas['focal_length'] = $metadata['image_meta']['focal_length'].'mm';
+		}
+
+		$exif_text = NULL;
+		if ( $exifdatas ) {
+			$exif_text = $exif_text_tag;
+			foreach($exifdatas as $item => $exif) {
+				$exif_text = str_replace('%'.$item.'%', $exif, $exif_text);
+			}
+			preg_match_all('/%(.*?)%/', $exif_text, $exif_text_per_match);
+			foreach($exif_text_per_match as $key1) {
+				foreach($key1 as $key2) {
+					$exif_text = str_replace('%'.$key2.'%', '', $exif_text);
+				}
+			}
+		}
+
+		if ( !empty($exif_text) ) {
+			// Change DB Attachement post
+			global $wpdb;
+			$update_array = array(
+							'post_excerpt'=> $exif_text
+						);
+			$id_array= array('ID'=> $attach_id);
+			$wpdb->update( $wpdb->posts, $update_array, $id_array, array('%s'), array('%d') );
+			unset($update_array, $id_array);
+		}
+
+		return $exif_text;
 
 	}
 

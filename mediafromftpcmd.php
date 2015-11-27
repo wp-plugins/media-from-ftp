@@ -37,7 +37,8 @@
  * 	  example -x jpg
  * -p Limit number of update files
  * 	  example -p 10
- *
+ * -c Exif tags for registering in the caption
+ *    example -c "%title% %credit% %camera% %caption% %created_timestamp% %copyright% %aperture% %shutter_speed% %iso% %focal_length%"
  * If the argument is empty, use the set value of the management screen.
  *
  * command line switch
